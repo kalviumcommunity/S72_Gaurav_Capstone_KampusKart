@@ -1,144 +1,75 @@
-# ULife – The Ultimate Campus Hub
+# 🧭 KampusKart – Your Toolkit for College
 
-## Overview
-ULife is an interactive web portal designed to revolutionize campus life at MIT ADT by providing a centralized platform where students, faculty, and visitors can seamlessly access essential campus services and information. The platform combines intuitive navigation, real-time updates, and user engagement tools to enhance the overall campus experience.
+KampusKart is a dynamic web portal designed to centralize all essential campus information for students, faculty, and visitors of MIT ADT University. From interactive maps and shuttle tracking to mess menus and lost & found, KampusKart is your all-in-one campus companion.
 
-## Purpose & Goals
-1. **Centralize Campus Information**  
-   Consolidate all critical information, including:  
-   - Campus maps with detailed building information  
-   - Shuttle schedules with expected timings  
-   - Mess and canteen menus with ratings and operating hours  
-   - Hostel and facility information with contact details  
+---
 
-2. **Enhance Campus Navigation**  
-   Provide an interactive campus map integrated with:  
-   - 3D shuttle model displaying expected shuttle timings  
-   - Clickable markers for key locations, showing additional details  
+## 🚀 Features
 
-3. **Improve Daily Life**  
-   Offer quick access to:  
-   - Mess and canteen menus  
-   - Hostel and facility details  
+### 🗺️ Interactive Campus Map
+- Locate hostels, messes, canteens, libraries, and other key facilities
+- View operating hours and facility details
+- Clickable markers and real-time data
 
-4. **Engage the Community**  
-   Include tools to promote interaction:  
-   - Feedback & Complaints System  
-   - Lost & Found Portal  
+### 🚌 3D Shuttle Model (Beta)
+- Animated shuttle overlay on the campus map
+- Preset routes with expected arrival times
+- Powered by Three.js and Google Maps API / Mapbox GL
 
-## Target Audience
-- **Students**: Need real-time information on shuttle timings, dining options, and campus facilities.  
-- **Faculty & Staff**: Require quick access to facility schedules and contact information for administrative support.  
-- **Visitors**: Explore campus layouts and view facility operating hours.  
+### 🍽️ Mess & Canteen System
+- Daily food menus and timings
+- Facility ratings and availability
 
-## Unique Value Proposition (UVP)
-ULife stands out by combining real-time campus navigation with interactive 3D visualization of shuttle routes, while integrating essential campus services such as mess menus, facility timings, feedback mechanisms, and lost & found services — all within a single intuitive platform.
+### 🏢 Hostel & Facility Information
+- Hostel rules, contact details, and amenities
+- Opening hours of libraries, labs, and other academic zones
 
-## Key Features
-1. **Interactive Campus Map**  
-   Displays campus buildings, hostels, messes, libraries, and key facilities with:  
-   - Clickable markers providing facility operating hours, contact details, and more.  
-   - Integration with Google Maps API/Mapbox GL JS for seamless navigation.  
+### 📢 Campus News & Events (New!)
+- Stay updated with the latest university happenings
+- Filter by department or interest
 
-2. **3D Shuttle Model with Expected Timings**  
-   Uses Three.js to render a 3D shuttle model that:  
-   - Animates shuttle along preset routes, displaying expected timings.  
+### 📬 Feedback & Complaints
+- Submit grievances and improvement suggestions
+- Admin dashboard for managing responses (WIP)
 
-3. **Mess & Canteen System**  
-   Displays:  
-   - Daily menus for mess and canteen facilities.  
-   - Ratings and reviews from students.  
-   - Operating hours for each facility.  
+### 🎒 Lost & Found Portal
+- Upload lost item details and search found listings
+- Contact finder anonymously
 
-4. **Hostel & Facility Information**  
-   Lists:  
-   - Room availability and contact information for hostels.  
-   - Operating hours for key campus facilities (e.g., libraries, labs).  
+### 🧠 Fun Daily Features (Coming Soon)
+- Word of the Day / Fun Fact of the Day
+- Quiz or mini-games to boost engagement
 
-5. **User Engagement Tools**  
-   - **Feedback & Complaints**: Form submission for raising concerns, with an admin panel to manage responses.  
-   - **Lost & Found Portal**: Allows users to report and search for lost items with file upload support.  
+---
 
-## Future Expansion (Optional)
-- **Cycle Rental System**: Allows students to locate and rent cycles on campus, providing details on availability and pricing.
-
-## Technical Stack
+## ⚙️ Tech Stack
 
 ### Frontend
-- **React.js**: Used to build the interactive, single-page application.
-- **Tailwind CSS**: Ensures a modern, responsive design with utility-first styling.
-- **React Router**: Manages client-side routing, allowing seamless transitions between pages without full-page reloads.
-- **Google Maps API / Mapbox GL JS**: Integrates an interactive map for campus navigation.
-- **Three.js**: Renders a 3D shuttle model overlayed on the campus map.
-- **React Context API**: Handles global state management.
+- **React.js** – SPA architecture
+- **Tailwind CSS** – Responsive and modern UI
+- **React Router** – Smooth page navigation
+- **Google Maps API / Mapbox GL JS** – Map integration
+- **Three.js** – 3D shuttle rendering
+- **React Context API** – State management
 
 ### Backend
-- **Node.js**: Powers the backend and handles all server-side logic.
-- **Express.js**: Builds RESTful API endpoints for CRUD operations.
-- **MongoDB**: Stores user data, shuttle schedule details, mess and facility information, feedback, and complaints.
-- **JWT (JSON Web Tokens)**: Provides secure user authentication.
-- **WebSockets (Socket.io)**: Enables real-time updates if required in future versions.
+- **Node.js** with **Express.js** – API and server logic
+- **MongoDB** (or Firebase) – Database and user data
+- **JWT** – Secure authentication
+- **Socket.io** – (Future) real-time updates
 
-### Deployment & Tooling
-- **Vercel / Netlify**: Hosts and deploys the frontend.
-- **Render / AWS**: Hosts the backend.
-- **Git & GitHub**: Manages version control and tracks development progress.
-- **Jest**: Provides testing for frontend components and backend API endpoints.
+### DevOps & Tools
+- **Vercel / Netlify** – Frontend deployment
+- **Render / AWS** – Backend deployment
+- **Git & GitHub** – Version control and issue tracking
+- **Jest** – Unit testing
 
-## Development Roadmap
-### Week 1: Foundations & Setup
-- Research & Planning: Learn about React.js, Node.js, Express.js, MongoDB, JWT, and Tailwind CSS.
-- Create wireframes and a GitHub repo with setup for issues, tasks, and milestones.
-- Low-Fidelity and High-Fidelity Design using Figma.
-- Set up frontend with React.js and Tailwind CSS.
+---
 
-### Week 2: Backend Development & APIs
-- Initialize backend with Node.js and Express.js.
-- Design database schema with MongoDB.
-- Build and test CRUD APIs.
-- Deploy backend on Render/AWS.
-- Implement JWT-based authentication and 3rd party login via Google OAuth.
-- Connect frontend to backend APIs.
+## 🛠️ Installation & Setup
 
-### Week 3: Feature Development & UI/UX Implementation
-- Integrate Google Maps API or Mapbox GL JS for interactive campus map.
-- Implement 3D shuttle model using Three.js.
-- Build mess and canteen system.
-- Develop the lost & found portal with file upload support.
-- Implement feedback and complaints system.
-
-### Week 4: Advanced Concepts, Testing & Deployment
-- Unit testing with Jest.
-- Docker support for the application.
-- Contribute to open-source projects.
-- Integrate AI-autocomplete functionality.
-- Gather active users and deploy the final version of ULife.
-
-## Font Analysis: Work Sans
-- **Legibility**: Optimized for both small body text and large display headers.
-- **Versatility**: Performs consistently across screen sizes and devices.
-- **Professional & Friendly**: Geometric structure provides a modern aesthetic with a welcoming feel.
-
-## Color Theme Analysis
-1. **#180161 (Deep Purple)** – Elegance & Sophistication  
-   - Usage: Backgrounds, headers, or call-to-action buttons.
-   
-2. **#4F1787 (Royal Purple)** – Creativity & Mystery  
-   - Usage: Highlighting key information and interactive elements.
-
-3. **#EB3678 (Hot Pink)** – Energy & Excitement  
-   - Usage: CTAs, interactive elements, and notifications.
-
-4. **#ECB629 (Goldenrod)** – Optimism & Warmth  
-   - Usage: Success messages, menu highlights, and positive feedback.
-
-5. **#FB773C (Coral Orange)** – Creativity & Urgency  
-   - Usage: Buttons, warnings, and notifications requiring immediate attention.
-
-## Impact & Benefits
-- **Enhanced Efficiency**: Centralizes campus-related information, saving time.
-- **Improved Communication**: Real-time feedback and reporting systems.
-- **Scalability**: Can be adapted for other campuses with minimal changes.
-- **Engagement**: Encourages regular use through a clean and engaging interface.
-
+### Prerequisites
+- Node.js and npm
+- MongoDB or Firebase
+- Git
 
