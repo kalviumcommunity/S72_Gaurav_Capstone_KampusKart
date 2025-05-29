@@ -9,6 +9,14 @@ export default {
       fontFamily: {
         sans: ["'Work Sans'", 'ui-sans-serif', 'system-ui'],
       },
+      fontSize: {
+        'h1': ['48px', { lineHeight: '1.2', fontWeight: '700' }],
+        'h2': ['36px', { lineHeight: '1.3', fontWeight: '700' }],
+        'h3': ['30px', { lineHeight: '1.4', fontWeight: '600' }],
+        'h4': ['24px', { lineHeight: '1.4', fontWeight: '600' }],
+        'h5': ['20px', { lineHeight: '1.5', fontWeight: '500' }],
+        'body': ['16px', { lineHeight: '1.5', fontWeight: '400' }],
+      },
       colors: {
         'deep-purple': {
           50: '#f3f0fa', 100: '#e0d6f5', 200: '#c1aeea', 300: '#a285df', 400: '#835dd4', 500: '#6434c9', 600: '#5029a1', 700: '#3c1f79', 800: '#281451', 900: '#140a28',
@@ -27,6 +35,18 @@ export default {
         },
         'ivory-cream': '#F5F5DA',
         'crimson-wine': '#7B021D',
+        orange: {
+          DEFAULT: '#F05A25',
+        },
+        blue: {
+          DEFAULT: '#3FA9F6',
+        },
+        cream: {
+          DEFAULT: '#EFE1CF',
+        },
+        black: {
+          DEFAULT: '#000000',
+        },
       },
     },
   },
