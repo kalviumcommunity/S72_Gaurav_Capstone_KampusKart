@@ -43,16 +43,16 @@ const Signup: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen w-screen h-screen flex font-sans bg-white">
+    <div className="min-h-screen w-screen h-screen flex font-sans bg-deep-purple-50">
       {/* Left: Signup Form */}
-      <div className="flex flex-col justify-center items-center w-full md:w-1/2 px-8 py-12 bg-white">
+      <div className="flex flex-col justify-center items-center w-full md:w-1/2 px-8 py-12 bg-white rounded-xl shadow-lg">
         <div className="w-full max-w-sm">
           <div className="flex items-center justify-center gap-3 mb-8">
             <img src="/Logo.png" alt="KampusKart Logo" className="h-14 w-14 rounded-lg" />
-            <span className="text-2xl font-extrabold text-gray-800 tracking-tight">KAMPUSKART</span>
+            <span className="text-2xl font-extrabold text-deep-purple-700 tracking-tight">KAMPUSKART</span>
           </div>
-          <h2 className="mb-2 text-3xl font-bold text-gray-700 text-center">Sign Up</h2>
-          <p className="text-center text-gray-500 mb-8">to KampusKart</p>
+          <h2 className="mb-2 text-3xl font-bold text-deep-purple-700 text-center">Sign Up</h2>
+          <p className="text-center text-deep-purple-400 mb-8">to KampusKart</p>
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
               <div className="rounded-md bg-hot-pink-100 p-4">
@@ -131,7 +131,7 @@ const Signup: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full flex justify-center py-3 px-4 rounded-full text-lg font-semibold text-white ${accentBtn} shadow-lg ${accentBtnHover} focus:outline-none focus:ring-2 focus:ring-offset-2 ${accentFocus} transition`}
+              className={`w-full flex justify-center py-3 px-4 rounded-full text-lg font-semibold text-white bg-deep-purple-500 shadow-lg hover:bg-deep-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-deep-purple-400 transition`}
               style={{ boxShadow: '0 4px 24px 0 rgba(123,2,29,0.10)' }}
             >
               {loading ? 'Creating account...' : 'Sign up'}
@@ -157,7 +157,7 @@ const Signup: React.FC = () => {
 
             <div className="text-center text-sm mt-6 text-gray-500">
               Already have an account?{' '}
-              <Link to="/login" className="text-deep-purple-600 font-semibold hover:underline">Login</Link>
+              <Link to="/login" className="text-hot-pink-600 font-semibold hover:underline">Login</Link>
             </div>
           </form>
         </div>

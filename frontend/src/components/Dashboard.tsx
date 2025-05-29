@@ -62,17 +62,17 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-deep-purple-50 to-hot-pink-50 font-sans">
+    <div className="min-h-screen flex flex-col bg-deep-purple-50 font-sans">
       <nav className="bg-white shadow-sm border-b border-deep-purple-100">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center justify-center gap-3 w-full">
               <img src="/Logo.png" alt="KampusKart Logo" className="w-10 h-10 rounded-lg" />
-              <span className="text-2xl font-extrabold text-gray-800 tracking-tight">KAMPUSKART</span>
+              <span className="text-2xl font-extrabold text-deep-purple-700 tracking-tight">KAMPUSKART</span>
             </div>
             <button
               onClick={handleLogout}
-              className={`ml-4 px-4 py-2 rounded-full text-sm font-semibold text-white ${accentBtn} ${accentBtnHover} focus:outline-none focus:ring-2 focus:ring-offset-2 ${accentFocus} transition`}
+              className={`ml-4 px-4 py-2 rounded-full text-sm font-semibold text-white bg-deep-purple-500 hover:bg-deep-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-deep-purple-400 transition`}
             >
               Logout
             </button>
@@ -154,7 +154,7 @@ const Dashboard: React.FC = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full flex justify-center py-3 px-4 rounded-full text-lg font-semibold text-white ${accentBtn} shadow-lg ${accentBtnHover} focus:outline-none focus:ring-2 focus:ring-offset-2 ${accentFocus} transition`}
+                className={`w-full flex justify-center py-3 px-4 rounded-full text-lg font-semibold text-white bg-deep-purple-500 shadow-lg hover:bg-deep-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-deep-purple-400 transition`}
                 style={{ boxShadow: '0 4px 24px 0 rgba(123,2,29,0.10)' }}
               >
                 {loading ? (
