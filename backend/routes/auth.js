@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const User = require('../models/User');
 const nodemailer = require('nodemailer');
+const crypto = require('crypto');
 
 // Create Nodemailer transporter
 const transporter = nodemailer.createTransport({
@@ -165,7 +166,7 @@ router.post('/reset-password', async (req, res) => {
     }
 
     // Secure OTP comparison to mitigate timing attacks
-    const isOtpValid = user.resetPasswordOTP === otp; // Simple comparison for now, can be enhanced with a timing-safe comparison library if needed
+    const isOtpValid = crypto.timingSafeEqual(Buffer.from(user.resetPasswordOTP), Buffer.from(otp));
     if (!isOtpValid) {
       return res.status(400).json({ message: 'Invalid or expired OTP' });
     }
