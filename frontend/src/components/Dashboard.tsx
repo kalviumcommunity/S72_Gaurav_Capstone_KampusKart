@@ -66,11 +66,9 @@ const Dashboard: React.FC = () => {
       <nav className="bg-white shadow-sm border-b border-deep-purple-100">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-deep-purple-500 to-hot-pink-500 flex items-center justify-center text-white font-bold text-lg">
-                {getInitials(user?.name || 'U')}
-              </div>
-              <span className="text-lg font-semibold text-deep-purple-700">KampusKart Dashboard</span>
+            <div className="flex items-center justify-center gap-3 w-full">
+              <img src="/Logo.png" alt="KampusKart Logo" className="w-10 h-10 rounded-lg" />
+              <span className="text-2xl font-extrabold text-gray-800 tracking-tight">KAMPUSKART</span>
             </div>
             <button
               onClick={handleLogout}

@@ -47,6 +47,10 @@ const Signup: React.FC = () => {
       {/* Left: Signup Form */}
       <div className="flex flex-col justify-center items-center w-full md:w-1/2 px-8 py-12 bg-white">
         <div className="w-full max-w-sm">
+          <div className="flex items-center justify-center gap-3 mb-8">
+            <img src="/Logo.png" alt="KampusKart Logo" className="h-14 w-14 rounded-lg" />
+            <span className="text-2xl font-extrabold text-gray-800 tracking-tight">KAMPUSKART</span>
+          </div>
           <h2 className="mb-2 text-3xl font-bold text-gray-700 text-center">Sign Up</h2>
           <p className="text-center text-gray-500 mb-8">to KampusKart</p>
           <form className="space-y-6" onSubmit={handleSubmit}>
