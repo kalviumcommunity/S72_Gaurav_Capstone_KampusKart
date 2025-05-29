@@ -12,12 +12,6 @@ const RightPanel: React.FC = () => (
   </div>
 );
 
-const accent = 'from-purple-500 to-pink-500';
-const accentText = 'text-purple-600';
-const accentBtn = 'bg-gradient-to-r from-purple-500 to-pink-500';
-const accentBtnHover = 'hover:from-pink-500 hover:to-purple-500';
-const accentFocus = 'focus:ring-purple-400';
-
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -43,20 +37,19 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen w-screen h-screen flex font-sans bg-deep-purple-50">
+    <div className="min-h-screen w-screen h-screen flex font-sans bg-white">
       {/* Left: Login Form */}
-      <div className="flex flex-col justify-center items-center w-full md:w-1/2 px-8 py-12 bg-white rounded-xl shadow-lg">
+      <div className="flex flex-col justify-center items-center w-full md:w-1/2 px-8 py-12 bg-white">
         <div className="w-full max-w-sm">
-          <div className="flex items-center justify-center gap-3 mb-8">
-            <img src="/Logo.png" alt="KampusKart Logo" className="h-14 w-14 rounded-lg" />
-            <span className="text-2xl font-extrabold text-deep-purple-700 tracking-tight">KAMPUSKART</span>
+          <div className="flex items-center justify-center gap-6 mb-8">
+            <img src="/Logo.png" alt="KampusKart Logo" className="h-12 w-12 object-contain" style={{ background: 'none', border: 'none', borderRadius: 0, boxShadow: 'none' }} />
+            <span className="text-h4 font-extrabold text-black tracking-tight font-sans">Kampuskart</span>
           </div>
-          <h2 className="mb-2 text-3xl font-bold text-deep-purple-700 text-center">Login</h2>
-          <p className="text-center text-deep-purple-400 mb-8">to KampusKart</p>
+          <h2 className="mb-6 text-h3 font-bold text-black text-center">Login</h2>
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
-              <div className="rounded-md bg-pink-100 p-4">
-                <div className="text-sm text-pink-700">{error}</div>
+              <div className="rounded-md bg-orange/10 p-4">
+                <div className="text-sm text-orange-700">{error}</div>
               </div>
             )}
             <div className="space-y-4">
@@ -70,7 +63,7 @@ const Login: React.FC = () => {
                   type="email"
                   autoComplete="email"
                   required
-                  className="block w-full pl-10 pr-3 py-3 border-b border-gray-300 focus:border-purple-500 focus:ring-0 text-gray-700 placeholder-gray-400 bg-transparent"
+                  className="block w-full pl-10 pr-3 py-3 border-b border-gray-300 focus:border-black focus:ring-0 text-black placeholder-gray-400 bg-transparent"
                   placeholder="user name/e-mail"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -86,7 +79,7 @@ const Login: React.FC = () => {
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
                   required
-                  className="block w-full pl-10 pr-10 py-3 border-b border-gray-300 focus:border-purple-500 focus:ring-0 text-gray-700 placeholder-gray-400 bg-transparent"
+                  className="block w-full pl-10 pr-10 py-3 border-b border-gray-300 focus:border-black focus:ring-0 text-black placeholder-gray-400 bg-transparent"
                   placeholder="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -94,7 +87,7 @@ const Login: React.FC = () => {
                 <button
                   type="button"
                   tabIndex={-1}
-                  className={`absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full bg-white ${accentText}`}
+                  className={`absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full bg-white text-black`}
                   onClick={() => setShowPassword((v) => !v)}
                   style={{ transition: 'color 0.2s' }}
                 >
@@ -107,11 +100,11 @@ const Login: React.FC = () => {
                     type="checkbox"
                     checked={remember}
                     onChange={e => setRemember(e.target.checked)}
-                    className="h-4 w-4 text-purple-500 focus:ring-purple-400 border-gray-300 rounded mr-2"
+                    className="h-4 w-4 text-black focus:ring-black border-gray-300 rounded mr-2"
                   />
                   Remember me
                 </label>
-                <Link to="/forgot-password" className="text-sm font-medium text-hot-pink-600 hover:text-hot-pink-500 transition bg-white px-3 py-1 rounded-lg">
+                <Link to="/forgot-password" className="text-sm font-medium text-black hover:text-[#F05A25] transition bg-white px-3 py-1 rounded-lg">
                   Forgot Password?
                 </Link>
               </div>
@@ -119,8 +112,8 @@ const Login: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full flex justify-center py-3 px-4 rounded-full text-lg font-semibold text-white bg-deep-purple-500 shadow-lg hover:bg-deep-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-deep-purple-400 transition`}
-              style={{ boxShadow: '0 4px 24px 0 rgba(123,2,29,0.10)' }}
+              className={`w-full flex justify-center py-3 px-4 rounded-full text-lg font-semibold text-black bg-white border border-[#E0E0E0] hover:bg-[#FFD166] hover:text-black transition`}
+              style={{ boxShadow: '0 4px 24px 0 rgba(0,0,0,0.10)' }}
             >
               {loading ? 'Logging in...' : 'Login'}
               <span className="ml-2">→</span>
@@ -138,7 +131,7 @@ const Login: React.FC = () => {
             <button
               type="button"
               onClick={loginWithGoogle}
-              className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-full text-lg font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-deep-purple-400 transition"
+              className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-full text-lg font-semibold text-black bg-white border border-[#E0E0E0] hover:bg-[#FFD166] hover:text-black transition"
             >
               <img src="/google-icon.svg" alt="Google" className="w-5 h-5" />
               Sign in with Google
@@ -146,7 +139,7 @@ const Login: React.FC = () => {
 
             <div className="text-center text-sm mt-6 text-gray-500">
               Don&apos;t have an account yet?{' '}
-              <Link to="/signup" className="text-hot-pink-600 font-semibold hover:underline">Sign up</Link>
+              <Link to="/signup" className="text-[#F05A25] font-semibold hover:underline">Sign up</Link>
             </div>
           </form>
         </div>
