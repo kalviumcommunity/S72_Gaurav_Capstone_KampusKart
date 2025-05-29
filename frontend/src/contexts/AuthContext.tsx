@@ -16,6 +16,8 @@ interface AuthContextType {
   token: string | null;
   login: (email: string, password: string, remember?: boolean) => Promise<void>;
   signup: (email: string, password: string, name: string, remember?: boolean) => Promise<void>;
+  loginWithGoogle: () => void;
+  handleGoogleCallback: (token: string) => void;
   logout: () => void;
   updateProfile: (data: Partial<User>) => Promise<void>;
 }
@@ -137,13 +139,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const loginWithGoogle = () => {
+    window.location.href = `${API_BASE}/api/auth/google`;
+  };
+
+  const handleGoogleCallback = async (token: string) => {
+    setToken(token);
+    try {
+      const response = await axios.get(`${API_BASE}/api/user/profile`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setUser(response.data.user);
+    } catch (error) {
+      setUser(null);
+      logout();
+    }
+  };
+
   // Only render children after token check is complete
   if (initializing) {
     return <div className="min-h-screen flex items-center justify-center text-lg font-semibold text-deep-purple-700">Loading...</div>;
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, login, signup, logout, updateProfile }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      token, 
+      login, 
+      signup, 
+      loginWithGoogle,
+      handleGoogleCallback,
+      logout, 
+      updateProfile 
+    }}>
       {children}
     </AuthContext.Provider>
   );
