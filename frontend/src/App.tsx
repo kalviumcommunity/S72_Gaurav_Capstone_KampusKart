@@ -7,6 +7,7 @@ import Dashboard from './components/Dashboard';
 import Header from './components/Header';
 import Landing from './components/Landing';
 import ForgotPassword from './components/ForgotPassword';
+import Home from './components/Home';
 
 // Protected Route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -30,7 +31,7 @@ const GoogleCallback: React.FC = () => {
     }
   }, [location, handleGoogleCallback]);
 
-  return <Navigate to="/dashboard" />;
+  return <Navigate to="/home" />;
 };
 
 const App: React.FC = () => {
@@ -43,6 +44,14 @@ const App: React.FC = () => {
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/auth/google/callback" element={<GoogleCallback />} />
+          <Route
+            path="/home"
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/dashboard"
             element={
