@@ -69,7 +69,92 @@ KampusKart is a dynamic web portal designed to centralize all essential campus i
 ## 🛠️ Installation & Setup
 
 ### Prerequisites
-- Node.js and npm
-- MongoDB or Firebase
+- Node.js (v16 or higher)
+- npm (v7 or higher)
+- MongoDB (v4.4 or higher)
 - Git
+
+### Frontend Setup
+1. Navigate to the frontend directory:
+   ```bash
+   cd frontend
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Create a `.env` file in the frontend directory with the following variables:
+   ```
+   VITE_API_URL=http://localhost:5000
+   VITE_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+   ```
+4. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+### Backend Setup
+1. Navigate to the backend directory:
+   ```bash
+   cd backend
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Create a `.env` file in the backend directory with the following variables:
+   ```
+   PORT=5000
+   MONGODB_URI=your_mongodb_connection_string
+   JWT_SECRET=your_jwt_secret
+   ```
+4. Start the server:
+   ```bash
+   npm start
+   ```
+
+## 🤝 Contributing
+
+We welcome contributions to KampusKart! Here's how you can help:
+
+1. Fork the repository
+2. Create a new branch for your feature:
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+3. Make your changes
+4. Commit your changes:
+   ```bash
+   git commit -m "Add your feature description"
+   ```
+5. Push to your fork:
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+6. Create a Pull Request
+
+### Code Style
+- Follow the existing code style
+- Use meaningful variable and function names
+- Add comments for complex logic
+- Write tests for new features
+- Update documentation as needed
+
+### Pull Request Process
+1. Update the README.md with details of changes if needed
+2. Update the documentation if needed
+3. The PR will be merged once you have the sign-off of at least one other developer
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👥 Authors
+
+- Your Name - Initial work
+
+## 🙏 Acknowledgments
+
+- MIT ADT University for their support
+- All contributors who have helped shape this project
 
