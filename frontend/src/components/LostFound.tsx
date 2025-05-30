@@ -475,7 +475,8 @@ const LostFound = () => {
                           <FiEdit2 className="mr-1" /> Edit
                         </button>
                         <button
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation(); // Stop event from bubbling up to parent
                             const deleteItem = async () => {
                               try {
                                 const response = await fetch(`${API_BASE}/api/lostfound/${item._id}`, {
