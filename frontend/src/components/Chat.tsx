@@ -84,7 +84,7 @@ const Chat: React.FC = () => {
       socket.on('reconnect', (attemptNumber) => {
         console.log('Socket reconnected after', attemptNumber, 'attempts');
         setSocketConnected(true);
-        socket.emit('setup', user);
+      socket.emit('setup', user);
       });
 
       socket.on('message received', (newMessageReceived: Message) => {
@@ -93,11 +93,11 @@ const Chat: React.FC = () => {
         } else {
           fetchConversations();
         }
-        setConversations(prevConversations => {
+         setConversations(prevConversations => {
           const updatedConversations = prevConversations.map(conv =>
             conv._id === newMessageReceived.conversation ? { ...conv, latestMessage: newMessageReceived, updatedAt: newMessageReceived.createdAt } : conv
           );
-          updatedConversations.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+           updatedConversations.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
           if (!updatedConversations.find(conv => conv._id === newMessageReceived.conversation)) {
             fetchConversations();
             return prevConversations;
@@ -184,9 +184,9 @@ const Chat: React.FC = () => {
         setMessages(data);
 
         if (user?._id) {
-          setConversations(prevConversations => prevConversations.map(conv =>
+        setConversations(prevConversations => prevConversations.map(conv =>
             conv._id === selectedConversation._id ? { ...conv, readBy: [...(conv.readBy || []), user._id].filter((id, index, self) => self.indexOf(id) === index) } : conv
-          ));
+        ));
         }
 
       } catch (error) {
@@ -246,9 +246,9 @@ const Chat: React.FC = () => {
       setSearchText('');
 
       if (user?._id) {
-        setConversations(prevConversations => prevConversations.map(conv =>
+      setConversations(prevConversations => prevConversations.map(conv =>
             conv._id === conversation._id ? { ...conv, readBy: [...(conv.readBy || []), user._id].filter((id, index, self) => self.indexOf(id) === index) } : conv
-        ));
+      ));
       }
 
       fetchConversations();
@@ -272,15 +272,15 @@ const Chat: React.FC = () => {
       setTyping(false);
     }
 
-    const tempMessage: Message = {
-      _id: Date.now().toString(),
-      sender: user!,
-      text: messageContent,
-      createdAt: new Date().toISOString(),
-      conversation: selectedConversation._id,
+      const tempMessage: Message = {
+        _id: Date.now().toString(),
+        sender: user!,
+        text: messageContent,
+        createdAt: new Date().toISOString(),
+        conversation: selectedConversation._id,
       status: 'sending'
-    };
-    setMessages([...messages, tempMessage]);
+      };
+      setMessages([...messages, tempMessage]);
 
     try {
       const response = await fetch(`${API_BASE}/api/chat/${selectedConversation._id}/messages`, {
@@ -307,7 +307,7 @@ const Chat: React.FC = () => {
         const updatedConversations = prevConversations.map(conv =>
           conv._id === selectedConversation._id ? { ...conv, latestMessage: sentMessage, updatedAt: sentMessage.createdAt } : conv
         );
-        updatedConversations.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+         updatedConversations.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
         return updatedConversations;
       });
 

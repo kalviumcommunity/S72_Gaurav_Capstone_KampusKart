@@ -12,6 +12,8 @@ import LostFound from './components/LostFound';
 import Profile from './components/Profile';
 import Chat from './components/Chat';
 import Complaints from './components/Complaints';
+import CampusMap from './components/CampusMap';
+import AuthenticatedLayout from './components/AuthenticatedLayout';
 
 // Protected Route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -52,7 +54,9 @@ const App: React.FC = () => {
             path="/home"
             element={
               <ProtectedRoute>
-                <Home />
+                <AuthenticatedLayout>
+                  <Home />
+                </AuthenticatedLayout>
               </ProtectedRoute>
             }
           />
@@ -60,7 +64,9 @@ const App: React.FC = () => {
             path="/lostfound"
             element={
               <ProtectedRoute>
-                <LostFound />
+                <AuthenticatedLayout>
+                  <LostFound />
+                </AuthenticatedLayout>
               </ProtectedRoute>
             }
           />
@@ -68,7 +74,9 @@ const App: React.FC = () => {
             path="/chat"
             element={
               <ProtectedRoute>
-                <Chat />
+                <AuthenticatedLayout>
+                  <Chat />
+                </AuthenticatedLayout>
               </ProtectedRoute>
             }
           />
@@ -76,7 +84,19 @@ const App: React.FC = () => {
             path="/complaints"
             element={
               <ProtectedRoute>
-                <Complaints />
+                <AuthenticatedLayout>
+                  <Complaints />
+                </AuthenticatedLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/campus-map"
+            element={
+              <ProtectedRoute>
+                <AuthenticatedLayout>
+                  <CampusMap />
+                </AuthenticatedLayout>
               </ProtectedRoute>
             }
           />
@@ -84,7 +104,9 @@ const App: React.FC = () => {
             path="/dashboard"
             element={
               <ProtectedRoute>
-                <Dashboard />
+                <AuthenticatedLayout>
+                  <Dashboard />
+                </AuthenticatedLayout>
               </ProtectedRoute>
             }
           />
@@ -92,7 +114,9 @@ const App: React.FC = () => {
             path="/profile"
             element={
               <ProtectedRoute>
-                <Profile />
+                <AuthenticatedLayout>
+                  <Profile />
+                </AuthenticatedLayout>
               </ProtectedRoute>
             }
           />

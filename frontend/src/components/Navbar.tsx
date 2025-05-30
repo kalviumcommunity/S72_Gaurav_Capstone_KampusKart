@@ -17,6 +17,7 @@ const Navbar: React.FC = () => {
               <Link to="/lostfound" className="px-5 py-2 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base">Lost and Found</Link>
               <Link to="/complaints" className="px-5 py-2 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base">Complaints</Link>
               <Link to="/chat" className="px-5 py-2 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base">Chat</Link>
+              <Link to="/campus-map" className="px-5 py-2 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base">Campus Map</Link>
             </>
           )}
         </div>

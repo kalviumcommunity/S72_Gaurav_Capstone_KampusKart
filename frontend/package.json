@@ -10,7 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@googlemaps/js-api-loader": "^1.16.8",
     "@headlessui/react": "^2.2.4",
+    "@react-google-maps/api": "^2.20.6",
+    "@types/google.maps": "^3.58.1",
     "date-fns": "^4.1.0",
     "express-rate-limit": "^7.5.0",
     "lodash": "^4.17.21",
