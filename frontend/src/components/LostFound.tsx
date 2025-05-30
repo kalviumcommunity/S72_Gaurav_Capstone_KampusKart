@@ -466,7 +466,7 @@ const LostFound = () => {
                 </div>
 
                 {/* Action Buttons */}
-                {user && item.user && item.user._id === user.id && (
+                {user && item.user && item.user._id === user._id && (
                   <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-100">
                     {!item.resolved && (
                       <>

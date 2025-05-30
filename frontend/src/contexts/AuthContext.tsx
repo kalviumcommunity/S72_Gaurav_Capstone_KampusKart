@@ -4,6 +4,7 @@ import axios from 'axios';
 const API_BASE = 'http://localhost:5000';
 
 interface User {
+  _id: string;
   id: string;
   email: string;
   name: string;
