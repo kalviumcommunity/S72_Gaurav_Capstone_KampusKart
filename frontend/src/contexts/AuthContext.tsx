@@ -8,7 +8,12 @@ interface User {
   email: string;
   name: string;
   phone?: string;
-  address?: string;
+  major?: string;
+  yearOfStudy?: string;
+  profilePicture?: { url: string; public_id: string };
+  gender?: string;
+  dateOfBirth?: string;
+  program?: string;
 }
 
 interface AuthContextType {
@@ -20,6 +25,7 @@ interface AuthContextType {
   handleGoogleCallback: (token: string) => void;
   logout: () => void;
   updateProfile: (data: Partial<User>) => Promise<void>;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -50,8 +56,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // If no valid token from localStorage, check sessionStorage
     if (!persistedToken) {
       console.log('AuthContext: No persisted token from localStorage, checking sessionStorage');
-      const sessionToken = sessionStorage.getItem('token');
-      if (sessionToken) {
+    const sessionToken = sessionStorage.getItem('token');
+    if (sessionToken) {
         console.log('AuthContext: Found token in sessionStorage');
         persistedToken = sessionToken;
       }
@@ -75,14 +81,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const fetchProfile = async () => {
     console.log('AuthContext: Attempting to fetch profile with token', token ? 'present' : 'null');
     try {
-      const response = await axios.get(`${API_BASE}/api/user/profile`, {
+      const response = await axios.get(`${API_BASE}/api/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setUser(response.data.user);
+      setUser(response.data);
+      console.log('AuthContext: Profile fetched successfully', response.data);
     } catch (error) {
       console.error('AuthContext: Error fetching profile:', error);
       setUser(null);
-      logout();
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+         logout();
+      }
     }
   };
 
@@ -98,9 +107,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(user);
       // Always save token to localStorage with expiry for persistent login
       const expiry = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
-      localStorage.setItem('token', token);
-      localStorage.setItem('token_expiry', expiry.toString());
-      sessionStorage.removeItem('token');
+        localStorage.setItem('token', token);
+        localStorage.setItem('token_expiry', expiry.toString());
+        sessionStorage.removeItem('token');
       console.log('AuthContext: Saved token to localStorage (Remember Me)');
     } catch (error) {
       throw error;
@@ -119,9 +128,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(user);
       // Always save token to localStorage with expiry for persistent login
       const expiry = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
-      localStorage.setItem('token', token);
-      localStorage.setItem('token_expiry', expiry.toString());
-      sessionStorage.removeItem('token');
+        localStorage.setItem('token', token);
+        localStorage.setItem('token_expiry', expiry.toString());
+        sessionStorage.removeItem('token');
       console.log('AuthContext: Saved token to localStorage (Remember Me)');
     } catch (error) {
       throw error;
@@ -141,12 +150,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateProfile = async (data: Partial<User>) => {
     try {
-      const response = await axios.put(`${API_BASE}/api/user/profile`, data, {
-        headers: { Authorization: `Bearer ${token}` }
+      const formData = new FormData();
+      for (const key in data) {
+          if (data[key as keyof Partial<User>] !== undefined) {
+              if (key === 'dateOfBirth') {
+                   formData.append(key, data[key] === null ? '' : data[key] as string);
+              } else if (key === 'profilePicture' && data[key]) {
+                   formData.append(key, data[key] as Blob);
+              } 
+              else {
+                formData.append(key, String(data[key]));
+              }
+          }
+      }
+
+      const response = await axios.put(`${API_BASE}/api/profile`, formData, {
+        headers: { 
+            Authorization: `Bearer ${token}`,
+        }
       });
-      setUser(response.data.user);
-      console.log('AuthContext: Profile updated successfully', response.data.user);
+      setUser(response.data);
+      console.log('AuthContext: Profile updated successfully', response.data);
     } catch (error) {
+      console.error('AuthContext: Error updating profile:', error);
       throw error;
     }
   };
@@ -159,19 +185,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const handleGoogleCallback = async (token: string) => {
     setToken(token);
     try {
-      const response = await axios.get(`${API_BASE}/api/user/profile`, {
+      const response = await axios.get(`${API_BASE}/api/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setUser(response.data.user);
+      setUser(response.data);
       // Always save token to localStorage with expiry for persistent login
       const expiry = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
       localStorage.setItem('token', token);
       localStorage.setItem('token_expiry', expiry.toString());
       sessionStorage.removeItem('token');
       console.log('AuthContext: Saved token to localStorage (Remember Me)');
+      return response.data;
     } catch (error) {
+      console.error('AuthContext: Error handling Google callback profile fetch:', error);
       setUser(null);
       logout();
+      throw error;
     }
   };
 
@@ -189,7 +218,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       loginWithGoogle,
       handleGoogleCallback,
       logout, 
-      updateProfile 
+      updateProfile,
+      loading: initializing
     }}>
       {children}
     </AuthContext.Provider>

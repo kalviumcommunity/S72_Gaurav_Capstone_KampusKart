@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface SkeletonLoaderProps {
-  variant?: 'lostfound' | 'login' | 'signup' | 'home';
+  variant?: 'lostfound' | 'login' | 'signup' | 'home' | 'profile';
 }
 
 const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({ variant = 'lostfound' }) => {
@@ -86,6 +86,74 @@ const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({ variant = 'lostfound' }
     </div>
   );
 
+  const ProfileSkeleton = () => (
+    <div className="min-h-screen flex flex-col bg-white font-sans">
+      <div className="fixed top-0 left-0 w-full z-50 bg-gray-200 h-16 animate-pulse"></div> {/* Navbar Placeholder */}
+      <main className="flex-1 container mx-auto px-12 py-8 pt-24">
+        <div className="h-8 bg-gray-200 rounded w-48 mb-6 animate-pulse mx-auto"></div> {/* Title Placeholder */}
+
+        <div className="bg-white rounded-lg shadow-md p-6 sm:p-8 max-w-md mx-auto">
+          {/* Profile Picture Section */}
+           <div className="flex flex-col items-center mb-6">
+               <div className="relative w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border border-gray-300 shadow-inner animate-pulse">
+                   {/* Placeholder icon */}
+                   <div className="w-16 h-16 bg-gray-300 rounded-full"></div>
+               </div>
+            </div>
+
+          <div className="space-y-6">
+            {/* Name Field */}
+            <div>
+              <div className="h-4 bg-gray-200 rounded w-24 mb-1 animate-pulse"></div> {/* Label */}
+              <div className="h-10 bg-gray-200 rounded-md animate-pulse"></div> {/* Input */}
+            </div>
+            {/* Email Field */}
+            <div>
+              <div className="h-4 bg-gray-200 rounded w-24 mb-1 animate-pulse"></div> {/* Label */}
+              <div className="h-10 bg-gray-200 rounded-md animate-pulse"></div> {/* Input */}
+            </div>
+             {/* Phone Field */}
+            <div>
+              <div className="h-4 bg-gray-200 rounded w-24 mb-1 animate-pulse"></div> {/* Label */}
+              <div className="h-10 bg-gray-200 rounded-md animate-pulse"></div> {/* Input */}
+            </div>
+            {/* Gender Field */}
+             <div>
+              <div className="h-4 bg-gray-200 rounded w-24 mb-1 animate-pulse"></div> {/* Label */}
+              <div className="h-10 bg-gray-200 rounded-md animate-pulse"></div> {/* Input */}
+            </div>
+             {/* Date of Birth Field */}
+             <div>
+              <div className="h-4 bg-gray-200 rounded w-24 mb-1 animate-pulse"></div> {/* Label */}
+              <div className="h-10 bg-gray-200 rounded-md animate-pulse"></div> {/* Input */}
+            </div>
+             {/* Major Field */}
+            <div>
+              <div className="h-4 bg-gray-200 rounded w-24 mb-1 animate-pulse"></div> {/* Label */}
+              <div className="h-10 bg-gray-200 rounded-md animate-pulse"></div> {/* Input */}
+            </div>
+             {/* Program Field */}
+             <div>
+              <div className="h-4 bg-gray-200 rounded w-24 mb-1 animate-pulse"></div> {/* Label */}
+              <div className="h-10 bg-gray-200 rounded-md animate-pulse"></div> {/* Input */}
+            </div>
+             {/* Year Interval Field */}
+            <div>
+              <div className="h-4 bg-gray-200 rounded w-24 mb-1 animate-pulse"></div> {/* Label */}
+              <div className="h-10 bg-gray-200 rounded-md animate-pulse"></div> {/* Input */}
+            </div>
+
+            {/* Buttons */}
+            <div className="flex justify-end space-x-4 pt-4 border-t border-gray-200">
+               <div className="h-10 bg-gray-200 rounded-full w-24 animate-pulse"></div> {/* Cancel/Edit Button */}
+               <div className="h-10 bg-gray-200 rounded-full w-32 animate-pulse"></div> {/* Save Button */}
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+
   switch (variant) {
     case 'lostfound':
       return <LostFoundSkeleton />;
@@ -94,6 +162,8 @@ const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({ variant = 'lostfound' }
       return <AuthSkeleton />;
     case 'home':
       return <HomeSkeleton />;
+    case 'profile':
+      return <ProfileSkeleton />;
     default:
       return <LostFoundSkeleton />;
   }

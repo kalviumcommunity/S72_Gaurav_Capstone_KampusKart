@@ -35,12 +35,15 @@ const Navbar: React.FC = () => {
           </>
         )}
         {user && (
-          <button
-            onClick={logout}
-            className="px-5 py-2 rounded-full font-bold text-white bg-[#181818] hover:bg-[#00C6A7] hover:text-white transition-colors duration-200 text-base"
-          >
-            Logout
-          </button>
+          <>
+            <Link to="/profile" className="px-5 py-2 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base">Profile</Link>
+            <button
+              onClick={logout}
+              className="px-5 py-2 rounded-full font-bold text-white bg-[#181818] hover:bg-[#00C6A7] hover:text-white transition-colors duration-200 text-base"
+            >
+              Logout
+            </button>
+          </>
         )}
       </div>
     </nav>

@@ -9,6 +9,7 @@ import Landing from './components/Landing';
 import ForgotPassword from './components/ForgotPassword';
 import Home from './components/Home';
 import LostFound from './components/LostFound';
+import Profile from './components/Profile';
 
 // Protected Route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -66,6 +67,14 @@ const App: React.FC = () => {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
               </ProtectedRoute>
             }
           />

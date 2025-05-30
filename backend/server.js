@@ -8,6 +8,7 @@ const passport = require('./config/passport');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const lostfoundRoutes = require('./routes/lostfound');
+const profileRoutes = require('./routes/profile');
 const startDeletionCronJob = require('./cron/deleteItems');
 
 const app = express();
@@ -21,6 +22,7 @@ app.use(passport.initialize());
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/lostfound', lostfoundRoutes);
+app.use('/api/profile', profileRoutes);
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI)
