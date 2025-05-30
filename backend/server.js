@@ -10,6 +10,7 @@ const userRoutes = require('./routes/user');
 const lostfoundRoutes = require('./routes/lostfound');
 const profileRoutes = require('./routes/profile');
 const chatRoutes = require('./routes/chat');
+const complaintsRoutes = require('./routes/complaints');
 const startDeletionCronJob = require('./cron/deleteItems');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -27,6 +28,7 @@ app.use('/api/user', userRoutes);
 app.use('/api/lostfound', lostfoundRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/complaints', complaintsRoutes);
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI)
