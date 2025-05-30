@@ -4,13 +4,17 @@ import { useAuth } from '../contexts/AuthContext';
 
 const Navbar: React.FC = () => {
   const location = useLocation();
-  const { token } = useAuth();
+  const { user, logout } = useAuth();
+
   return (
     <nav className="fixed top-0 left-0 w-full z-50 bg-white shadow-sm flex items-center justify-between px-8 py-4">
       {/* Left-aligned content */}
       <div className="flex items-center">
-        {token && (
-          <Link to="/home" className="px-5 py-2 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base">Home</Link>
+        {user && (
+          <>
+            <Link to="/home" className="px-5 py-2 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base">Home</Link>
+            <Link to="/lostfound" className="px-5 py-2 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base">Lost and Found</Link>
+          </>
         )}
       </div>
       {/* Centered branding */}
@@ -20,7 +24,7 @@ const Navbar: React.FC = () => {
       </div>
       {/* Right-aligned buttons */}
       <div className="flex gap-2">
-        {!token && (
+        {!user && (
           <>
             {location.pathname !== '/login' && (
               <Link to="/login" className="px-5 py-2 rounded-full font-bold text-black bg-white border border-[#E0E0E0] hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base">Login</Link>
@@ -29,6 +33,14 @@ const Navbar: React.FC = () => {
               <Link to="/signup" className="px-5 py-2 rounded-full font-bold text-white bg-[#181818] hover:bg-[#00C6A7] hover:text-white transition-colors duration-200 text-base">Sign up</Link>
             )}
           </>
+        )}
+        {user && (
+          <button
+            onClick={logout}
+            className="px-5 py-2 rounded-full font-bold text-white bg-[#181818] hover:bg-[#00C6A7] hover:text-white transition-colors duration-200 text-base"
+          >
+            Logout
+          </button>
         )}
       </div>
     </nav>

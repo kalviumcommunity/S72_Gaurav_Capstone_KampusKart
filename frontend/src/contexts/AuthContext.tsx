@@ -31,25 +31,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // On mount, check both storages for a valid token
   useEffect(() => {
+    console.log('AuthContext: Running initial token check effect');
     const now = Date.now();
     const localToken = localStorage.getItem('token');
     const expiry = localStorage.getItem('token_expiry');
+    let persistedToken = null;
+
     if (localToken && expiry && now < Number(expiry)) {
-      setToken(localToken);
-      setInitializing(false);
-      return;
+      console.log('AuthContext: Found valid token in localStorage');
+      persistedToken = localToken;
     } else {
+      console.log('AuthContext: No valid token in localStorage, clearing...');
+      // Clear potentially expired or invalid token from localStorage
       localStorage.removeItem('token');
       localStorage.removeItem('token_expiry');
     }
-    const sessionToken = sessionStorage.getItem('token');
-    if (sessionToken) {
-      setToken(sessionToken);
+
+    // If no valid token from localStorage, check sessionStorage
+    if (!persistedToken) {
+      console.log('AuthContext: No persisted token from localStorage, checking sessionStorage');
+      const sessionToken = sessionStorage.getItem('token');
+      if (sessionToken) {
+        console.log('AuthContext: Found token in sessionStorage');
+        persistedToken = sessionToken;
+      }
     }
+
+    setToken(persistedToken);
+    console.log('AuthContext: Set token state to', persistedToken ? 'present' : 'null');
     setInitializing(false);
+    console.log('AuthContext: Finished initial token check effect');
   }, []);
 
   useEffect(() => {
+    console.log('AuthContext: Token state changed effect. Current token:', token ? 'present' : 'null');
     if (token) {
       fetchProfile();
     } else {
@@ -58,12 +73,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [token]);
 
   const fetchProfile = async () => {
+    console.log('AuthContext: Attempting to fetch profile with token', token ? 'present' : 'null');
     try {
       const response = await axios.get(`${API_BASE}/api/user/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUser(response.data.user);
     } catch (error) {
+      console.error('AuthContext: Error fetching profile:', error);
       setUser(null);
       logout();
     }
@@ -79,16 +96,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { token, user } = response.data;
       setToken(token);
       setUser(user);
-      if (remember) {
-        const expiry = Date.now() + 30 * 24 * 60 * 60 * 1000;
-        localStorage.setItem('token', token);
-        localStorage.setItem('token_expiry', expiry.toString());
-        sessionStorage.removeItem('token');
-      } else {
-        sessionStorage.setItem('token', token);
-        localStorage.removeItem('token');
-        localStorage.removeItem('token_expiry');
-      }
+      // Always save token to localStorage with expiry for persistent login
+      const expiry = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
+      localStorage.setItem('token', token);
+      localStorage.setItem('token_expiry', expiry.toString());
+      sessionStorage.removeItem('token');
+      console.log('AuthContext: Saved token to localStorage (Remember Me)');
     } catch (error) {
       throw error;
     }
@@ -104,16 +117,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { token, user } = response.data;
       setToken(token);
       setUser(user);
-      if (remember) {
-        const expiry = Date.now() + 30 * 24 * 60 * 60 * 1000;
-        localStorage.setItem('token', token);
-        localStorage.setItem('token_expiry', expiry.toString());
-        sessionStorage.removeItem('token');
-      } else {
-        sessionStorage.setItem('token', token);
-        localStorage.removeItem('token');
-        localStorage.removeItem('token_expiry');
-      }
+      // Always save token to localStorage with expiry for persistent login
+      const expiry = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
+      localStorage.setItem('token', token);
+      localStorage.setItem('token_expiry', expiry.toString());
+      sessionStorage.removeItem('token');
+      console.log('AuthContext: Saved token to localStorage (Remember Me)');
     } catch (error) {
       throw error;
     }
@@ -121,11 +130,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Remove token from both storages on logout
   const logout = () => {
+    console.log('AuthContext: Logging out, clearing storage and state');
     localStorage.removeItem('token');
     localStorage.removeItem('token_expiry');
     sessionStorage.removeItem('token');
     setToken(null);
     setUser(null);
+    console.log('AuthContext: Logout complete');
   };
 
   const updateProfile = async (data: Partial<User>) => {
@@ -134,12 +145,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         headers: { Authorization: `Bearer ${token}` }
       });
       setUser(response.data.user);
+      console.log('AuthContext: Profile updated successfully', response.data.user);
     } catch (error) {
       throw error;
     }
   };
 
   const loginWithGoogle = () => {
+    console.log('AuthContext: Initiating Google login');
     window.location.href = `${API_BASE}/api/auth/google`;
   };
 
@@ -150,6 +163,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         headers: { Authorization: `Bearer ${token}` }
       });
       setUser(response.data.user);
+      // Always save token to localStorage with expiry for persistent login
+      const expiry = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
+      localStorage.setItem('token', token);
+      localStorage.setItem('token_expiry', expiry.toString());
+      sessionStorage.removeItem('token');
+      console.log('AuthContext: Saved token to localStorage (Remember Me)');
     } catch (error) {
       setUser(null);
       logout();
