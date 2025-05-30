@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { EyeIcon, EyeSlashIcon, EnvelopeIcon, LockClosedIcon } from '@heroicons/react/24/outline';
+import SkeletonLoader from './SkeletonLoader';
 
 // Use an image from the public folder
 const imageUrl = '/login-side.jpg'; // Place your image in the public folder as login-side.jpg
@@ -35,6 +36,14 @@ const Login: React.FC = () => {
       setLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white font-sans px-4">
+        <SkeletonLoader variant="login" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen w-screen h-screen flex font-sans bg-white">

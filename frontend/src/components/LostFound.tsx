@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Navbar from './Navbar';
 import { useAuth } from '../contexts/AuthContext';
 import { FiSearch, FiX, FiClock, FiMapPin, FiUser, FiCalendar, FiMessageSquare, FiEdit2, FiTrash2, FiCheckCircle } from 'react-icons/fi';
+import SkeletonLoader from './SkeletonLoader';
 
 // Define API_BASE locally for now to avoid process.env issue
 const API_BASE = 'http://localhost:5000';
@@ -22,7 +23,7 @@ interface LostFoundItem {
   resolved: boolean;
   contact?: string;
   createdAt: string;
-  displayText?: string; // Add this for suggestions
+  displayText?: string;
   formattedDate?: string;
   timeAgo?: string;
   userName?: string;
@@ -250,7 +251,25 @@ const LostFound = () => {
   };
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-white font-sans"><p>Loading...</p></div>;
+    return (
+      <div className="min-h-screen flex flex-col bg-white font-sans">
+        <Navbar />
+        <main className="flex-1 container mx-auto px-12 py-8 pt-24">
+          <h1 className="text-h2 font-extrabold text-black mb-6">Lost and Found</h1>
+          <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
+            <div className="h-10 bg-gray-200 rounded-full w-32 animate-pulse mb-4 sm:mb-0"></div>
+            <div className="w-full sm:w-1/3">
+              <div className="h-10 bg-gray-200 rounded-md animate-pulse"></div>
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-6">
+            <div className="h-10 bg-gray-200 rounded-md w-32 animate-pulse"></div>
+            <div className="h-10 bg-gray-200 rounded-md w-32 animate-pulse"></div>
+          </div>
+          <SkeletonLoader variant="lostfound" />
+        </main>
+      </div>
+    );
   }
 
   if (error) {
@@ -382,7 +401,7 @@ const LostFound = () => {
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                   />
                   {item.resolved && (
-                    <div className="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-semibold flex items-center">
+                    <div className="absolute top-2 right-2 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center">
                       <FiCheckCircle className="mr-1" /> Resolved
                     </div>
                   )}
@@ -390,6 +409,11 @@ const LostFound = () => {
               ) : (
                 <div className="h-48 bg-gray-100 flex items-center justify-center">
                   <span className="text-gray-400">No image available</span>
+                  {item.resolved && (
+                    <div className="absolute top-2 right-2 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center">
+                      <FiCheckCircle className="mr-1" /> Resolved
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -397,13 +421,20 @@ const LostFound = () => {
               <div className="p-4">
                 <div className="flex items-center justify-between mb-2">
                   <h2 className="text-lg font-bold text-gray-900 truncate">{item.title}</h2>
-                  <span className={`text-xs px-2 py-1 rounded-full ${
-                    item.type === 'lost' 
-                      ? 'bg-red-100 text-red-800' 
-                      : 'bg-green-100 text-green-800'
-                  }`}>
-                    {item.type}
-                  </span>
+                  <div className="flex items-center space-x-2">
+                    <span className={`text-xs px-2 py-1 rounded-full ${
+                      item.type === 'lost' 
+                        ? 'bg-red-100 text-red-800' 
+                        : 'bg-green-100 text-green-800'
+                    }`}>
+                      {item.type}
+                    </span>
+                    {item.resolved && (
+                      <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-800 flex items-center">
+                        <FiCheckCircle className="mr-1" /> Resolved
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 <p className="text-gray-600 text-sm mb-4 line-clamp-2">{item.description}</p>
@@ -440,7 +471,8 @@ const LostFound = () => {
                     {!item.resolved && (
                       <>
                         <button
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation(); // Stop event from bubbling up to parent
                             const markAsResolved = async () => {
                               try {
                                 const response = await fetch(`${API_BASE}/api/lostfound/${item._id}/resolve`, {
@@ -455,8 +487,10 @@ const LostFound = () => {
                                   const errorMessage = data.message || `Error marking item as resolved: ${response.statusText}`;
                                   throw new Error(errorMessage);
                                 }
-                                setItems(items.map(i => i._id === item._id ? {...i, resolved: true} : i));
-                                // Optionally show a success message here
+                                // Update the items state with the resolved item
+                                setItems(items.map(i => i._id === item._id ? {...i, resolved: true, resolvedAt: new Date().toISOString()} : i));
+                                // Close the details modal if it's open
+                                setSelectedItemForDetails(null);
                               } catch (err: any) {
                                 console.error('Error marking item as resolved:', err);
                                 setError(err.message || 'Failed to mark item as resolved.');
@@ -469,7 +503,10 @@ const LostFound = () => {
                           <FiCheckCircle className="mr-1" /> Mark Resolved
                         </button>
                         <button
-                          onClick={() => openEditItemModal(item)}
+                          onClick={(e) => {
+                            e.stopPropagation(); // Stop event from bubbling up to parent
+                            openEditItemModal(item);
+                          }}
                           className="flex-1 px-3 py-2 rounded-full text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors duration-200 flex items-center justify-center"
                         >
                           <FiEdit2 className="mr-1" /> Edit
