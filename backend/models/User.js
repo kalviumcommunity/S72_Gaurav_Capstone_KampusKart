@@ -30,16 +30,35 @@ const userSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
-  address: {
-    type: String,
-    trim: true
-  },
   createdAt: {
     type: Date,
     default: Date.now
   },
   resetPasswordOTP: String,
-  resetPasswordExpires: Date
+  resetPasswordExpires: Date,
+  profilePicture: {
+    url: String,
+    public_id: String,
+  },
+  major: {
+    type: String,
+    trim: true,
+  },
+  yearOfStudy: {
+    type: String, // Changed to String to accommodate year interval
+    trim: true,
+  },
+  gender: {
+    type: String,
+    trim: true,
+  },
+  dateOfBirth: {
+    type: Date,
+  },
+  program: {
+    type: String,
+    trim: true,
+  },
 });
 
 // Hash password before saving
