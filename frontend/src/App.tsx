@@ -8,6 +8,7 @@ import Header from './components/Header';
 import Landing from './components/Landing';
 import ForgotPassword from './components/ForgotPassword';
 import Home from './components/Home';
+import LostFound from './components/LostFound';
 
 // Protected Route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -49,6 +50,14 @@ const App: React.FC = () => {
             element={
               <ProtectedRoute>
                 <Home />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/lostfound"
+            element={
+              <ProtectedRoute>
+                <LostFound />
               </ProtectedRoute>
             }
           />
