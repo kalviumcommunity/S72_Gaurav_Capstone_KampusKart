@@ -223,7 +223,7 @@ const Profile = () => {
     return (
       <div className="min-h-screen flex flex-col bg-white font-sans">
         <Navbar />
-        <main className="flex-1 container mx-auto px-12 py-8 pt-24">
+        <main className="flex-1 container mx-auto px-12 py-8 pt-[100px]">
           <SkeletonLoader variant="profile" />
         </main>
       </div>
@@ -233,7 +233,7 @@ const Profile = () => {
   return (
     <div className="min-h-screen flex flex-col bg-white font-sans">
       <Navbar />
-      <main className="flex-1 container mx-auto px-12 py-8 pt-24">
+      <main className="flex-1 container mx-auto px-12 py-8 pt-[100px]">
         <h1 className="text-h2 font-extrabold text-black mb-8 text-center">My Profile</h1>
 
         {error && (

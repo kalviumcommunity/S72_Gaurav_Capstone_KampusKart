@@ -403,7 +403,7 @@ const Chat: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-white font-sans">
       <Navbar />
-      <main className="flex-1 container mx-auto px-12 py-8 pt-28 grid grid-cols-1 md:grid-cols-3 gap-6">
+      <main className="flex-1 container mx-auto px-12 py-8 pt-[100px] grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-1 bg-white p-6 rounded-lg shadow-md flex flex-col max-h-[calc(100vh-144px)] border border-gray-200">
           <h2 className="text-xl font-bold mb-4 text-black">Find Users</h2>
           <div className="relative mb-6">
@@ -491,11 +491,11 @@ const Chat: React.FC = () => {
                          className={`flex ${message.sender._id === user?._id ? 'justify-end' : 'justify-start'} mb-2`}
                        >
                           <div className={`max-w-[70%] px-4 py-2 rounded-xl ${message.sender._id === user?._id ? 'bg-blue-500 text-white rounded-br-none mr-2' : 'bg-gray-200 text-black rounded-bl-none ml-2'}`}>
-                           <p>{message.text}</p>
-                           <div className="flex items-center justify-end space-x-1 mt-1">
-                             <span className="text-xs opacity-75">{format(new Date(message.createdAt), 'h:mm a')}</span>
+                           <p className="pb-1">{message.text}</p>
+                           <div className="flex items-center justify-end space-x-1 mt-1 text-xs opacity-75">
+                             <span>{format(new Date(message.createdAt), 'h:mm a')}</span>
                              {message.sender._id === user?._id && message.status && (
-                               <span className="text-xs opacity-75">
+                               <span>
                                  {message.status === 'sending' && 'Sending...'}
                                  {message.status === 'sent' && '✓'}
                                  {message.status === 'delivered' && '✓✓'}

@@ -18,9 +18,9 @@ const Home = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-white font-sans">
+    <div className="min-h-screen bg-gray-100 flex flex-col font-sans">
       <Navbar />
-      <main className="flex-1 flex items-center justify-center">
+      <main className="flex-1 container mx-auto px-4 py-8 pt-[100px]">
         <h1 className="text-h1 font-extrabold text-black">Welcome Home!</h1>
       </main>
     </div>
