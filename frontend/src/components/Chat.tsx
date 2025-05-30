@@ -183,9 +183,11 @@ const Chat: React.FC = () => {
         const data = await response.json();
         setMessages(data);
 
-        setConversations(prevConversations => prevConversations.map(conv =>
-          conv._id === selectedConversation._id ? { ...conv, readBy: [...(conv.readBy || []), user?._id].filter((id, index, self) => self.indexOf(id) === index) } : conv
-        ));
+        if (user?._id) {
+          setConversations(prevConversations => prevConversations.map(conv =>
+            conv._id === selectedConversation._id ? { ...conv, readBy: [...(conv.readBy || []), user._id].filter((id, index, self) => self.indexOf(id) === index) } : conv
+          ));
+        }
 
       } catch (error) {
         console.error('Error fetching messages:', error);
@@ -243,9 +245,11 @@ const Chat: React.FC = () => {
       setSearchResults([]);
       setSearchText('');
 
-      setConversations(prevConversations => prevConversations.map(conv =>
-          conv._id === conversation._id ? { ...conv, readBy: [...(conv.readBy || []), user?._id].filter((id, index, self) => self.indexOf(id) === index) } : conv
-      ));
+      if (user?._id) {
+        setConversations(prevConversations => prevConversations.map(conv =>
+            conv._id === conversation._id ? { ...conv, readBy: [...(conv.readBy || []), user._id].filter((id, index, self) => self.indexOf(id) === index) } : conv
+        ));
+      }
 
       fetchConversations();
 
@@ -268,17 +272,17 @@ const Chat: React.FC = () => {
       setTyping(false);
     }
 
-    try {
-      const tempMessage: Message = {
-        _id: Date.now().toString(),
-        sender: user!,
-        text: messageContent,
-        createdAt: new Date().toISOString(),
-        conversation: selectedConversation._id,
-        status: 'sending'
-      };
-      setMessages([...messages, tempMessage]);
+    const tempMessage: Message = {
+      _id: Date.now().toString(),
+      sender: user!,
+      text: messageContent,
+      createdAt: new Date().toISOString(),
+      conversation: selectedConversation._id,
+      status: 'sending'
+    };
+    setMessages([...messages, tempMessage]);
 
+    try {
       const response = await fetch(`${API_BASE}/api/chat/${selectedConversation._id}/messages`, {
         method: 'POST',
         headers: {
@@ -399,8 +403,8 @@ const Chat: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-white font-sans">
       <Navbar />
-      <main className="flex-1 container mx-auto px-4 py-8 pt-28 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-1 bg-white p-6 rounded-lg shadow-md flex flex-col border border-gray-200">
+      <main className="flex-1 container mx-auto px-12 py-8 pt-28 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="md:col-span-1 bg-white p-6 rounded-lg shadow-md flex flex-col max-h-[calc(100vh-144px)] border border-gray-200">
           <h2 className="text-xl font-bold mb-4 text-black">Find Users</h2>
           <div className="relative mb-6">
             <FiSearch className="absolute top-3 left-3 text-gray-400" size={20} />
@@ -455,11 +459,11 @@ const Chat: React.FC = () => {
                   </div>
                   <div className="flex-1">
                     <div className="font-semibold text-gray-900">{getParticipantName(conversation.participants.filter(p => p._id !== user?._id))}</div>
-                    <div className={`text-sm ${conversation.latestMessage && !conversation.readBy?.includes(user?._id) ? 'text-gray-900 font-semibold' : 'text-gray-600'}`}>
+                    <div className={`text-sm ${conversation.latestMessage && user?._id && !conversation.readBy?.includes(user._id) ? 'text-gray-900 font-semibold' : 'text-gray-600'}`}>
                       {conversation.latestMessage ? `${conversation.latestMessage.sender._id === user?._id ? 'You: ' : ''}${conversation.latestMessage.text.substring(0, 30)}${conversation.latestMessage.text.length > 30 ? '...' : ''}` : 'Start a conversation'}
                     </div>
                   </div>
-                  {conversation.latestMessage && !conversation.readBy?.includes(user?._id) && (
+                  {conversation.latestMessage && user?._id && !conversation.readBy?.includes(user._id) && (
                     <div className="w-2 h-2 bg-blue-500 rounded-full ml-2"></div>
                   )}
                 </div>
