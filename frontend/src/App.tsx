@@ -11,6 +11,7 @@ import Home from './components/Home';
 import LostFound from './components/LostFound';
 import Profile from './components/Profile';
 import Chat from './components/Chat';
+import Complaints from './components/Complaints';
 
 // Protected Route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -68,6 +69,14 @@ const App: React.FC = () => {
             element={
               <ProtectedRoute>
                 <Chat />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/complaints"
+            element={
+              <ProtectedRoute>
+                <Complaints />
               </ProtectedRoute>
             }
           />
