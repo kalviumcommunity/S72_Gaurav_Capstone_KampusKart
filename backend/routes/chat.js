@@ -158,4 +158,69 @@ router.post('/:conversationId/messages', protect, async (req, res) => {
   }
 });
 
+// @desc    Create a new group chat
+// @route   POST /api/chat/group
+// @access  Private
+router.post('/group', protect, async (req, res) => {
+  const { name, members } = req.body;
+
+  if (!name || !members || members.length < 2) {
+    return res.status(400).json({ message: 'Please provide a group name and select at least two members.' });
+  }
+
+  // Add the current user to the members list if not already present
+  if (!members.includes(req.user._id)) {
+      members.push(req.user._id);
+  }
+
+  try {
+    const groupChat = await Conversation.create({
+      isGroupChat: true,
+      name: name,
+      participants: members,
+      groupAdmin: req.user._id,
+      readBy: [req.user._id]
+    });
+
+    const fullGroupChat = await Conversation.findOne({ _id: groupChat._id })
+      .populate('participants', '-password')
+      .populate('groupAdmin', '-password');
+
+    res.status(201).json(fullGroupChat);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+// @desc    Delete a conversation
+// @route   DELETE /api/chat/:conversationId
+// @access  Private
+router.delete('/:conversationId', protect, async (req, res) => {
+  try {
+    const conversationId = req.params.conversationId;
+
+    // Optional: Add authorization check to ensure only participants can delete
+    const conversation = await Conversation.findById(conversationId);
+    if (!conversation) {
+      return res.status(404).json({ message: 'Conversation not found' });
+    }
+
+    // Ensure the user is a participant in the conversation
+    if (!conversation.participants.includes(req.user._id)) {
+        return res.status(403).json({ message: 'Not authorized to delete this conversation' });
+    }
+
+    // Delete associated messages (optional, depending on desired behavior)
+    await Message.deleteMany({ conversation: conversationId });
+
+    // Delete the conversation
+    await Conversation.findByIdAndDelete(conversationId);
+
+    res.status(200).json({ message: 'Conversation deleted successfully' });
+
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
 module.exports = router; 

@@ -2,9 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import Navbar from './Navbar';
 import { useAuth } from '../contexts/AuthContext';
 import { API_BASE } from '../config';
-import { FiSearch, FiSend } from 'react-icons/fi';
+import { FiSearch, FiSend, FiSmile } from 'react-icons/fi';
 import io from 'socket.io-client';
 import { format, isSameDay, parseISO } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
+import Picker from '@emoji-mart/react';
+import emojiData from '@emoji-mart/data';
 
 interface User {
   _id: string;
@@ -31,11 +34,12 @@ interface Conversation {
   latestMessage?: Message;
   updatedAt: string;
   readBy?: string[];
+  isGroupChat: boolean;
+  name?: string;
 }
 
 const ENDPOINT = API_BASE;
-var socket: any;
-
+  
 const Chat: React.FC = () => {
   const { user, token } = useAuth();
   const [searchText, setSearchText] = useState('');
@@ -54,10 +58,15 @@ const Chat: React.FC = () => {
   const [searchError, setSearchError] = useState<string | null>(null);
   const [conversationCreateError, setConversationCreateError] = useState<string | null>(null);
   const [sendMessageError, setSendMessageError] = useState<string | null>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchResultsRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const socketRef = useRef<any>(null);
 
   useEffect(() => {
     if (user) {
-      socket = io(ENDPOINT, {
+      socketRef.current = io(ENDPOINT, {
         reconnection: true,
         reconnectionAttempts: 5,
         reconnectionDelay: 1000,
@@ -65,29 +74,29 @@ const Chat: React.FC = () => {
         timeout: 20000,
       });
 
-      socket.on('connect', () => {
+      socketRef.current.on('connect', () => {
         console.log('Socket connected');
         setSocketConnected(true);
-        socket.emit('setup', user);
+        socketRef.current.emit('setup', user);
       });
 
-      socket.on('connect_error', (error) => {
+      socketRef.current.on('connect_error', (error: any) => {
         console.error('Socket connection error:', error);
         setSocketConnected(false);
       });
 
-      socket.on('disconnect', (reason) => {
+      socketRef.current.on('disconnect', (reason: any) => {
         console.log('Socket disconnected:', reason);
         setSocketConnected(false);
       });
 
-      socket.on('reconnect', (attemptNumber) => {
+      socketRef.current.on('reconnect', (attemptNumber: number) => {
         console.log('Socket reconnected after', attemptNumber, 'attempts');
         setSocketConnected(true);
-      socket.emit('setup', user);
+        socketRef.current.emit('setup', user);
       });
 
-      socket.on('message received', (newMessageReceived: Message) => {
+      socketRef.current.on('message received', (newMessageReceived: Message) => {
         if (selectedConversation && selectedConversation._id === newMessageReceived.conversation) {
           setMessages((prevMessages) => [...prevMessages, newMessageReceived]);
         } else {
@@ -106,28 +115,25 @@ const Chat: React.FC = () => {
         });
       });
 
-      socket.on('typing', () => setIsTyping(true));
-      socket.on('stop typing', () => setIsTyping(false));
-
-      socket.on('online users', (users: string[]) => {
+      socketRef.current.on('online users', (users: string[]) => {
         console.log('Online users received:', users);
         setOnlineUsers(users);
       });
 
-      socket.on('user online', (userId: string) => {
+      socketRef.current.on('user online', (userId: string) => {
         console.log('User online:', userId);
         setOnlineUsers(prevUsers => [...prevUsers, userId]);
       });
 
-      socket.on('user offline', (userId: string) => {
+      socketRef.current.on('user offline', (userId: string) => {
         console.log('User offline:', userId);
         setOnlineUsers(prevUsers => prevUsers.filter(id => id !== userId));
       });
     }
 
     return () => {
-      if (socket) {
-        socket.disconnect();
+      if (socketRef.current) {
+        socketRef.current.disconnect();
       }
     };
   }, [user, selectedConversation]);
@@ -149,7 +155,7 @@ const Chat: React.FC = () => {
         throw new Error('Failed to fetch conversations');
       }
       const data = await response.json();
-       data.sort((a: Conversation, b: Conversation) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+      data.sort((a: Conversation, b: Conversation) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
       setConversations(data);
     } catch (error) {
       console.error('Error fetching conversations:', error);
@@ -170,7 +176,9 @@ const Chat: React.FC = () => {
       }
       setMessagesError(null);
       try {
-        socket.emit('join chat', selectedConversation._id);
+        if (socketRef.current) {
+          socketRef.current.emit('join chat', selectedConversation._id);
+        }
 
         const response = await fetch(`${API_BASE}/api/chat/${selectedConversation._id}/messages`, {
           headers: {
@@ -267,20 +275,15 @@ const Chat: React.FC = () => {
     setNewMessage('');
     setSendMessageError(null);
 
-    if (socketConnected && selectedConversation) {
-      socket.emit('stop typing', selectedConversation._id);
-      setTyping(false);
-    }
-
-      const tempMessage: Message = {
-        _id: Date.now().toString(),
-        sender: user!,
-        text: messageContent,
-        createdAt: new Date().toISOString(),
-        conversation: selectedConversation._id,
+    const tempMessage: Message = {
+      _id: Date.now().toString(),
+      sender: user!,
+      text: messageContent,
+      createdAt: new Date().toISOString(),
+      conversation: selectedConversation._id,
       status: 'sending'
-      };
-      setMessages([...messages, tempMessage]);
+    };
+    setMessages([...messages, tempMessage]);
 
     try {
       const response = await fetch(`${API_BASE}/api/chat/${selectedConversation._id}/messages`, {
@@ -301,7 +304,9 @@ const Chat: React.FC = () => {
         prevMessages.map((msg) => (msg._id === tempMessage._id ? { ...sentMessage, status: 'sent' } : msg))
       );
 
-      socket.emit('new message', sentMessage);
+      if (socketRef.current) {
+        socketRef.current.emit('new message', sentMessage);
+      }
 
       setConversations(prevConversations => {
         const updatedConversations = prevConversations.map(conv =>
@@ -321,27 +326,6 @@ const Chat: React.FC = () => {
 
   const handleTyping = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewMessage(e.target.value);
-
-    if (!socketConnected || !selectedConversation) return;
-
-    if (!typing) {
-      setTyping(true);
-      socket.emit('typing', selectedConversation._id);
-    }
-
-    let lastTypingTime = new Date().getTime();
-    var timerLength = 3000;
-
-    setTimeout(() => {
-      var timeNow = new Date().getTime();
-      var timeDiff = timeNow - lastTypingTime;
-
-      if (timeDiff >= timerLength && typing) {
-        socket.emit('stop typing', selectedConversation._id);
-        setTyping(false);
-      }
-    }, timerLength);
-
   };
 
   const getParticipantName = (participants: User[]) => {
@@ -400,87 +384,168 @@ const Chat: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchInputRef.current && !searchInputRef.current.contains(event.target as Node) &&
+          searchResultsRef.current && !searchResultsRef.current.contains(event.target as Node)) {
+        setSearchResults([]);
+        setSearchText('');
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [searchInputRef, searchResultsRef]);
+
+  const handleDeleteChat = async () => {
+    if (!selectedConversation || !token) return;
+
+    const confirmDelete = window.confirm(`Are you sure you want to delete this conversation?`);
+
+    if (confirmDelete) {
+      try {
+        const response = await fetch(`${API_BASE}/api/chat/${selectedConversation._id}`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to delete conversation');
+        }
+
+        // Remove the conversation from the state
+        setConversations(prevConversations => prevConversations.filter(conv => conv._id !== selectedConversation._id));
+        setSelectedConversation(null); // Deselect the conversation
+
+        alert('Conversation deleted successfully.');
+
+      } catch (error) {
+        console.error('Error deleting conversation:', error);
+        alert('Failed to delete conversation.');
+      }
+    }
+  };
+
+  const handleEmojiSelect = (emoji: any) => {
+    setNewMessage(prev => prev + emoji.native);
+    setShowEmojiPicker(false);
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-white font-sans">
       <Navbar />
-      <main className="flex-1 container mx-auto px-12 py-8 pt-[100px] grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-1 bg-white p-6 rounded-lg shadow-md flex flex-col max-h-[calc(100vh-144px)] border border-gray-200">
-          <h2 className="text-xl font-bold mb-4 text-black">Find Users</h2>
-          <div className="relative mb-6">
-            <FiSearch className="absolute top-3 left-3 text-gray-400" size={20} />
-            <input
-              type="text"
-              placeholder="Search users by name or email..."
-              className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white bg-[#181818]"
-              value={searchText}
-              onChange={handleSearch}
-            />
-            {searchResults.length > 0 && (
-              <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 shadow-lg max-h-60 overflow-y-auto">
-                {searchResults.map((result) => (
-                  <div
-                    key={result._id}
-                    className="px-4 py-3 hover:bg-gray-100 cursor-pointer flex items-center text-gray-900 rounded-md"
-                    onClick={() => handleUserSelect(result._id)}
-                  >
-                    {renderParticipantAvatar(result, 'small')}
-                    <div>
-                      <p className="font-semibold">{result.name}</p>
-                      <p className="text-sm text-gray-600">{result.email}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-            {searchError && <div className="text-red-500 text-sm mt-2">{searchError}</div>}
-          </div>
+      <main className="flex-1 container mx-auto p-4 grid grid-cols-1 md:grid-cols-3 gap-4 bg-[#F3F4F6] rounded-lg shadow-inner overflow-x-hidden" style={{ paddingTop: '80px' }}>
+        {/* Left Column - Conversations */}
+        <div className="md:col-span-1 bg-white p-4 rounded-lg shadow flex flex-col max-h-[calc(100vh-100px)] overflow-hidden">
+          {/* Search Users section at the top of the left panel */}
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold mb-2 text-gray-800">Start New Chat</h2>
+             <div className="relative mb-4">
+               <FiSearch className="absolute top-3 left-3 text-gray-400" size={20} />
+               <input
+                 type="text"
+                 placeholder="Search users..."
+                 className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                 value={searchText}
+                 onChange={handleSearch}
+                 ref={searchInputRef}
+               />
+               {searchResults.length > 0 && (
+                 <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 shadow-lg max-h-80 overflow-y-auto" ref={searchResultsRef}>
+                   {searchResults.map((result) => (
+                     <div
+                       key={result._id}
+                       className="px-4 py-3 hover:bg-gray-100 cursor-pointer flex items-center text-gray-900 rounded-md"
+                       onClick={() => handleUserSelect(result._id)}
+                     >
+                       {renderParticipantAvatar(result, 'small')}
+                       <div>
+                         <p className="font-semibold">{result.name}</p>
+                         <p className="text-sm text-gray-600">{result.email}</p>
+                       </div>
+                     </div>
+                   ))}
+                 </div>
+               )}
+             </div>
+             {conversationCreateError && <div className="text-red-500 text-sm mt-2">{conversationCreateError}</div>}
+           </div>
 
-          <h2 className="text-xl font-bold mb-4 text-black">Conversations</h2>
-          <div className="flex-1 overflow-y-auto space-y-4">
-            {conversations.length === 0 && !conversationsError ? (
-               <div className="text-center text-gray-500">Loading conversations...</div>
-            ) : conversationsError ? (
-               <div className="text-center text-red-500">{conversationsError}</div>
-            ) : (conversations.map((conversation) => {
-              const otherParticipant = conversation.participants.find(p => p._id !== user?._id);
-              return (
-                <div
-                  key={conversation._id}
-                  className={`flex items-center p-4 border-b cursor-pointer ${
-                    selectedConversation?._id === conversation._id ? 'bg-blue-100' : 'hover:bg-gray-50'
-                  }`}
-                  onClick={() => setSelectedConversation(conversation)}
-                >
-                  <div className="relative mr-3">
-                    {renderParticipantAvatar(otherParticipant, 'small')}
-                    {otherParticipant && onlineUsers.includes(otherParticipant._id) && (
-                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <div className="font-semibold text-gray-900">{getParticipantName(conversation.participants.filter(p => p._id !== user?._id))}</div>
-                    <div className={`text-sm ${conversation.latestMessage && user?._id && !conversation.readBy?.includes(user._id) ? 'text-gray-900 font-semibold' : 'text-gray-600'}`}>
-                      {conversation.latestMessage ? `${conversation.latestMessage.sender._id === user?._id ? 'You: ' : ''}${conversation.latestMessage.text.substring(0, 30)}${conversation.latestMessage.text.length > 30 ? '...' : ''}` : 'Start a conversation'}
-                    </div>
-                  </div>
-                  {conversation.latestMessage && user?._id && !conversation.readBy?.includes(user._id) && (
-                    <div className="w-2 h-2 bg-blue-500 rounded-full ml-2"></div>
-                  )}
-                </div>
-              );
-            }))}
-          </div>
+           <h2 className="text-lg font-semibold mb-4 text-gray-800">People</h2>
+           <div className="space-y-4 flex-1 overflow-y-auto">
+             {/* Combined Conversation List */}
+              <div className="flex-1 overflow-y-auto space-y-4">
+                {conversations.length === 0 && !conversationsError ? (
+                   <div className="text-center text-gray-500">No conversations yet.</div>
+                ) : conversationsError ? (
+                   <div className="text-center text-red-500">{conversationsError}</div>
+                ) : (conversations.map((conversation) => {
+                    const isGroup = conversation.isGroupChat;
+                    const displayName = isGroup ? conversation.name : getParticipantName(conversation.participants);
+                    const displayAvatar = isGroup ? (
+                      <div className="w-8 h-8 rounded-full bg-purple-300 mr-3 flex items-center justify-center text-black font-bold">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="feather feather-users"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                      </div>
+                    ) : (
+                      renderParticipantAvatar(conversation.participants.find(p => p._id !== user?._id), 'small')
+                    );
+                    const isOnline = !isGroup && conversation.participants.find(p => p._id !== user?._id) && onlineUsers.includes(conversation.participants.find(p => p._id !== user?._id)?._id || '');
+
+                    return (
+                      <div
+                        key={conversation._id}
+                        className={`flex items-center p-2 cursor-pointer rounded-md ${
+                          selectedConversation?._id === conversation._id ? 'bg-gray-200' : 'hover:bg-gray-100'
+                        }`}
+                        onClick={() => setSelectedConversation(conversation)}
+                      >
+                       <div className="relative mr-3">
+                          {displayAvatar}
+                          {isOnline && (
+                            <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-medium text-gray-900">{displayName}</div>
+                          <div className={`text-sm ${conversation.latestMessage && user?._id && !conversation.readBy?.includes(user._id) ? 'text-gray-900 font-semibold' : 'text-gray-600'}`}>
+                            {conversation.latestMessage ? `${conversation.latestMessage.sender._id === user?._id ? 'You: ' : ''}${conversation.latestMessage.text.substring(0, 30)}${conversation.latestMessage.text.length > 30 ? '...' : ''}` : 'Start a conversation'}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                }))}
+              </div>
+           </div>
         </div>
 
-        <div className="md:col-span-2 bg-white p-6 rounded-lg shadow-md flex flex-col max-h-[calc(100vh-144px)] border border-gray-200">
+        {/* Right Column - Chat Area */}
+        <div className="md:col-span-2 bg-white p-6 rounded-lg shadow flex flex-col max-h-[calc(100vh-96px)]">
           {selectedConversation ? (
             <>
-              <div className="flex items-center mb-4">
-                 <h2 className="text-xl font-bold text-black mr-2">Chat with {getParticipantName(selectedConversation.participants)}</h2>
-                {selectedConversation.participants.find(p => p._id !== user?._id) && onlineUsers.includes(selectedConversation.participants.find(p => p._id !== user?._id)?._id || '') && (
-                  <span className="text-sm text-green-600 font-semibold">(Online)</span>
-                )}
+              {/* Chat Header */}
+              <div className="flex items-center border-b border-gray-200 pb-4 mb-4">
+                 {renderParticipantAvatar(selectedConversation.participants.find(p => p._id !== user?._id), 'large')}
+                 <div className="flex-1">
+                   <h2 className="text-xl font-bold text-gray-800">{getParticipantName(selectedConversation.participants)}</h2>
+                   {selectedConversation.participants.find(p => p._id !== user?._id) && onlineUsers.includes(selectedConversation.participants.find(p => p._id !== user?._id)?._id || '') ? (
+                     <span className="text-sm text-green-600 font-semibold">Online</span>
+                   ) : (
+                      <span className="text-sm text-gray-500">Offline</span>
+                   )}
+                 </div>
+                 {/* Header Icons (placeholder) */}
+                 <div className="flex space-x-4 text-gray-400">
+                    {/* Delete Chat Icon */}
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="feather feather-trash-2 cursor-pointer hover:text-red-600" onClick={handleDeleteChat}><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                 </div>
               </div>
+
+              {/* Messages Area */}
               <div className="flex-1 overflow-y-auto mb-4 space-y-4">
                  {groupMessagesByDate(messages).map(([date, messagesForDate]) => (
                    <div key={date}>
@@ -490,13 +555,17 @@ const Chat: React.FC = () => {
                          key={message._id}
                          className={`flex ${message.sender._id === user?._id ? 'justify-end' : 'justify-start'} mb-2`}
                        >
-                          <div className={`max-w-[70%] px-4 py-2 rounded-xl ${message.sender._id === user?._id ? 'bg-blue-500 text-white rounded-br-none mr-2' : 'bg-gray-200 text-black rounded-bl-none ml-2'}`}>
+                          <div className={`max-w-[70%] px-4 py-2 rounded-xl ${
+                           message.sender._id === user?._id 
+                            ? 'bg-[#DCF8C6] text-black rounded-br-none mr-4'
+                            : 'bg-[#F3F4F6] text-black rounded-bl-none ml-2'
+                           }`}>
                            <p className="pb-1">{message.text}</p>
-                           <div className="flex items-center justify-end space-x-1 mt-1 text-xs opacity-75">
+                           <div className="flex items-center ${message.sender._id === user?._id ? 'justify-end' : 'justify-start'} space-x-1 mt-1 text-xs text-gray-500 opacity-75">
                              <span>{format(new Date(message.createdAt), 'h:mm a')}</span>
-                             {message.sender._id === user?._id && message.status && (
+                              {message.sender._id === user?._id && message.status && (
                                <span>
-                                 {message.status === 'sending' && 'Sending...'}
+                                 {/* Status icons - can use checkmarks or similar */}
                                  {message.status === 'sent' && '✓'}
                                  {message.status === 'delivered' && '✓✓'}
                                  {message.status === 'read' && '✓✓'}
@@ -509,33 +578,52 @@ const Chat: React.FC = () => {
                    </div>
                  ))}
                  {isTyping && (
-                   <div className="flex items-center space-x-2">
-                     
-                     <div className="text-sm text-gray-500">{getParticipantName(selectedConversation.participants)} is typing...</div>
+                   <div className="flex items-center space-x-2 text-sm text-gray-500 italic">
+                     <div>{getParticipantName(selectedConversation.participants.filter(p => p._id !== user?._id))} is typing...</div>
                    </div>
                  )}
                  <div ref={messagesEndRef} />
               </div>
+
               {messages.length === 0 && selectedConversation && !messagesError && (
                 <div className="text-center text-gray-500">Loading messages...</div>
               )}
               {messagesError && (
                   <div className="text-center text-red-500 mt-4">{messagesError}</div>
               )}
-              <form onSubmit={handleSendMessage} className="flex gap-4 mt-auto">
+
+              {/* Message Input Area */}
+              <form onSubmit={handleSendMessage} className="flex items-center gap-2 pt-4 border-t border-gray-200 relative">
+                {/* Emoji Picker Button */}
+                <button
+                  type="button"
+                  aria-label="Open emoji picker"
+                  className="flex items-center justify-center w-14 h-14 rounded-full bg-[#181818] text-white border border-gray-300 hover:bg-[#00C6A7] focus:outline-none focus:ring-2 focus:ring-blue-500 mr-2 transition-colors duration-200"
+                  onClick={() => setShowEmojiPicker(v => !v)}
+                  tabIndex={0}
+                >
+                  <FiSmile size={40} className="text-white" />
+                </button>
+                {showEmojiPicker && (
+                  <div className="absolute bottom-16 left-0 z-[9999]">
+                    <Picker data={emojiData} onEmojiSelect={handleEmojiSelect} theme="light" />
+                  </div>
+                )}
                 <input
                   type="text"
-                  placeholder="Type a message..."
-                  className="flex-1 px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white bg-[#181818] text-base"
+                  placeholder="Type your message here..."
+                  className="flex-1 px-4 py-3 rounded-full bg-[#F3F4F6] border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 text-base"
                   value={newMessage}
                   onChange={handleTyping}
                 />
+                {/* Send Button */}
                 <button
                   type="submit"
-                  className="w-10 h-10 rounded-full font-semibold text-white bg-[#181818] hover:bg-[#00C6A7] transition-colors duration-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-label="Send message"
+                  className="flex items-center justify-center w-14 h-14 rounded-full bg-[#181818] text-white border border-gray-300 hover:bg-[#00C6A7] focus:outline-none focus:ring-2 focus:ring-blue-500 ml-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={!newMessage.trim()}
                 >
-                  <FiSend size={20} />
+                  <FiSend size={36} className="text-white" />
                 </button>
               </form>
                 {sendMessageError && (

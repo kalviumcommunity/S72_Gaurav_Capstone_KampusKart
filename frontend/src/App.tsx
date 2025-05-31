@@ -131,6 +131,16 @@ const App: React.FC = () => {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/profile/:userId"
+            element={
+              <ProtectedRoute>
+                <AuthenticatedLayout>
+                  <Profile />
+                </AuthenticatedLayout>
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </Router>
     </AuthProvider>

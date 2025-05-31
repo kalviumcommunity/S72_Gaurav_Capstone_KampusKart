@@ -35,7 +35,7 @@ const Signup: React.FC = () => {
       setError('');
       setLoading(true);
       await signup(email, password, name, remember);
-      navigate('/dashboard');
+      navigate('/home');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to create account');
     } finally {
