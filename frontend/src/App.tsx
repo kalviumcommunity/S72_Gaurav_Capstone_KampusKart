@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Login from './components/Login';
 import Signup from './components/Signup';
-import Dashboard from './components/Dashboard';
 import Header from './components/Header';
 import Landing from './components/Landing';
 import ForgotPassword from './components/ForgotPassword';
@@ -116,16 +115,6 @@ const App: React.FC = () => {
               <ProtectedRoute>
                 <AuthenticatedLayout>
                   <CampusMap />
-                </AuthenticatedLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <AuthenticatedLayout>
-                  <Dashboard />
                 </AuthenticatedLayout>
               </ProtectedRoute>
             }

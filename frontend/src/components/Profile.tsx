@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import Navbar from './Navbar';
 import { useAuth } from '../contexts/AuthContext';
 import SkeletonLoader from './SkeletonLoader';
 import { FiUser, FiMail, FiPhone, FiMapPin, FiEdit2, FiSave, FiXCircle, FiUpload, FiAlertCircle, FiCheckCircle, FiCalendar, FiTag, FiBriefcase } from 'react-icons/fi'; // Importing icons including new ones
@@ -222,7 +221,6 @@ const Profile = () => {
   if (loading || pageLoading || !user) {
     return (
       <div className="min-h-screen flex flex-col bg-white font-sans">
-        <Navbar />
         <main className="flex-1 container mx-auto px-12 py-8 pt-[100px]">
           <SkeletonLoader variant="profile" />
         </main>
@@ -232,7 +230,6 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-white font-sans">
-      <Navbar />
       <main className="flex-1 container mx-auto px-12 py-8 pt-[100px]">
         <h1 className="text-h2 font-extrabold text-black mb-8 text-center">My Profile</h1>
 

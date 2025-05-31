@@ -31,7 +31,15 @@ const Login: React.FC = () => {
       await login(email, password, remember);
       navigate('/home');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to login');
+      // Robust error handling
+      let message = 'Failed to login';
+      if (err?.response?.data?.message) {
+        message = err.response.data.message;
+      } else if (err?.message) {
+        message = err.message;
+      }
+      setError(message);
+      console.error('Login error:', err);
     } finally {
       setLoading(false);
     }

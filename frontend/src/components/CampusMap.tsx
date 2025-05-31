@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { GoogleMap, useLoadScript, Marker, InfoWindow, Libraries } from '@react-google-maps/api';
 
 // Define libraries outside the component to prevent unnecessary reloads
@@ -29,6 +29,7 @@ const CampusMap: React.FC<CampusMapProps> = () => {
   const [mapRef, setMapRef] = useState<google.maps.Map | null>(null);
   const [placeDetails, setPlaceDetails] = useState<{ [key: string]: PlaceDetails }>({});
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
 
   // MIT ADT University locations with coordinates and additional details
   const locations: Location[] = [
@@ -295,6 +296,30 @@ const CampusMap: React.FC<CampusMapProps> = () => {
     );
   }, [searchTerm]);
 
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.warn('Geolocation error:', error);
+        }
+      );
+    }
+  }, []);
+
+  // Add handler to recenter map
+  const handleRecenter = () => {
+    if (mapRef && userLocation) {
+      mapRef.panTo(userLocation);
+      mapRef.setZoom(17);
+    }
+  };
+
   if (loadError) {
     return <div>Error loading maps</div>;
   }
@@ -304,12 +329,12 @@ const CampusMap: React.FC<CampusMapProps> = () => {
   }
 
   return (
-    <div className="w-full h-full flex flex-col bg-gray-100">
+    <div className="w-full h-full flex flex-col bg-gray-100 relative">
       <div className="p-4">
          <h1 className="text-3xl font-bold text-gray-800">Campus Map</h1>
       </div>
       <div className="flex flex-grow h-0">
-        <div className="w-2/3 h-full">
+        <div className="w-2/3 h-full relative">
           <div className="bg-white shadow-lg overflow-hidden h-full relative">
             <GoogleMap
               mapContainerStyle={mapContainerStyle}
@@ -327,7 +352,34 @@ const CampusMap: React.FC<CampusMapProps> = () => {
                   title={location.name}
                 />
               ))}
+              {userLocation && (
+                <Marker
+                  position={userLocation}
+                  icon={{
+                    url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+                    scaledSize: new window.google.maps.Size(40, 40),
+                  }}
+                  title="Your Location"
+                />
+              )}
             </GoogleMap>
+            {/* Recenter Button */}
+            <button
+              onClick={handleRecenter}
+              disabled={!userLocation}
+              className="absolute bottom-6 left-6 z-10 bg-white border border-gray-300 shadow-lg rounded-full p-3 flex items-center justify-center hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              title="Re-center map on your location"
+              style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.10)' }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none" />
+                <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="2" fill="none" />
+                <line x1="12" y1="2" x2="12" y2="6" stroke="currentColor" strokeWidth="2" />
+                <line x1="12" y1="18" x2="12" y2="22" stroke="currentColor" strokeWidth="2" />
+                <line x1="2" y1="12" x2="6" y2="12" stroke="currentColor" strokeWidth="2" />
+                <line x1="18" y1="12" x2="22" y2="12" stroke="currentColor" strokeWidth="2" />
+              </svg>
+            </button>
           </div>
         </div>
 
