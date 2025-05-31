@@ -41,12 +41,21 @@ const GoogleCallback: React.FC = () => {
   return <Navigate to="/home" />;
 };
 
+// Add this component for root redirect
+const RootRedirect: React.FC = () => {
+  const { token } = useAuth();
+  if (token) {
+    return <Navigate to="/home" />;
+  }
+  return <Landing />;
+};
+
 const App: React.FC = () => {
   return (
     <AuthProvider>
       <Router>
         <Routes>
-          <Route path="/" element={<Landing />} />
+          <Route path="/" element={<RootRedirect />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
