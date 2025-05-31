@@ -14,6 +14,7 @@ import Chat from './components/Chat';
 import Complaints from './components/Complaints';
 import CampusMap from './components/CampusMap';
 import AuthenticatedLayout from './components/AuthenticatedLayout';
+import Features from './components/Features';
 
 // Protected Route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -86,6 +87,16 @@ const App: React.FC = () => {
               <ProtectedRoute>
                 <AuthenticatedLayout>
                   <Complaints />
+                </AuthenticatedLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/features"
+            element={
+              <ProtectedRoute>
+                <AuthenticatedLayout>
+                  <Features />
                 </AuthenticatedLayout>
               </ProtectedRoute>
             }

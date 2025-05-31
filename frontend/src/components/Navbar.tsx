@@ -1,10 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { IoIosArrowDropdown, IoIosArrowDropup } from "react-icons/io";
 
 const Navbar: React.FC = () => {
   const location = useLocation();
   const { user, logout } = useAuth();
+  const [isFeaturesDropdownOpen, setIsFeaturesDropdownOpen] = useState(false);
+
+  const handleFeaturesMouseEnter = () => {
+    setIsFeaturesDropdownOpen(true);
+  };
+
+  const handleFeaturesMouseLeave = () => {
+    setIsFeaturesDropdownOpen(false);
+  };
 
   return (
     <nav className="bg-white shadow-md fixed top-0 left-0 w-full z-50">
@@ -14,10 +24,25 @@ const Navbar: React.FC = () => {
           {user && (
             <>
               <Link to="/home" className="px-5 py-2 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base">Home</Link>
-              <Link to="/lostfound" className="px-5 py-2 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base">Lost and Found</Link>
-              <Link to="/complaints" className="px-5 py-2 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base">Complaints</Link>
-              <Link to="/chat" className="px-5 py-2 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base">Chat</Link>
               <Link to="/campus-map" className="px-5 py-2 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base">Campus Map</Link>
+              {/* Features Dropdown */}
+              <div
+                className="relative group flex items-center"
+                onMouseEnter={handleFeaturesMouseEnter}
+                onMouseLeave={handleFeaturesMouseLeave}
+              >
+                <button className="px-5 py-2 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base flex items-center">
+                  Features {isFeaturesDropdownOpen ? <IoIosArrowDropup className="ml-1" /> : <IoIosArrowDropdown className="ml-1" />}
+                </button>
+                {isFeaturesDropdownOpen && (
+                  <div className="absolute top-full left-0 bg-white shadow-lg rounded-md w-48 z-50">
+                    <Link to="/lostfound" className="block px-4 py-2 text-black hover:bg-[#FFD166]">Lost and Found</Link>
+                    <Link to="/complaints" className="block px-4 py-2 text-black hover:bg-[#FFD166]">Complaints</Link>
+                    {/* Add other feature links here */}
+                  </div>
+                )}
+              </div>
+              <Link to="/chat" className="px-5 py-2 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base">Chat</Link>
             </>
           )}
         </div>
@@ -55,4 +80,4 @@ const Navbar: React.FC = () => {
   );
 };
 
-export default Navbar; 
+export default Navbar;
