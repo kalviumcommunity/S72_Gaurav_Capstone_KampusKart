@@ -12,8 +12,12 @@
   "dependencies": {
     "@emoji-mart/data": "^1.2.1",
     "@emoji-mart/react": "^1.1.1",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
     "@googlemaps/js-api-loader": "^1.16.8",
     "@headlessui/react": "^2.2.4",
+    "@mui/icons-material": "^7.1.0",
+    "@mui/material": "^7.1.0",
     "@react-google-maps/api": "^2.20.6",
     "@types/google.maps": "^3.58.1",
     "date-fns": "^4.1.0",
@@ -21,6 +25,7 @@
     "express-rate-limit": "^7.5.0",
     "lodash": "^4.17.21",
     "react": "^19.1.0",
+    "react-calendar": "^6.0.0",
     "react-dom": "^19.1.0",
     "react-icons": "^5.5.0",
     "socket.io-client": "^4.8.1"

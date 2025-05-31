@@ -72,7 +72,7 @@ const Landing: React.FC = () => {
       <section className="flex flex-col items-center justify-center min-h-[60vh] pt-36 pb-16 px-4">
         <h1 className="text-h1 font-extrabold text-center text-black mb-6 leading-tight" style={{ fontWeight: 900, letterSpacing: '-0.02em', lineHeight: '1.05' }}>Don't make campus life awkward</h1>
         <p className="text-lg text-center text-gray-500 mb-10 max-w-2xl">No more missing out on campus events, updates, or connections. KampusKart makes it easy to discover, connect, and manage your campus life—all in one place.</p>
-        <Link to="/signup" className="mt-2 px-10 py-4 rounded-full font-bold text-white bg-[#181818] shadow-lg hover:bg-[#00C6A7] hover:text-white transition text-lg">Sign up free</Link>
+        <Link to="/signup" className="mt-2 px-10 py-4 rounded-full font-bold text-white bg-[#181818] shadow-lg hover:bg-[#00C6A7] hover:text-white transition text-lg">Sign up</Link>
       </section>
       {/* How it works */}
       <section className="flex flex-col items-center justify-center py-12 px-4">
@@ -87,7 +87,7 @@ const Landing: React.FC = () => {
             </div>
           ))}
         </div>
-        <Link to="/signup" className="mt-12 px-10 py-4 rounded-full font-bold text-white bg-[#00C6A7] shadow-lg hover:bg-[#181818] hover:text-white transition text-lg">Sign up free</Link>
+        <Link to="/signup" className="mt-12 px-10 py-4 rounded-full font-bold text-white bg-[#00C6A7] shadow-lg hover:bg-[#181818] hover:text-white transition text-lg">Sign up</Link>
       </section>
       {/* Footer */}
       <footer className="text-center py-8 text-gray-400 text-sm">

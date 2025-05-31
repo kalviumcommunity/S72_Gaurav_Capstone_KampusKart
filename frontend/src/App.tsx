@@ -14,6 +14,8 @@ import Complaints from './components/Complaints';
 import CampusMap from './components/CampusMap';
 import AuthenticatedLayout from './components/AuthenticatedLayout';
 import Features from './components/Features';
+import Events from './components/Events';
+import News from './components/News';
 
 // Protected Route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -135,6 +137,26 @@ const App: React.FC = () => {
               <ProtectedRoute>
                 <AuthenticatedLayout>
                   <Profile />
+                </AuthenticatedLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/events"
+            element={
+              <ProtectedRoute>
+                <AuthenticatedLayout>
+                  <Events />
+                </AuthenticatedLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/news"
+            element={
+              <ProtectedRoute>
+                <AuthenticatedLayout>
+                  <News />
                 </AuthenticatedLayout>
               </ProtectedRoute>
             }

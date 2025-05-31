@@ -38,6 +38,8 @@ const Navbar: React.FC = () => {
                   <div className="absolute top-full left-0 bg-white shadow-lg rounded-md w-48 z-50">
                     <Link to="/lostfound" className="block px-4 py-2 text-black hover:bg-[#FFD166]">Lost and Found</Link>
                     <Link to="/complaints" className="block px-4 py-2 text-black hover:bg-[#FFD166]">Complaints</Link>
+                    <Link to="/events" className="block px-4 py-2 text-black hover:bg-[#FFD166]">Events</Link>
+                    <Link to="/news" className="block px-4 py-2 text-black hover:bg-[#FFD166]">News</Link>
                     {/* Add other feature links here */}
                   </div>
                 )}
@@ -80,4 +82,4 @@ const Navbar: React.FC = () => {
   );
 };
 
-export default Navbar;
+export default Navbar; 
