@@ -10,9 +10,4 @@ const SOCKET_URL = isProduction
   ? 'https://s72-gaurav-capstone.onrender.com'
   : 'http://localhost:5000';
 
-// Function to get the current API URL
-const getApiUrl = () => {
-  return API_BASE;
-};
-
-export { getApiUrl as API_BASE, SOCKET_URL, isProduction }; 
+export { API_BASE, SOCKET_URL, isProduction }; 

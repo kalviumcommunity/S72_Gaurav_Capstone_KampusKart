@@ -1,13 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Navbar from './Navbar';
 import { useAuth } from '../contexts/AuthContext';
-import { API_BASE } from '../config';
 import { FiSearch, FiSend, FiSmile } from 'react-icons/fi';
 import io from 'socket.io-client';
 import { format, isSameDay, parseISO } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import Picker from '@emoji-mart/react';
 import emojiData from '@emoji-mart/data';
+
+// Define API_BASE based on environment
+const API_BASE = window.location.hostname === 'localhost' 
+  ? 'http://localhost:5000'
+  : 'https://s72-gaurav-capstone.onrender.com';
 
 interface User {
   _id: string;
@@ -65,100 +69,158 @@ const Chat: React.FC = () => {
   const socketRef = useRef<any>(null);
 
   useEffect(() => {
-    if (user) {
-      socketRef.current = io(ENDPOINT, {
-        reconnection: true,
-        reconnectionAttempts: 5,
-        reconnectionDelay: 1000,
-        reconnectionDelayMax: 5000,
-        timeout: 20000,
-      });
-
-      socketRef.current.on('connect', () => {
-        console.log('Socket connected');
-        setSocketConnected(true);
-        socketRef.current.emit('setup', user);
-      });
-
-      socketRef.current.on('connect_error', (error: any) => {
-        console.error('Socket connection error:', error);
-        setSocketConnected(false);
-      });
-
-      socketRef.current.on('disconnect', (reason: any) => {
-        console.log('Socket disconnected:', reason);
-        setSocketConnected(false);
-      });
-
-      socketRef.current.on('reconnect', (attemptNumber: number) => {
-        console.log('Socket reconnected after', attemptNumber, 'attempts');
-        setSocketConnected(true);
-        socketRef.current.emit('setup', user);
-      });
-
-      socketRef.current.on('message received', (newMessageReceived: Message) => {
-        if (selectedConversation && selectedConversation._id === newMessageReceived.conversation) {
-          setMessages((prevMessages) => [...prevMessages, newMessageReceived]);
-          // Mark message as delivered
-          socketRef.current.emit('message delivered', { messageId: newMessageReceived._id, userId: user._id });
-        } else {
-          fetchConversations();
-        }
-        setConversations(prevConversations => {
-          const updatedConversations = prevConversations.map(conv =>
-            conv._id === newMessageReceived.conversation ? { ...conv, latestMessage: newMessageReceived, updatedAt: newMessageReceived.createdAt } : conv
-          );
-          updatedConversations.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
-          if (!updatedConversations.find(conv => conv._id === newMessageReceived.conversation)) {
-            fetchConversations();
-            return prevConversations;
-          }
-          return updatedConversations;
+    if (user && API_BASE) {
+      try {
+        socketRef.current = io(API_BASE, {
+          reconnection: true,
+          reconnectionAttempts: 5,
+          reconnectionDelay: 1000,
+          reconnectionDelayMax: 5000,
+          timeout: 20000,
+          transports: ['websocket', 'polling'],
         });
-      });
 
-      socketRef.current.on('message delivered', (data: { messageId: string, userId: string }) => {
-        setMessages((prevMessages) =>
-          prevMessages.map((msg) =>
-            msg._id === data.messageId ? { ...msg, status: 'delivered' } : msg
-          )
-        );
-      });
+        socketRef.current.on('connect', () => {
+          console.log('Socket connected');
+          setSocketConnected(true);
+          if (user?._id) {
+            socketRef.current.emit('setup', user);
+          }
+        });
 
-      socketRef.current.on('message read', (data: { messageId: string, userId: string }) => {
-        setMessages((prevMessages) =>
-          prevMessages.map((msg) =>
-            msg._id === data.messageId ? { ...msg, status: 'read' } : msg
-          )
-        );
-      });
+        socketRef.current.on('connect_error', (error: any) => {
+          console.error('Socket connection error:', error);
+          setSocketConnected(false);
+          // Attempt to reconnect after a delay
+          setTimeout(() => {
+            if (socketRef.current) {
+              socketRef.current.connect();
+            }
+          }, 5000);
+        });
 
-      socketRef.current.on('typing', (data: { conversationId: string, userId: string }) => {
-        if (selectedConversation && selectedConversation._id === data.conversationId) {
-          setIsTyping(true);
-        }
-      });
+        socketRef.current.on('disconnect', (reason: any) => {
+          console.log('Socket disconnected:', reason);
+          setSocketConnected(false);
+          // Attempt to reconnect if not disconnected by the server
+          if (reason !== 'io server disconnect') {
+            setTimeout(() => {
+              if (socketRef.current) {
+                socketRef.current.connect();
+              }
+            }, 5000);
+          }
+        });
 
-      socketRef.current.on('stop typing', (data: { conversationId: string, userId: string }) => {
-        if (selectedConversation && selectedConversation._id === data.conversationId) {
-          setIsTyping(false);
-        }
-      });
+        socketRef.current.on('reconnect', (attemptNumber: number) => {
+          console.log('Socket reconnected after', attemptNumber, 'attempts');
+          setSocketConnected(true);
+          if (user?._id) {
+            socketRef.current.emit('setup', user);
+          }
+        });
 
-      socketRef.current.on('online users', (users: string[]) => {
-        console.log('Online users received:', users);
-        setOnlineUsers(users);
-      });
+        socketRef.current.on('message received', (newMessageReceived: Message) => {
+          if (selectedConversation && selectedConversation._id === newMessageReceived.conversation) {
+            setMessages((prevMessages) => [...prevMessages, newMessageReceived]);
+            // Mark message as delivered
+            if (user?._id) {
+              socketRef.current.emit('message delivered', { 
+                messageId: newMessageReceived._id, 
+                userId: user._id 
+              });
+            }
+          }
+          
+          // Update conversations list
+          setConversations(prevConversations => {
+            const updatedConversations = prevConversations.map(conv =>
+              conv._id === newMessageReceived.conversation 
+                ? { 
+                    ...conv, 
+                    latestMessage: newMessageReceived, 
+                    updatedAt: newMessageReceived.createdAt,
+                    readBy: conv.readBy || []
+                  } 
+                : conv
+            );
+            
+            // Sort conversations by updatedAt
+            updatedConversations.sort((a, b) => 
+              new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+            );
+            
+            // If conversation not found, fetch updated list
+            if (!updatedConversations.find(conv => conv._id === newMessageReceived.conversation)) {
+              fetchConversations();
+              return prevConversations;
+            }
+            
+            return updatedConversations;
+          });
+        });
 
-      socketRef.current.on('user online', (userId: string) => {
-        console.log('User online:', userId);
-        setOnlineUsers(prevUsers => [...prevUsers, userId]);
-      });
+        socketRef.current.on('message delivered', (data: { messageId: string, userId: string }) => {
+          setMessages((prevMessages) =>
+            prevMessages.map((msg) =>
+              msg._id === data.messageId ? { ...msg, status: 'delivered' } : msg
+            )
+          );
+        });
 
-      socketRef.current.on('user offline', (userId: string) => {
-        console.log('User offline:', userId);
-        setOnlineUsers(prevUsers => prevUsers.filter(id => id !== userId));
-      });
+        socketRef.current.on('message read', (data: { messageId: string, userId: string }) => {
+          setMessages((prevMessages) =>
+            prevMessages.map((msg) =>
+              msg._id === data.messageId ? { ...msg, status: 'read' } : msg
+            )
+          );
+          
+          // Update conversation readBy status
+          setConversations(prevConversations =>
+            prevConversations.map(conv => {
+              if (conv.latestMessage?._id === data.messageId) {
+                return {
+                  ...conv,
+                  readBy: [...(conv.readBy || []), data.userId].filter((id, index, self) => 
+                    self.indexOf(id) === index
+                  )
+                };
+              }
+              return conv;
+            })
+          );
+        });
+
+        socketRef.current.on('typing', (data: { conversationId: string, userId: string }) => {
+          if (selectedConversation && selectedConversation._id === data.conversationId) {
+            setIsTyping(true);
+          }
+        });
+
+        socketRef.current.on('stop typing', (data: { conversationId: string, userId: string }) => {
+          if (selectedConversation && selectedConversation._id === data.conversationId) {
+            setIsTyping(false);
+          }
+        });
+
+        socketRef.current.on('online users', (users: string[]) => {
+          console.log('Online users received:', users);
+          setOnlineUsers(users);
+        });
+
+        socketRef.current.on('user online', (userId: string) => {
+          console.log('User online:', userId);
+          setOnlineUsers(prevUsers => [...prevUsers, userId]);
+        });
+
+        socketRef.current.on('user offline', (userId: string) => {
+          console.log('User offline:', userId);
+          setOnlineUsers(prevUsers => prevUsers.filter(id => id !== userId));
+        });
+      } catch (error) {
+        console.error('Error initializing socket:', error);
+        setSocketConnected(false);
+      }
     }
 
     return () => {
@@ -202,62 +264,64 @@ const Chat: React.FC = () => {
     fetchConversations();
   }, [token]);
 
-  useEffect(() => {
-    const fetchMessages = async () => {
-      if (!selectedConversation || !token) {
-        setMessages([]);
-        setMessagesError(null);
-        return;
-      }
+  const fetchMessages = async () => {
+    console.log('fetchMessages called', { selectedConversation: selectedConversation?._id, token: !!token, socketConnected });
+    if (!selectedConversation || !token) {
+      setMessages([]);
       setMessagesError(null);
-      try {
-        if (socketRef.current) {
-          socketRef.current.emit('join chat', selectedConversation._id);
-        }
+      return;
+    }
+    setMessagesError(null);
+    try {
+      if (socketRef.current) {
+        socketRef.current.emit('join chat', selectedConversation._id);
+      }
 
-        const response = await fetch(`${API_BASE}/api/chat/${selectedConversation._id}/messages`, {
+      const response = await fetch(`${API_BASE}/api/chat/${selectedConversation._id}/messages`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch messages');
+      }
+      const data = await response.json();
+      setMessages(data);
+
+      // Mark conversation as read by the current user
+      if (user?._id) {
+        const markReadResponse = await fetch(`${API_BASE}/api/chat/${selectedConversation._id}/read`, {
+          method: 'POST',
           headers: {
+            'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
+          body: JSON.stringify({ userId: user._id }),
         });
-        if (!response.ok) {
-          throw new Error('Failed to fetch messages');
+        if (!markReadResponse.ok) {
+          console.error('Failed to mark conversation as read');
         }
-        const data = await response.json();
-        setMessages(data);
-
-        // Mark conversation as read by the current user
-        if (user?._id) {
-          const markReadResponse = await fetch(`${API_BASE}/api/chat/${selectedConversation._id}/read`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ userId: user._id }),
-          });
-          if (!markReadResponse.ok) {
-            console.error('Failed to mark conversation as read');
-          }
-        }
-
-        // Update local state to mark conversation as read
-        if (user?._id) {
-          setConversations(prevConversations => prevConversations.map(conv =>
-            conv._id === selectedConversation._id
-              ? { ...conv, readBy: [...(conv.readBy || []), user._id].filter((id, index, self) => self.indexOf(id) === index) }
-              : conv
-          ));
-        }
-      } catch (error) {
-        console.error('Error fetching messages:', error);
-        setMessages([]);
-        setMessagesError('Failed to load messages.');
       }
-    };
 
+      // Update local state to mark conversation as read
+      if (user?._id) {
+        setConversations(prevConversations => prevConversations.map(conv =>
+          conv._id === selectedConversation._id
+            ? { ...conv, readBy: [...(conv.readBy || []), user._id].filter((id, index, self) => self.indexOf(id) === index) }
+            : conv
+        ));
+      }
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+      setMessages([]);
+      setMessagesError('Failed to load messages.');
+    }
+  };
+
+  useEffect(() => {
+    console.log('useEffect for fetching messages triggered', { selectedConversation: selectedConversation?._id, token: !!token, socketConnected });
     fetchMessages();
-  }, [selectedConversation, token, socketConnected]);
+  }, [selectedConversation, token, socketConnected, user]);
 
   useEffect(() => {
     if (
@@ -306,6 +370,8 @@ const Chat: React.FC = () => {
   };
 
   const handleUserSelect = async (userId: string) => {
+    if (!user?._id || !token) return;
+    
     setConversationCreateError(null);
     try {
       const response = await fetch(`${API_BASE}/api/chat`, {
@@ -316,31 +382,41 @@ const Chat: React.FC = () => {
         },
         body: JSON.stringify({ userId }),
       });
+
       if (!response.ok) {
         throw new Error('Failed to create/fetch conversation');
       }
+
       const conversation = await response.json();
-      setSelectedConversation(conversation);
+      
+      // Clear search results
       setSearchResults([]);
       setSearchText('');
 
-      if (user?._id) {
-      setConversations(prevConversations => prevConversations.map(conv =>
-            conv._id === conversation._id ? { ...conv, readBy: [...(conv.readBy || []), user._id].filter((id, index, self) => self.indexOf(id) === index) } : conv
-      ));
-      }
+      // Update conversations list
+      setConversations(prevConversations => {
+        const updatedConversations = prevConversations.filter(conv => conv._id !== conversation._id);
+        updatedConversations.unshift({
+          ...conversation,
+          readBy: [user._id]
+        });
+        return updatedConversations;
+      });
 
-      fetchConversations();
+      // Select the new conversation and immediately trigger message fetching
+      setSelectedConversation(conversation);
+      console.log('setSelectedConversation called with:', conversation);
+      console.log('Conversations after update:', conversations);
 
     } catch (error) {
       console.error('Error creating/fetching conversation:', error);
-      setConversationCreateError('Failed to start conversation.');
+      setConversationCreateError('Failed to start conversation. Please try again.');
     }
   };
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !selectedConversation || !token || !socketConnected) return;
+    if (!newMessage.trim() || !selectedConversation || !token || !socketConnected || !user?._id) return;
 
     const messageContent = newMessage;
     setNewMessage('');
@@ -348,13 +424,13 @@ const Chat: React.FC = () => {
 
     const tempMessage: Message = {
       _id: Date.now().toString(),
-      sender: user!,
+      sender: user,
       text: messageContent,
       createdAt: new Date().toISOString(),
       conversation: selectedConversation._id,
       status: 'sending'
     };
-    setMessages([...messages, tempMessage]);
+    setMessages(prev => [...prev, tempMessage]);
 
     try {
       const response = await fetch(`${API_BASE}/api/chat/${selectedConversation._id}/messages`, {
@@ -371,27 +447,46 @@ const Chat: React.FC = () => {
       }
 
       const sentMessage: Message = await response.json();
-      setMessages((prevMessages) =>
-        prevMessages.map((msg) => (msg._id === tempMessage._id ? { ...sentMessage, status: 'sent' } : msg))
+      
+      // Update messages with the sent message
+      setMessages(prevMessages =>
+        prevMessages.map(msg => 
+          msg._id === tempMessage._id ? { ...sentMessage, status: 'sent' } : msg
+        )
       );
 
+      // Emit the new message through socket
       if (socketRef.current) {
         socketRef.current.emit('new message', sentMessage);
       }
 
+      // Update conversations list
       setConversations(prevConversations => {
         const updatedConversations = prevConversations.map(conv =>
-          conv._id === selectedConversation._id ? { ...conv, latestMessage: sentMessage, updatedAt: sentMessage.createdAt } : conv
+          conv._id === selectedConversation._id 
+            ? { 
+                ...conv, 
+                latestMessage: sentMessage, 
+                updatedAt: sentMessage.createdAt,
+                readBy: [user._id] // Reset readBy to only include sender
+              } 
+            : conv
         );
-         updatedConversations.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+        
+        // Sort conversations by updatedAt
+        updatedConversations.sort((a, b) => 
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+        );
+        
         return updatedConversations;
       });
 
     } catch (error) {
       console.error('Error sending message:', error);
-      setMessages((prevMessages) => prevMessages.filter(msg => msg._id !== tempMessage._id));
+      // Remove the temporary message and restore the input
+      setMessages(prevMessages => prevMessages.filter(msg => msg._id !== tempMessage._id));
       setNewMessage(messageContent);
-      setSendMessageError('Failed to send message.');
+      setSendMessageError('Failed to send message. Please try again.');
     }
   };
 
@@ -516,6 +611,22 @@ const Chat: React.FC = () => {
     setShowEmojiPicker(false);
   };
 
+  const handleConversationClick = (conversation: Conversation) => {
+    if (conversation && conversation._id) {
+      setSelectedConversation(conversation);
+      // Mark conversation as read when selected
+      if (user?._id && conversation.readBy && !conversation.readBy.includes(user._id)) {
+        setConversations(prevConversations =>
+          prevConversations.map(conv =>
+            conv._id === conversation._id
+              ? { ...conv, readBy: [...(conv.readBy || []), user._id] }
+              : conv
+          )
+        );
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-white font-sans">
       <Navbar />
@@ -555,6 +666,14 @@ const Chat: React.FC = () => {
                        key={result._id}
                        className="px-4 py-3 hover:bg-gray-100 cursor-pointer flex items-center text-gray-900 rounded-md"
                        onClick={() => handleUserSelect(result._id)}
+                       onKeyDown={(e) => {
+                         if (e.key === 'Enter' || e.key === ' ') {
+                           handleUserSelect(result._id);
+                         }
+                       }}
+                       role="button"
+                       tabIndex={0}
+                       style={{ pointerEvents: 'auto', zIndex: 20 }}
                      >
                        {renderParticipantAvatar(result, 'small')}
                        <div>
@@ -589,7 +708,7 @@ const Chat: React.FC = () => {
                     );
                     const isOnline = !isGroup && conversation.participants.find(p => p._id !== user?._id) && onlineUsers.includes(conversation.participants.find(p => p._id !== user?._id)?._id || '');
                     const isSelected = selectedConversation?._id === conversation._id;
-                    const isUnread = conversation.latestMessage && user?._id && !conversation.readBy?.includes(user._id);
+                    const isUnread = conversation.latestMessage && user?._id && conversation.readBy && !conversation.readBy.includes(user._id);
 
                     return (
                       <div
@@ -597,7 +716,14 @@ const Chat: React.FC = () => {
                         className={`flex items-center p-2 cursor-pointer rounded-md ${
                           isSelected ? 'bg-gray-200' : 'hover:bg-gray-100'
                         }`}
-                        onClick={() => setSelectedConversation(conversation)}
+                        onClick={() => handleConversationClick(conversation)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            handleConversationClick(conversation);
+                          }
+                        }}
+                        role="button"
+                        tabIndex={0}
                       >
                         <div className="relative mr-3 flex items-center">
                           {displayAvatar}
@@ -606,7 +732,12 @@ const Chat: React.FC = () => {
                           )}
                         </div>
                         <div className="flex-1">
-                          <div className="font-medium text-gray-900 flex items-center">{displayName}</div>
+                          <div className="font-medium text-gray-900 flex items-center">
+                            {displayName}
+                            {isUnread && (
+                              <span className="ml-2 w-2 h-2 bg-blue-500 rounded-full"></span>
+                            )}
+                          </div>
                           <div className="text-sm text-gray-600">
                             {conversation.latestMessage ? `${conversation.latestMessage.sender._id === user?._id ? 'You: ' : ''}${conversation.latestMessage.text.substring(0, 30)}${conversation.latestMessage.text.length > 30 ? '...' : ''}` : 'Start a conversation'}
                           </div>
