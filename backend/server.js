@@ -22,7 +22,12 @@ const Message = require('./models/Message'); // Import Message model
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://kampuskart.netlify.app', 'https://s72-gaurav-capstone.onrender.com']
+    : 'http://localhost:3000',
+  credentials: true
+}));
 app.use(express.json());
 app.use(passport.initialize());
 
@@ -59,7 +64,9 @@ const server = http.createServer(app);
 const io = new Server(server, {
   pingTimeout: 60000,
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: process.env.NODE_ENV === 'production'
+      ? ['https://kampuskart.netlify.app', 'https://s72-gaurav-capstone.onrender.com']
+      : 'http://localhost:3000',
     credentials: true,
   },
   transports: ['websocket', 'polling'],

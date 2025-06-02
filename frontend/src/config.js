@@ -1,3 +1,9 @@
-const API_BASE = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5000'; // Replace with your production backend URL when deploying
+const API_BASE = process.env.NODE_ENV === 'production' 
+  ? 'https://s72-gaurav-capstone.onrender.com' 
+  : 'http://localhost:5000';
 
-export { API_BASE }; 
+const SOCKET_URL = process.env.NODE_ENV === 'production'
+  ? 'https://s72-gaurav-capstone.onrender.com'
+  : 'http://localhost:5000';
+
+export { API_BASE, SOCKET_URL }; 
