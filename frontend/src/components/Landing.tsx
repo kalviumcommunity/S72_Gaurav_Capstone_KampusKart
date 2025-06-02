@@ -62,47 +62,47 @@ const steps = [
 
 const Landing: React.FC = () => {
   return (
-    <div className="relative min-h-screen bg-white font-sans overflow-hidden pt-24">
+    <div className="relative min-h-screen bg-white font-sans overflow-hidden pt-16 md:pt-24">
       <Navbar />
       {/* Large abstract blobs */}
-      <svg className="absolute left-[-120px] top-[-80px] w-[340px] h-[220px] -z-10" viewBox="0 0 340 220" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M60,40 Q120,0 200,60 T340,40 Q320,120 200,180 T60,180 Q0,120 60,40Z" fill="#FFD166"/></svg>
-      <svg className="absolute right-[-120px] top-20 w-[320px] h-[200px] -z-10" viewBox="0 0 320 200" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M40,60 Q100,0 180,40 T320,60 Q300,140 180,180 T40,140 Q0,100 40,60Z" fill="#F05A25"/></svg>
-      <svg className="absolute left-[-100px] bottom-[-80px] w-[300px] h-[180px] -z-10" viewBox="0 0 300 180" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M60,40 Q120,0 200,60 T300,40 Q280,120 200,160 T60,160 Q0,120 60,40Z" fill="#00C6A7"/></svg>
+      <svg className="absolute left-[-120px] top-[-80px] w-[240px] h-[160px] md:w-[340px] md:h-[220px] -z-10" viewBox="0 0 340 220" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M60,40 Q120,0 200,60 T340,40 Q320,120 200,180 T60,180 Q0,120 60,40Z" fill="#FFD166"/></svg>
+      <svg className="absolute right-[-120px] top-20 w-[220px] h-[140px] md:w-[320px] md:h-[200px] -z-10" viewBox="0 0 320 200" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M40,60 Q100,0 180,40 T320,60 Q300,140 180,180 T40,140 Q0,100 40,60Z" fill="#F05A25"/></svg>
+      <svg className="absolute left-[-100px] bottom-[-80px] w-[200px] h-[120px] md:w-[300px] md:h-[180px] -z-10" viewBox="0 0 300 180" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M60,40 Q120,0 200,60 T300,40 Q280,120 200,160 T60,160 Q0,120 60,40Z" fill="#00C6A7"/></svg>
       {/* Hero */}
-      <section className="flex flex-col items-center justify-center min-h-[60vh] pt-36 pb-16 px-4">
-        <h1 className="text-h1 font-extrabold text-center text-black mb-6 leading-tight" style={{ fontWeight: 900, letterSpacing: '-0.02em', lineHeight: '1.05' }}>Don't make campus life awkward</h1>
-        <p className="text-lg text-center text-gray-500 mb-10 max-w-2xl">No more missing out on campus events, updates, or connections. KampusKart makes it easy to discover, connect, and manage your campus life—all in one place.</p>
-        <Link to="/signup" className="mt-2 px-10 py-4 rounded-full font-bold text-white bg-[#181818] shadow-lg hover:bg-[#00C6A7] hover:text-white transition text-lg">Sign up</Link>
+      <section className="flex flex-col items-center justify-center min-h-[60vh] pt-24 md:pt-36 pb-8 md:pb-16 px-4">
+        <h1 className="text-3xl md:text-h1 font-extrabold text-center text-black mb-4 md:mb-6 leading-tight" style={{ fontWeight: 900, letterSpacing: '-0.02em', lineHeight: '1.05' }}>Don't make campus life awkward</h1>
+        <p className="text-base md:text-lg text-center text-gray-500 mb-6 md:mb-10 max-w-2xl">No more missing out on campus events, updates, or connections. KampusKart makes it easy to discover, connect, and manage your campus life—all in one place.</p>
+        <Link to="/signup" className="mt-2 px-8 md:px-10 py-3 md:py-4 rounded-full font-bold text-white bg-[#181818] shadow-lg hover:bg-[#00C6A7] hover:text-white transition text-base md:text-lg">Sign up</Link>
       </section>
       {/* How it works */}
-      <section className="flex flex-col items-center justify-center py-12 px-4">
-        <h2 className="text-h2 font-extrabold text-center text-black mb-2" style={{ fontWeight: 900, letterSpacing: '-0.01em', lineHeight: '1.1' }}>Here's how it works</h2>
-        <p className="text-lg text-center text-gray-500 mb-12">More living, less searching.</p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-5xl w-full">
+      <section className="flex flex-col items-center justify-center py-8 md:py-12 px-4">
+        <h2 className="text-2xl md:text-h2 font-extrabold text-center text-black mb-2" style={{ fontWeight: 900, letterSpacing: '-0.01em', lineHeight: '1.1' }}>Here's how it works</h2>
+        <p className="text-base md:text-lg text-center text-gray-500 mb-8 md:mb-12">More living, less searching.</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-10 max-w-5xl w-full">
           {steps.map((step, idx) => (
-            <div key={idx} className="flex flex-col items-center text-center">
-              <div className={`mb-4 w-14 h-14 flex items-center justify-center rounded-full font-bold text-h4 ${step.bg} ${step.color}`}>{step.number}</div>
-              <h3 className="text-h4 font-bold text-black mb-2">{step.title}</h3>
-              <p className="text-body text-gray-500">{step.desc}</p>
+            <div key={idx} className="flex flex-col items-center text-center p-4 md:p-0">
+              <div className={`mb-4 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full font-bold text-lg md:text-h4 ${step.bg} ${step.color}`}>{step.number}</div>
+              <h3 className="text-lg md:text-h4 font-bold text-black mb-2">{step.title}</h3>
+              <p className="text-sm md:text-body text-gray-500">{step.desc}</p>
             </div>
           ))}
         </div>
-        <Link to="/signup" className="mt-12 px-10 py-4 rounded-full font-bold text-white bg-[#00C6A7] shadow-lg hover:bg-[#181818] hover:text-white transition text-lg">Sign up</Link>
+        <Link to="/signup" className="mt-8 md:mt-12 px-8 md:px-10 py-3 md:py-4 rounded-full font-bold text-white bg-[#00C6A7] shadow-lg hover:bg-[#181818] hover:text-white transition text-base md:text-lg">Sign up</Link>
       </section>
       {/* Footer */}
-      <footer className="text-center py-8 text-gray-400 text-sm">
+      <footer className="text-center py-6 md:py-8 px-4 text-gray-400 text-sm">
         <div className="flex items-center justify-center gap-2 mb-2">
-          <img src="/Logo.png" alt="KampusKart Logo" className="h-8 w-8" />
-          <span className="text-h5 font-extrabold text-black tracking-tight">Kampuskart</span>
+          <img src="/Logo.png" alt="KampusKart Logo" className="h-6 w-6 md:h-8 md:w-8" />
+          <span className="text-base md:text-h5 font-extrabold text-black tracking-tight">Kampuskart</span>
         </div>
-        <div className="flex justify-center gap-6 mb-4">
+        <div className="flex justify-center gap-4 md:gap-6 mb-4">
           {socials.map((s, i) => (
             <a key={i} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label} className="text-gray-400 hover:text-[#F05A25] transition-colors duration-200">
               {s.icon}
             </a>
           ))}
         </div>
-        <div className="text-body">&copy; {new Date().getFullYear()} KampusKart. All rights reserved.</div>
+        <div className="text-xs md:text-body">&copy; {new Date().getFullYear()} KampusKart. All rights reserved.</div>
       </footer>
     </div>
   );

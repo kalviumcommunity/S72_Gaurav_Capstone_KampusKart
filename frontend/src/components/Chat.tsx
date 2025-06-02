@@ -519,9 +519,11 @@ const Chat: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-white font-sans">
       <Navbar />
-      <main className="flex-1 container mx-auto p-4 grid grid-cols-1 md:grid-cols-3 gap-4 bg-[#F3F4F6] rounded-lg shadow-inner overflow-x-hidden" style={{ paddingTop: '80px' }}>
+      <main className="flex-1 container mx-auto p-2 md:p-4 grid grid-cols-1 md:grid-cols-3 gap-4 bg-[#F3F4F6] rounded-lg shadow-inner overflow-x-hidden" style={{ paddingTop: '80px' }}>
         {/* Left Column - Conversations */}
-        <div className="md:col-span-1 bg-white p-4 rounded-lg shadow flex flex-col max-h-[calc(100vh-100px)] overflow-hidden">
+        <div className={`md:col-span-1 bg-white p-4 rounded-lg shadow flex flex-col max-h-[calc(100vh-100px)] overflow-hidden ${
+          selectedConversation ? 'hidden md:flex' : 'flex'
+        }`}>
           {/* Search Users section at the top of the left panel */}
           <div className="mb-6">
             <h2 className="text-lg font-semibold mb-2 text-gray-800">Start New Chat</h2>
@@ -617,81 +619,89 @@ const Chat: React.FC = () => {
         </div>
 
         {/* Right Column - Chat Area */}
-        <div className="md:col-span-2 bg-white p-6 rounded-lg shadow flex flex-col max-h-[calc(100vh-96px)]">
+        <div className={`md:col-span-2 bg-white p-4 md:p-6 rounded-lg shadow flex flex-col max-h-[calc(100vh-96px)] ${
+          selectedConversation ? 'flex' : 'hidden md:flex'
+        }`}>
           {selectedConversation ? (
             <>
               {/* Chat Header */}
               <div className="flex items-center border-b border-gray-200 pb-4 mb-4">
-                 {renderParticipantAvatar(selectedConversation.participants.find(p => p._id !== user?._id), 'large')}
-                 <div className="flex-1">
-                   <h2 className="text-xl font-bold text-gray-800">{getParticipantName(selectedConversation.participants)}</h2>
-                   {selectedConversation.participants.find(p => p._id !== user?._id) && onlineUsers.includes(selectedConversation.participants.find(p => p._id !== user?._id)?._id || '') ? (
-                     <span className="text-sm text-green-600 font-semibold">Online</span>
-                   ) : (
-                      <span className="text-sm text-gray-500">Offline</span>
-                   )}
-                 </div>
-                 {/* Header Icons (placeholder) */}
-                 <div className="flex space-x-4 text-gray-400">
-                    {/* Delete Chat Icon */}
-                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="feather feather-trash-2 cursor-pointer hover:text-red-600" onClick={handleDeleteChat}><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                 </div>
+                <button
+                  onClick={() => setSelectedConversation(null)}
+                  className="md:hidden mr-2 p-2 hover:bg-gray-100 rounded-full"
+                  aria-label="Back to conversations"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                </button>
+                {renderParticipantAvatar(selectedConversation.participants.find(p => p._id !== user?._id), 'large')}
+                <div className="flex-1">
+                  <h2 className="text-xl font-bold text-gray-800">{getParticipantName(selectedConversation.participants)}</h2>
+                  {selectedConversation.participants.find(p => p._id !== user?._id) && onlineUsers.includes(selectedConversation.participants.find(p => p._id !== user?._id)?._id || '') ? (
+                    <span className="text-sm text-green-600 font-semibold">Online</span>
+                  ) : (
+                    <span className="text-sm text-gray-500">Offline</span>
+                  )}
+                </div>
+                {/* Header Icons */}
+                <div className="flex space-x-4 text-gray-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="feather feather-trash-2 cursor-pointer hover:text-red-600" onClick={handleDeleteChat}><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                </div>
               </div>
 
               {/* Messages Area */}
-              <div className="flex-1 overflow-y-auto mb-4 space-y-4">
-                 {groupMessagesByDate(messages).map(([date, messagesForDate]) => (
-                   <div key={date}>
-                      <div className="text-center text-sm text-gray-500 mb-4">{renderDateHeader(date)}</div>
-                     {messagesForDate.map((message) => {
-                       const isMine = message.sender._id === user?._id;
-                       return (
-                         <div
-                           key={message._id}
-                           className={`flex ${isMine ? 'justify-end' : 'justify-start'} mb-2`}
-                         >
-                            <div className={`max-w-[70%] px-4 py-2 rounded-2xl shadow-md ${
-                             isMine
-                               ? 'bg-gradient-to-br from-[#DCF8C6] to-[#b2f0e6] text-black rounded-br-none mr-4'
-                               : 'bg-gradient-to-br from-[#F3F4F6] to-[#e0e7ef] text-black rounded-bl-none ml-2'
-                             }`}>
-                             <p className="pb-1 break-words">{message.text}</p>
-                             <div className={`flex items-center ${isMine ? 'justify-end' : 'justify-start'} space-x-1 mt-1 text-xs text-gray-500 opacity-75`}>
-                               <span>{format(new Date(message.createdAt), 'h:mm a')}</span>
-                               {isMine && message.status && (
-                                 <span className="ml-1">
-                                   {message.status === 'sent' && '✓'}
-                                   {message.status === 'delivered' && '✓✓'}
-                                   {message.status === 'read' && <span className="text-blue-500">✓✓</span>}
-                                 </span>
-                               )}
-                             </div>
-                           </div>
-                         </div>
-                       );
-                     })}
-                   </div>
-                 ))}
-                 {isTyping && (
-                   <div className="flex items-center space-x-2 text-sm text-gray-500 italic">
-                     <div className="flex items-center gap-2">
-                       <span>{getParticipantName(selectedConversation.participants.filter(p => p._id !== user?._id))} is typing</span>
-                       <span className="inline-flex gap-1">
-                         <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                         <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '100ms' }}></span>
-                         <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '200ms' }}></span>
-                       </span>
-                     </div>
-                   </div>
-                 )}
-                 <div ref={messagesEndRef} />
+              <div className="flex-1 overflow-y-auto mb-4 space-y-4 px-2 md:px-0">
+                {groupMessagesByDate(messages).map(([date, messagesForDate]) => (
+                  <div key={date}>
+                    <div className="text-center text-sm text-gray-500 mb-4">{renderDateHeader(date)}</div>
+                    {messagesForDate.map((message) => {
+                      const isMine = message.sender._id === user?._id;
+                      return (
+                        <div
+                          key={message._id}
+                          className={`flex ${isMine ? 'justify-end' : 'justify-start'} mb-2`}
+                        >
+                          <div className={`max-w-[85%] md:max-w-[70%] px-4 py-2 rounded-2xl shadow-md ${
+                            isMine
+                              ? 'bg-gradient-to-br from-[#DCF8C6] to-[#b2f0e6] text-black rounded-br-none mr-4'
+                              : 'bg-gradient-to-br from-[#F3F4F6] to-[#e0e7ef] text-black rounded-bl-none ml-2'
+                            }`}>
+                            <p className="pb-1 break-words">{message.text}</p>
+                            <div className={`flex items-center ${isMine ? 'justify-end' : 'justify-start'} space-x-1 mt-1 text-xs text-gray-500 opacity-75`}>
+                              <span>{format(new Date(message.createdAt), 'h:mm a')}</span>
+                              {isMine && message.status && (
+                                <span className="ml-1">
+                                  {message.status === 'sent' && '✓'}
+                                  {message.status === 'delivered' && '✓✓'}
+                                  {message.status === 'read' && <span className="text-blue-500">✓✓</span>}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))}
+                {isTyping && (
+                  <div className="flex items-center space-x-2 text-sm text-gray-500 italic">
+                    <div className="flex items-center gap-2">
+                      <span>{getParticipantName(selectedConversation.participants.filter(p => p._id !== user?._id))} is typing</span>
+                      <span className="inline-flex gap-1">
+                        <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                        <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '100ms' }}></span>
+                        <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '200ms' }}></span>
+                      </span>
+                    </div>
+                  </div>
+                )}
+                <div ref={messagesEndRef} />
               </div>
 
               {messages.length === 0 && selectedConversation && !messagesError && (
                 <div className="text-center text-gray-500">Loading messages...</div>
               )}
               {messagesError && (
-                  <div className="text-center text-red-500 mt-4">{messagesError}</div>
+                <div className="text-center text-red-500 mt-4">{messagesError}</div>
               )}
 
               {/* Message Input Area */}
@@ -700,11 +710,11 @@ const Chat: React.FC = () => {
                 <button
                   type="button"
                   aria-label="Open emoji picker"
-                  className="flex items-center justify-center w-14 h-14 rounded-full bg-[#181818] text-white border border-gray-300 hover:bg-[#00C6A7] focus:outline-none focus:ring-2 focus:ring-blue-500 mr-2 transition-colors duration-200"
+                  className="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-full bg-[#181818] text-white border border-gray-300 hover:bg-[#00C6A7] focus:outline-none focus:ring-2 focus:ring-blue-500 mr-2 transition-colors duration-200"
                   onClick={() => setShowEmojiPicker(v => !v)}
                   tabIndex={0}
                 >
-                  <FiSmile size={40} className="text-white" />
+                  <FiSmile size={32} className="text-white md:text-4xl" />
                 </button>
                 {showEmojiPicker && (
                   <div className="absolute bottom-16 left-0 z-[9999]">
@@ -714,7 +724,7 @@ const Chat: React.FC = () => {
                 <input
                   type="text"
                   placeholder="Type your message here..."
-                  className="flex-1 px-4 py-3 rounded-full bg-[#F3F4F6] border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 text-base"
+                  className="flex-1 px-4 py-2 md:py-3 rounded-full bg-[#F3F4F6] border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 text-base"
                   value={newMessage}
                   onChange={handleTyping}
                 />
@@ -722,15 +732,15 @@ const Chat: React.FC = () => {
                 <button
                   type="submit"
                   aria-label="Send message"
-                  className="flex items-center justify-center w-14 h-14 rounded-full bg-[#181818] text-white border border-gray-300 hover:bg-[#00C6A7] focus:outline-none focus:ring-2 focus:ring-blue-500 ml-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-full bg-[#181818] text-white border border-gray-300 hover:bg-[#00C6A7] focus:outline-none focus:ring-2 focus:ring-blue-500 ml-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={!newMessage.trim()}
                 >
-                  <FiSend size={36} className="text-white" />
+                  <FiSend size={28} className="text-white md:text-3xl" />
                 </button>
               </form>
-                {sendMessageError && (
-                    <div className="text-center text-red-500 mt-2">{sendMessageError}</div>
-                )}
+              {sendMessageError && (
+                <div className="text-center text-red-500 mt-2">{sendMessageError}</div>
+              )}
             </>
           ) : (
             <div className="flex items-center justify-center h-full text-gray-500">

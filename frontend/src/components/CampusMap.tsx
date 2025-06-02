@@ -344,16 +344,24 @@ const CampusMap: React.FC<CampusMapProps> = () => {
   return (
     <div className="w-full h-full flex flex-col bg-gray-100 relative">
       <div className="p-4">
-         <h1 className="text-3xl font-bold text-gray-800">Campus Map</h1>
+         <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Campus Map</h1>
       </div>
-      <div className="flex flex-grow h-0">
-        <div className="w-2/3 h-full relative">
+      <div className="flex flex-col md:flex-row flex-grow h-0">
+        {/* Map Container - Full width on mobile, 2/3 on desktop */}
+        <div className="w-full md:w-2/3 h-[50vh] md:h-full relative">
           <div className="bg-white shadow-lg overflow-hidden h-full relative">
             <GoogleMap
               mapContainerStyle={MAP_CONTAINER_STYLE}
               center={animationInProgress.current ? undefined : mapCenter}
               zoom={animationInProgress.current ? undefined : mapZoom}
-              options={MAP_OPTIONS}
+              options={{
+                ...MAP_OPTIONS,
+                // Adjust controls for mobile
+                zoomControl: true,
+                mapTypeControl: window.innerWidth >= 768,
+                streetViewControl: window.innerWidth >= 768,
+                fullscreenControl: window.innerWidth >= 768,
+              }}
               onClick={handleMapClick}
               onLoad={onMapLoad}
             >
@@ -453,34 +461,36 @@ const CampusMap: React.FC<CampusMapProps> = () => {
                 </InfoWindow>
               )}
             </GoogleMap>
-            {/* Recenter Button */}
+            {/* Recenter Button - Adjusted for mobile */}
             <button
               onClick={handleRecenter}
-              className="absolute bottom-6 left-6 z-10 bg-white border border-gray-300 shadow-lg rounded-full p-3 flex items-center justify-center hover:bg-blue-100 transition"
+              className="absolute bottom-4 md:bottom-6 left-4 md:left-6 z-10 bg-white border border-gray-300 shadow-lg rounded-full p-2 md:p-3 flex items-center justify-center hover:bg-blue-100 transition"
               title="Re-center map on your location"
               style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.10)' }}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none" />
-                <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="2" fill="none" />
-                <line x1="12" y1="2" x2="12" y2="6" stroke="currentColor" strokeWidth="2" />
-                <line x1="12" y1="18" x2="12" y2="22" stroke="currentColor" strokeWidth="2" />
-                <line x1="2" y1="12" x2="6" y2="12" stroke="currentColor" strokeWidth="2" />
-                <line x1="18" y1="12" x2="22" y2="12" stroke="currentColor" strokeWidth="2" />
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 md:h-6 md:w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth={2} fill="none" />
+                <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth={2} fill="none" />
+                <line x1="12" y1="2" x2="12" y2="6" stroke="currentColor" strokeWidth={2} />
+                <line x1="12" y1="18" x2="12" y2="22" stroke="currentColor" strokeWidth={2} />
+                <line x1="2" y1="12" x2="6" y2="12" stroke="currentColor" strokeWidth={2} />
+                <line x1="18" y1="12" x2="22" y2="12" stroke="currentColor" strokeWidth={2} />
               </svg>
             </button>
           </div>
         </div>
 
-        <div className="w-1/3 flex flex-col h-full">
-          <div className="bg-white shadow-lg p-4 flex-grow overflow-y-auto">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Campus Locations</h2>
-            <div className="mb-4 flex">
+        {/* Locations List - Full width on mobile, 1/3 on desktop */}
+        <div className="w-full md:w-1/3 flex flex-col h-[50vh] md:h-full">
+          <div className="bg-white shadow-lg p-3 md:p-4 flex-grow overflow-y-auto">
+            <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-3 md:mb-4">Campus Locations</h2>
+            {/* Search Bar - Improved for mobile */}
+            <div className="mb-3 md:mb-4 flex">
               <div className="relative flex items-center flex-1">
                 <input
                   type="text"
-                  placeholder="Search locations, categories, or descriptions..."
-                  className="w-full p-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Search locations..."
+                  className="w-full p-2 text-sm md:text-base border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={searchInput}
                   onChange={handleSearchInputChange}
                   onKeyDown={e => {
@@ -493,13 +503,14 @@ const CampusMap: React.FC<CampusMapProps> = () => {
               <button
                 type="button"
                 aria-label="Search"
-                className="px-4 py-2 bg-[#00C6A7] text-white rounded-none rounded-r-md font-semibold hover:bg-[#009e87] transition border border-l-0 border-gray-300"
+                className="px-3 md:px-4 py-2 bg-[#00C6A7] text-white rounded-none rounded-r-md font-semibold hover:bg-[#009e87] transition border border-l-0 border-gray-300"
                 onClick={handleSearchClick}
               >
-                <FiSearch />
+                <FiSearch className="w-4 h-4 md:w-5 md:h-5" />
               </button>
             </div>
-            <ul>
+            {/* Locations List - Improved for mobile */}
+            <ul className="space-y-2">
               {filteredLocations.map((location) => (
                 <li
                   key={location.id}
@@ -509,11 +520,11 @@ const CampusMap: React.FC<CampusMapProps> = () => {
                   onClick={() => handleLocationClick(location)}
                 >
                   <div className="flex justify-between items-start">
-                    <div>
-                      <span className="font-semibold">{location.id}. {location.name}</span>
-                      <p className="text-sm text-gray-600 mt-1">{location.description}</p>
+                    <div className="flex-1 min-w-0">
+                      <span className="font-semibold text-sm md:text-base block truncate">{location.id}. {location.name}</span>
+                      <p className="text-xs md:text-sm text-gray-600 mt-1 line-clamp-2">{location.description}</p>
                     </div>
-                    <span className="text-xs bg-gray-200 px-2 py-1 rounded-full">
+                    <span className="text-xs bg-gray-200 px-2 py-1 rounded-full ml-2 flex-shrink-0">
                       {location.category}
                     </span>
                   </div>
