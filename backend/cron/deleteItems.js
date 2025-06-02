@@ -2,19 +2,42 @@ const cron = require('node-cron');
 const LostFoundItem = require('../models/LostFoundItem');
 const cloudinary = require('cloudinary').v2;
 
-// Cloudinary configuration (ensure this is configured in your main server file or here)
+// Cloudinary configuration
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+// Helper function to delete images from Cloudinary
+const deleteImages = async (images) => {
+    if (!images || !Array.isArray(images)) return;
+    
+    const deletePromises = images.map(image => {
+        return new Promise((resolve) => {
+            if (!image || !image.public_id) {
+                resolve();
+                return;
+            }
+            cloudinary.uploader.destroy(image.public_id)
+                .then(() => resolve())
+                .catch(error => {
+                    console.error(`Error deleting image ${image.public_id}:`, error);
+                    resolve(); // Resolve anyway to continue with other operations
+                });
+        });
+    });
+    
+    await Promise.all(deletePromises);
+};
+
 const deleteExpiredItems = async () => {
     try {
         const now = new Date();
         const fifteenDaysAgo = new Date(now);
         fifteenDaysAgo.setDate(now.getDate() - 15);
-        const twentyFourHoursAgo = new Date(now.getTime() - (24 * 60 * 60 * 1000));
+        const threeDaysAgo = new Date(now);
+        threeDaysAgo.setDate(now.getDate() - 3);
 
         // Find unresolved items older than 15 days
         const unresolvedExpiredItems = await LostFoundItem.find({
@@ -22,10 +45,10 @@ const deleteExpiredItems = async () => {
             createdAt: { $lt: fifteenDaysAgo }
         });
 
-        // Find resolved items older than 24 hours
+        // Find resolved items older than 3 days
         const resolvedExpiredItems = await LostFoundItem.find({
             resolved: true,
-            resolvedAt: { $lt: twentyFourHoursAgo }
+            resolvedAt: { $lt: threeDaysAgo }
         });
 
         const itemsToDelete = [...unresolvedExpiredItems, ...resolvedExpiredItems];
@@ -36,16 +59,8 @@ const deleteExpiredItems = async () => {
             for (const item of itemsToDelete) {
                 try {
                     // Remove images from Cloudinary
-                    if (item.images && item.images.length > 0) {
-                        for (const image of item.images) {
-                            try {
-                                await cloudinary.uploader.destroy(image.public_id);
-                            } catch (cloudinaryError) {
-                                console.error(`Error deleting image ${image.public_id} from Cloudinary:`, cloudinaryError);
-                                // Continue with item deletion even if image deletion fails
-                            }
-                        }
-                    }
+                    await deleteImages(item.images);
+                    
                     // Delete item from database
                     await LostFoundItem.deleteOne({ _id: item._id });
                     console.log(`Deleted item: ${item._id}`);
@@ -55,19 +70,18 @@ const deleteExpiredItems = async () => {
             }
             console.log('Finished deleting expired items.');
         }
-
     } catch (error) {
-        console.error('Error in scheduled item deletion task:', error);
+        console.error('Error in deleteExpiredItems:', error);
     }
 };
 
-// Schedule the task to run once every day at midnight
+// Schedule the cron job to run every day at midnight
 const startDeletionCronJob = () => {
-    cron.schedule('0 0 * * *', () => {
-        console.log('Running scheduled item deletion task...');
-        deleteExpiredItems();
+    cron.schedule('0 0 * * *', async () => {
+        console.log('Running scheduled deletion of expired items...');
+        await deleteExpiredItems();
     });
-    console.log('Scheduled item deletion cron job to run daily at midnight.');
+    console.log('Scheduled deletion of expired items is active.');
 };
 
 module.exports = startDeletionCronJob; 

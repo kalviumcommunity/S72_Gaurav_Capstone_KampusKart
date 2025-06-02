@@ -22,8 +22,21 @@ const upload = multer({ storage });
 const uploadImages = async (files) => {
   const uploadPromises = files.map(file => {
     return new Promise((resolve, reject) => {
+      // Validate file type
+      if (!file.mimetype.startsWith('image/')) {
+        return reject(new Error('Only image files are allowed'));
+      }
+      // Validate file size (5MB max)
+      if (file.size > 5 * 1024 * 1024) {
+        return reject(new Error('Image size should be less than 5MB'));
+      }
+
       const uploadStream = cloudinary.uploader.upload_stream(
-        { folder: 'lost-found' }, // Specify a folder in Cloudinary
+        { 
+          folder: 'lost-found',
+          resource_type: 'auto',
+          allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp']
+        },
         (error, result) => {
           if (error) {
             return reject(error);
@@ -35,6 +48,28 @@ const uploadImages = async (files) => {
     });
   });
   return Promise.all(uploadPromises);
+};
+
+// Helper function to delete images from Cloudinary
+const deleteImages = async (images) => {
+  if (!images || !Array.isArray(images)) return;
+  
+  const deletePromises = images.map(image => {
+    return new Promise((resolve) => {
+      if (!image || !image.public_id) {
+        resolve();
+        return;
+      }
+      cloudinary.uploader.destroy(image.public_id)
+        .then(() => resolve())
+        .catch(error => {
+          console.error(`Error deleting image ${image.public_id}:`, error);
+          resolve(); // Resolve anyway to continue with other operations
+        });
+    });
+  });
+  
+  await Promise.all(deletePromises);
 };
 
 // Rate limiting middleware for item creation, update, and deletion
@@ -215,13 +250,13 @@ router.get('/:id', async (req, res) => {
 // Update a lost or found item by ID
 router.put('/:id', authMiddleware, itemRateLimiter, upload.array('images', 5), async (req, res) => {
   try {
-    const { type, title, description, location, date, resolved, contact } = req.body;
+    const { type, title, description, location, date, resolved, contact, keepImages } = req.body;
     const userId = req.user.id;
     const itemId = req.params.id;
 
     // Validate required fields
     if (!title || !description || !date || !contact) {
-        return res.status(400).json({ message: 'Please provide title, description, date, and contact information.' });
+      return res.status(400).json({ message: 'Please provide title, description, date, and contact information.' });
     }
 
     const item = await LostFoundItem.findById(itemId);
@@ -232,7 +267,7 @@ router.put('/:id', authMiddleware, itemRateLimiter, upload.array('images', 5), a
 
     // Check if the item is resolved
     if (item.resolved) {
-        return res.status(409).json({ message: 'Resolved items cannot be updated' });
+      return res.status(409).json({ message: 'Resolved items cannot be updated' });
     }
 
     // Check if the logged-in user is the owner of the item
@@ -240,17 +275,45 @@ router.put('/:id', authMiddleware, itemRateLimiter, upload.array('images', 5), a
       return res.status(403).json({ message: 'You are not authorized to update this item' });
     }
 
-    // Handle image uploads and potentially deleting old images
-    if (req.files && req.files.length > 0) {
-        // Remove old images from Cloudinary
-        if (item.images.length > 0) {
-            for (const image of item.images) {
-                await cloudinary.uploader.destroy(image.public_id);
-            }
+    // Handle image updates
+    let keepPublicIds = [];
+    if (keepImages) {
+      try {
+        keepPublicIds = JSON.parse(keepImages);
+      } catch (e) {
+        keepPublicIds = [];
+      }
+    }
+
+    // Remove images not in keepPublicIds from Cloudinary
+    if (Array.isArray(item.images)) {
+      for (const img of item.images) {
+        if (!keepPublicIds.includes(img.public_id)) {
+          try {
+            await cloudinary.uploader.destroy(img.public_id);
+          } catch (err) {
+            console.error(`Error deleting image ${img.public_id}:`, err);
+          }
         }
-        // Upload new images
+      }
+    }
+
+    // Keep only images whose public_id is in keepPublicIds, preserving order
+    let keptImages = [];
+    if (Array.isArray(item.images)) {
+      keptImages = keepPublicIds
+        .map(pid => item.images.find(img => img.public_id === pid))
+        .filter(Boolean);
+    }
+
+    // Handle new images if provided
+    if (req.files && req.files.length > 0) {
+      try {
         const newImages = await uploadImages(req.files);
-        item.images = newImages;
+        keptImages = [...keptImages, ...newImages];
+      } catch (error) {
+        return res.status(400).json({ message: error.message });
+      }
     }
 
     // Update item fields
@@ -259,11 +322,13 @@ router.put('/:id', authMiddleware, itemRateLimiter, upload.array('images', 5), a
     item.description = description || item.description;
     item.location = location || item.location;
     item.date = date || item.date;
+    item.contact = contact || item.contact;
+    item.images = keptImages;
+    
     // Only update resolved if it's explicitly provided in the request body
     if (resolved !== undefined) {
-        item.resolved = resolved;
+      item.resolved = resolved;
     }
-    item.contact = contact || item.contact;
 
     await item.save();
 
@@ -271,7 +336,6 @@ router.put('/:id', authMiddleware, itemRateLimiter, upload.array('images', 5), a
     await item.populate('user', 'name email');
 
     res.status(200).json(item);
-
 
   } catch (error) {
     console.error('Update lost/found item error:', error);
@@ -284,6 +348,7 @@ router.delete('/:id', authMiddleware, itemRateLimiter, async (req, res) => {
   try {
     const itemId = req.params.id;
     const userId = req.user.id;
+    const userEmail = req.user.email;
 
     const item = await LostFoundItem.findById(itemId);
 
@@ -293,22 +358,17 @@ router.delete('/:id', authMiddleware, itemRateLimiter, async (req, res) => {
 
     // Check if the item is resolved
     if (item.resolved) {
-        return res.status(409).json({ message: 'Resolved items cannot be deleted' });
+      return res.status(409).json({ message: 'Resolved items cannot be deleted' });
     }
 
-    // Check if the logged-in user is the owner of the item
-    if (item.user.toString() !== userId) {
+    // Allow owner or admin
+    if (item.user.toString() !== userId && userEmail !== 'gauravkhandelwal205@gmail.com') {
       return res.status(403).json({ message: 'You are not authorized to delete this item' });
     }
 
     // Remove images from Cloudinary
-    if (item.images.length > 0) {
-      for (const image of item.images) {
-        await cloudinary.uploader.destroy(image.public_id);
-      }
-    }
+    await deleteImages(item.images);
 
-    // Use deleteOne() for Mongoose v6+
     await LostFoundItem.deleteOne({ _id: itemId });
 
     res.status(200).json({ message: 'Item deleted successfully' });
@@ -318,33 +378,33 @@ router.delete('/:id', authMiddleware, itemRateLimiter, async (req, res) => {
   }
 });
 
-// Mark a lost or found item as resolved
-router.put('/:id/resolve', authMiddleware, async (req, res) => {
-    try {
-        const itemId = req.params.id;
-        const userId = req.user.id;
+// Mark a lost or found item as resolved (allow owner or admin)
+router.patch('/:id/resolve', authMiddleware, async (req, res) => {
+  try {
+    const itemId = req.params.id;
+    const userId = req.user.id;
+    const userEmail = req.user.email;
 
-        const item = await LostFoundItem.findById(itemId);
+    const item = await LostFoundItem.findById(itemId);
 
-        if (!item) {
-            return res.status(404).json({ message: 'Item not found' });
-        }
-
-        // Check if the logged-in user is the owner of the item
-        if (item.user.toString() !== userId) {
-            return res.status(403).json({ message: 'You are not authorized to mark this item as resolved' });
-        }
-
-        item.resolved = true;
-        item.resolvedAt = new Date(); // Set resolvedAt timestamp
-        await item.save();
-
-        res.status(200).json({ message: 'Item marked as resolved' });
-
-    } catch (error) {
-        console.error('Mark item as resolved error:', error);
-        res.status(500).json({ message: 'Error marking item as resolved' });
+    if (!item) {
+      return res.status(404).json({ message: 'Item not found' });
     }
+
+    // Allow owner or admin
+    if (item.user.toString() !== userId && userEmail !== 'gauravkhandelwal205@gmail.com') {
+      return res.status(403).json({ message: 'You are not authorized to mark this item as resolved' });
+    }
+
+    item.resolved = true;
+    item.resolvedAt = new Date();
+    await item.save();
+
+    res.status(200).json({ message: 'Item marked as resolved' });
+  } catch (error) {
+    console.error('Mark item as resolved error:', error);
+    res.status(500).json({ message: 'Error marking item as resolved' });
+  }
 });
 
 module.exports = router; 

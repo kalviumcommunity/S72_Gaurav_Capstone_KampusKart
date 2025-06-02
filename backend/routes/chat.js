@@ -223,4 +223,23 @@ router.delete('/:conversationId', protect, async (req, res) => {
   }
 });
 
+// Update the route to mark a conversation as read
+router.post('/:conversationId/read', protect, async (req, res) => {
+  const { conversationId } = req.params;
+  const userId = req.user._id; // Use the authenticated user's ID
+  try {
+    const conversation = await Conversation.findById(conversationId);
+    if (!conversation) {
+      return res.status(404).json({ error: 'Conversation not found' });
+    }
+    if (!conversation.readBy.includes(userId)) {
+      conversation.readBy.push(userId);
+      await conversation.save();
+    }
+    res.status(200).json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to mark as read' });
+  }
+});
+
 module.exports = router; 

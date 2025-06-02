@@ -102,12 +102,6 @@ const Landing: React.FC = () => {
             </a>
           ))}
         </div>
-        <div className="flex justify-center gap-6 mb-2">
-          <Link to="/about" className="text-body hover:underline hover:text-[#F05A25]">About</Link>
-          <Link to="/privacy" className="text-body hover:underline hover:text-[#F05A25]">Privacy</Link>
-          <Link to="/terms" className="text-body hover:underline hover:text-[#F05A25]">Terms</Link>
-          <Link to="/contact" className="text-body hover:underline hover:text-[#F05A25]">Contact</Link>
-        </div>
         <div className="text-body">&copy; {new Date().getFullYear()} KampusKart. All rights reserved.</div>
       </footer>
     </div>
