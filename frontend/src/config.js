@@ -1,16 +1,17 @@
-const API_BASE = process.env.NODE_ENV === 'production' 
+// Determine if we're in production based on the hostname
+const isProduction = window.location.hostname === 'kampuskart.netlify.app';
+
+// Base API URL configuration
+const API_BASE = isProduction 
   ? 'https://s72-gaurav-capstone.onrender.com' 
   : 'http://localhost:5000';
 
-const SOCKET_URL = process.env.NODE_ENV === 'production'
+const SOCKET_URL = isProduction
   ? 'https://s72-gaurav-capstone.onrender.com'
   : 'http://localhost:5000';
 
-// Add a function to get the current API URL
+// Function to get the current API URL
 const getApiUrl = () => {
-  if (window.location.hostname === 'kampuskart.netlify.app') {
-    return 'https://s72-gaurav-capstone.onrender.com';
-  }
   return API_BASE;
 };
 
