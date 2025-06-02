@@ -15,4 +15,4 @@ const getApiUrl = () => {
   return API_BASE;
 };
 
-export { getApiUrl as API_BASE, SOCKET_URL }; 
+export { getApiUrl as API_BASE, SOCKET_URL, isProduction }; 
