@@ -2,12 +2,20 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('../models/User');
 
+// Determine the callback URL based on environment
+const getCallbackURL = () => {
+  if (process.env.NODE_ENV === 'production') {
+    return 'https://s72-gaurav-capstone.onrender.com/api/auth/google/callback';
+  }
+  return 'http://localhost:5000/api/auth/google/callback';
+};
+
 passport.use(
   new GoogleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: '/api/auth/google/callback',
+      callbackURL: getCallbackURL(),
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
