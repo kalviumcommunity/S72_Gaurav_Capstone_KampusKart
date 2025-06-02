@@ -17,26 +17,45 @@ const transporter = nodemailer.createTransport({
 
 // Google OAuth routes
 router.get('/google',
-  passport.authenticate('google', { scope: ['profile', 'email'] })
+  (req, res, next) => {
+    console.log('Initiating Google OAuth login');
+    passport.authenticate('google', { 
+      scope: ['profile', 'email'],
+      prompt: 'select_account'
+    })(req, res, next);
+  }
 );
 
 router.get('/google/callback',
-  passport.authenticate('google', { session: false }),
+  (req, res, next) => {
+    console.log('Received Google OAuth callback');
+    passport.authenticate('google', { 
+      session: false,
+      failureRedirect: '/login'
+    })(req, res, next);
+  },
   (req, res) => {
-    // Generate JWT token
-    const token = jwt.sign(
-      { userId: req.user._id },
-      process.env.JWT_SECRET || 'your-secret-key',
-      { expiresIn: '24h' }
-    );
+    try {
+      console.log('Processing Google OAuth callback');
+      // Generate JWT token
+      const token = jwt.sign(
+        { userId: req.user._id },
+        process.env.JWT_SECRET || 'your-secret-key',
+        { expiresIn: '24h' }
+      );
 
-    // Determine the frontend URL based on environment
-    const frontendUrl = process.env.NODE_ENV === 'production'
-      ? 'https://kampuskart.netlify.app'
-      : 'http://localhost:3000';
+      // Determine the frontend URL based on environment
+      const frontendUrl = process.env.NODE_ENV === 'production'
+        ? 'https://kampuskart.netlify.app'
+        : 'http://localhost:3000';
 
-    // Redirect to frontend with token
-    res.redirect(`${frontendUrl}/auth/google/callback?token=${token}`);
+      console.log('Redirecting to frontend:', frontendUrl);
+      // Redirect to frontend with token
+      res.redirect(`${frontendUrl}/auth/google/callback?token=${token}`);
+    } catch (error) {
+      console.error('Error in Google callback:', error);
+      res.redirect('/login?error=authentication_failed');
+    }
   }
 );
 

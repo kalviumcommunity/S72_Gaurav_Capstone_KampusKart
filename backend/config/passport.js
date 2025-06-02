@@ -10,15 +10,21 @@ const getCallbackURL = () => {
   return 'http://localhost:5000/api/auth/google/callback';
 };
 
+// Log the callback URL for debugging
+console.log('Google OAuth Callback URL:', getCallbackURL());
+
 passport.use(
   new GoogleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: getCallbackURL(),
+      proxy: true // Add this to handle proxy settings
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
+        console.log('Google OAuth profile:', profile);
+        
         // Check if user already exists
         let user = await User.findOne({ googleId: profile.id });
 
@@ -42,6 +48,7 @@ passport.use(
 
         return done(null, user);
       } catch (error) {
+        console.error('Google OAuth error:', error);
         return done(error, null);
       }
     }

@@ -179,7 +179,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const loginWithGoogle = () => {
     console.log('AuthContext: Initiating Google login');
-    window.location.href = `${API_BASE}/api/auth/google`;
+    const backendUrl = isProduction 
+      ? 'https://s72-gaurav-capstone.onrender.com'
+      : 'http://localhost:5000';
+    window.location.href = `${backendUrl}/api/auth/google`;
   };
 
   const handleGoogleCallback = async (token: string) => {
