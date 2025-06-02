@@ -14,6 +14,11 @@ const complaintsRoutes = require('./routes/complaints');
 const startDeletionCronJob = require('./cron/deleteItems');
 const http = require('http');
 const { Server } = require('socket.io');
+const newsRoutes = require('./routes/news');
+const eventsRoutes = require('./routes/events');
+const lostFoundRoutes = require('./routes/lostFound');
+const facilitiesRoutes = require('./routes/facilities');
+const Message = require('./models/Message'); // Import Message model
 
 const app = express();
 
@@ -29,6 +34,10 @@ app.use('/api/lostfound', lostfoundRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/complaints', complaintsRoutes);
+app.use('/api/news', newsRoutes);
+app.use('/api/events', eventsRoutes);
+app.use('/api/lost-found', lostFoundRoutes);
+app.use('/api/facilities', facilitiesRoutes);
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI)
@@ -121,22 +130,51 @@ io.on('connection', (socket) => {
     });
   });
 
-  // Message read status
-  socket.on('message read', (data) => {
-    const { conversationId, messageId } = data;
-    const userId = Object.keys(onlineUsers).find(key => onlineUsers[key] === socket.id);
-    
-    if (userId) {
-      socket.to(conversationId).emit('message read', {
-        messageId,
-        readBy: userId
-      });
+  // Handle message delivered
+  socket.on('message delivered', async ({ messageId, userId }) => {
+    try {
+      await Message.findByIdAndUpdate(messageId, { status: 'delivered' });
+      // Optionally, emit to sender/recipient as you already do
+    } catch (err) {
+      console.error('Failed to update message status to delivered:', err);
     }
   });
 
-  // Typing indicator
-  socket.on('typing', (room) => socket.in(room).emit('typing'));
-  socket.on('stop typing', (room) => socket.in(room).emit('stop typing'));
+  // Message read status
+  socket.on('message read', async (data) => {
+    const { conversationId, messageId, senderId } = data;
+    const userId = Object.keys(onlineUsers).find(key => onlineUsers[key] === socket.id);
+
+    if (userId) {
+      try {
+        await Message.findByIdAndUpdate(messageId, { status: 'read' });
+        // Notify all participants except the reader
+        socket.to(conversationId).emit('message read', {
+          messageId,
+          readBy: userId
+        });
+        // Notify the sender directly for blue ✓✓
+        if (senderId && onlineUsers[senderId]) {
+          io.to(onlineUsers[senderId]).emit('message read', {
+            messageId,
+            readBy: userId
+          });
+        }
+      } catch (err) {
+        console.error('Failed to update message status to read:', err);
+      }
+    }
+  });
+
+  // Typing indicator (broadcast to all except sender, with userId and conversationId)
+  socket.on('typing', (data) => {
+    // data: { conversationId, userId }
+    socket.to(data.conversationId).emit('typing', data);
+  });
+  socket.on('stop typing', (data) => {
+    // data: { conversationId, userId }
+    socket.to(data.conversationId).emit('stop typing', data);
+  });
 
   // Disconnect user and remove from online users list
   socket.on('disconnect', () => {

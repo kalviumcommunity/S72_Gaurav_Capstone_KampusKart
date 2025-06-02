@@ -40,6 +40,7 @@ const Navbar: React.FC = () => {
                     <Link to="/complaints" className="block px-4 py-2 text-black hover:bg-[#FFD166]">Complaints</Link>
                     <Link to="/events" className="block px-4 py-2 text-black hover:bg-[#FFD166]">Events</Link>
                     <Link to="/news" className="block px-4 py-2 text-black hover:bg-[#FFD166]">News</Link>
+                    <Link to="/facilities" className="block px-4 py-2 text-black hover:bg-[#FFD166]">Facilities</Link>
                     {/* Add other feature links here */}
                   </div>
                 )}

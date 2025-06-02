@@ -99,20 +99,50 @@ const Chat: React.FC = () => {
       socketRef.current.on('message received', (newMessageReceived: Message) => {
         if (selectedConversation && selectedConversation._id === newMessageReceived.conversation) {
           setMessages((prevMessages) => [...prevMessages, newMessageReceived]);
+          // Mark message as delivered
+          socketRef.current.emit('message delivered', { messageId: newMessageReceived._id, userId: user._id });
         } else {
           fetchConversations();
         }
-         setConversations(prevConversations => {
+        setConversations(prevConversations => {
           const updatedConversations = prevConversations.map(conv =>
             conv._id === newMessageReceived.conversation ? { ...conv, latestMessage: newMessageReceived, updatedAt: newMessageReceived.createdAt } : conv
           );
-           updatedConversations.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+          updatedConversations.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
           if (!updatedConversations.find(conv => conv._id === newMessageReceived.conversation)) {
             fetchConversations();
             return prevConversations;
           }
           return updatedConversations;
         });
+      });
+
+      socketRef.current.on('message delivered', (data: { messageId: string, userId: string }) => {
+        setMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg._id === data.messageId ? { ...msg, status: 'delivered' } : msg
+          )
+        );
+      });
+
+      socketRef.current.on('message read', (data: { messageId: string, userId: string }) => {
+        setMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg._id === data.messageId ? { ...msg, status: 'read' } : msg
+          )
+        );
+      });
+
+      socketRef.current.on('typing', (data: { conversationId: string, userId: string }) => {
+        if (selectedConversation && selectedConversation._id === data.conversationId) {
+          setIsTyping(true);
+        }
+      });
+
+      socketRef.current.on('stop typing', (data: { conversationId: string, userId: string }) => {
+        if (selectedConversation && selectedConversation._id === data.conversationId) {
+          setIsTyping(false);
+        }
       });
 
       socketRef.current.on('online users', (users: string[]) => {
@@ -155,7 +185,12 @@ const Chat: React.FC = () => {
         throw new Error('Failed to fetch conversations');
       }
       const data = await response.json();
+      // Sort conversations by updatedAt (newest first)
       data.sort((a: Conversation, b: Conversation) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+      // Ensure readBy is an array for each conversation
+      data.forEach((conv: Conversation) => {
+        if (!conv.readBy) conv.readBy = [];
+      });
       setConversations(data);
     } catch (error) {
       console.error('Error fetching conversations:', error);
@@ -191,12 +226,29 @@ const Chat: React.FC = () => {
         const data = await response.json();
         setMessages(data);
 
+        // Mark conversation as read by the current user
         if (user?._id) {
-        setConversations(prevConversations => prevConversations.map(conv =>
-            conv._id === selectedConversation._id ? { ...conv, readBy: [...(conv.readBy || []), user._id].filter((id, index, self) => self.indexOf(id) === index) } : conv
-        ));
+          const markReadResponse = await fetch(`${API_BASE}/api/chat/${selectedConversation._id}/read`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ userId: user._id }),
+          });
+          if (!markReadResponse.ok) {
+            console.error('Failed to mark conversation as read');
+          }
         }
 
+        // Update local state to mark conversation as read
+        if (user?._id) {
+          setConversations(prevConversations => prevConversations.map(conv =>
+            conv._id === selectedConversation._id
+              ? { ...conv, readBy: [...(conv.readBy || []), user._id].filter((id, index, self) => self.indexOf(id) === index) }
+              : conv
+          ));
+        }
       } catch (error) {
         console.error('Error fetching messages:', error);
         setMessages([]);
@@ -206,6 +258,25 @@ const Chat: React.FC = () => {
 
     fetchMessages();
   }, [selectedConversation, token, socketConnected]);
+
+  useEffect(() => {
+    if (
+      selectedConversation &&
+      messages.length > 0 &&
+      socketRef.current &&
+      user?._id
+    ) {
+      messages.forEach((msg) => {
+        if (msg.sender._id !== user._id && msg.status !== 'read') {
+          socketRef.current.emit('message read', {
+            conversationId: selectedConversation._id,
+            messageId: msg._id,
+            senderId: msg.sender._id,
+          });
+        }
+      });
+    }
+  }, [messages, selectedConversation, user]);
 
   const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -326,6 +397,15 @@ const Chat: React.FC = () => {
 
   const handleTyping = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewMessage(e.target.value);
+    if (socketRef.current && selectedConversation) {
+      socketRef.current.emit('typing', { conversationId: selectedConversation._id, userId: user?._id });
+    }
+  };
+
+  const handleStopTyping = () => {
+    if (socketRef.current && selectedConversation) {
+      socketRef.current.emit('stop typing', { conversationId: selectedConversation._id, userId: user?._id });
+    }
   };
 
   const getParticipantName = (participants: User[]) => {
@@ -445,18 +525,29 @@ const Chat: React.FC = () => {
           {/* Search Users section at the top of the left panel */}
           <div className="mb-6">
             <h2 className="text-lg font-semibold mb-2 text-gray-800">Start New Chat</h2>
-             <div className="relative mb-4">
-               <FiSearch className="absolute top-3 left-3 text-gray-400" size={20} />
-               <input
-                 type="text"
-                 placeholder="Search users..."
-                 className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
-                 value={searchText}
-                 onChange={handleSearch}
-                 ref={searchInputRef}
-               />
+             <form className="relative mb-4 flex" onSubmit={e => e.preventDefault()}>
+               <div className="relative flex-1">
+                 <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                 <input
+                   type="text"
+                   placeholder="Search users..."
+                   className="w-full pl-10 pr-4 py-2 rounded-l-full border border-gray-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#00C6A7] focus:border-transparent text-gray-900 bg-gray-50"
+                   value={searchText}
+                   onChange={handleSearch}
+                   ref={searchInputRef}
+                 />
+               </div>
+               <button
+                 type="button"
+                 aria-label="Search"
+                 className="px-4 py-2 bg-[#00C6A7] text-white rounded-r-full font-semibold hover:bg-[#009e87] transition"
+                 tabIndex={-1}
+                 onClick={() => searchInputRef.current?.focus()}
+               >
+                 <FiSearch />
+               </button>
                {searchResults.length > 0 && (
-                 <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 shadow-lg max-h-80 overflow-y-auto" ref={searchResultsRef}>
+                 <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 shadow-lg max-h-80 overflow-y-auto left-0 top-12" ref={searchResultsRef}>
                    {searchResults.map((result) => (
                      <div
                        key={result._id}
@@ -472,7 +563,7 @@ const Chat: React.FC = () => {
                    ))}
                  </div>
                )}
-             </div>
+             </form>
              {conversationCreateError && <div className="text-red-500 text-sm mt-2">{conversationCreateError}</div>}
            </div>
 
@@ -495,24 +586,26 @@ const Chat: React.FC = () => {
                       renderParticipantAvatar(conversation.participants.find(p => p._id !== user?._id), 'small')
                     );
                     const isOnline = !isGroup && conversation.participants.find(p => p._id !== user?._id) && onlineUsers.includes(conversation.participants.find(p => p._id !== user?._id)?._id || '');
+                    const isSelected = selectedConversation?._id === conversation._id;
+                    const isUnread = conversation.latestMessage && user?._id && !conversation.readBy?.includes(user._id);
 
                     return (
                       <div
                         key={conversation._id}
                         className={`flex items-center p-2 cursor-pointer rounded-md ${
-                          selectedConversation?._id === conversation._id ? 'bg-gray-200' : 'hover:bg-gray-100'
+                          isSelected ? 'bg-gray-200' : 'hover:bg-gray-100'
                         }`}
                         onClick={() => setSelectedConversation(conversation)}
                       >
-                       <div className="relative mr-3">
+                        <div className="relative mr-3 flex items-center">
                           {displayAvatar}
                           {isOnline && (
                             <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
                           )}
                         </div>
                         <div className="flex-1">
-                          <div className="font-medium text-gray-900">{displayName}</div>
-                          <div className={`text-sm ${conversation.latestMessage && user?._id && !conversation.readBy?.includes(user._id) ? 'text-gray-900 font-semibold' : 'text-gray-600'}`}>
+                          <div className="font-medium text-gray-900 flex items-center">{displayName}</div>
+                          <div className="text-sm text-gray-600">
                             {conversation.latestMessage ? `${conversation.latestMessage.sender._id === user?._id ? 'You: ' : ''}${conversation.latestMessage.text.substring(0, 30)}${conversation.latestMessage.text.length > 30 ? '...' : ''}` : 'Start a conversation'}
                           </div>
                         </div>
@@ -550,36 +643,45 @@ const Chat: React.FC = () => {
                  {groupMessagesByDate(messages).map(([date, messagesForDate]) => (
                    <div key={date}>
                       <div className="text-center text-sm text-gray-500 mb-4">{renderDateHeader(date)}</div>
-                     {messagesForDate.map((message) => (
-                       <div
-                         key={message._id}
-                         className={`flex ${message.sender._id === user?._id ? 'justify-end' : 'justify-start'} mb-2`}
-                       >
-                          <div className={`max-w-[70%] px-4 py-2 rounded-xl ${
-                           message.sender._id === user?._id 
-                            ? 'bg-[#DCF8C6] text-black rounded-br-none mr-4'
-                            : 'bg-[#F3F4F6] text-black rounded-bl-none ml-2'
-                           }`}>
-                           <p className="pb-1">{message.text}</p>
-                           <div className="flex items-center ${message.sender._id === user?._id ? 'justify-end' : 'justify-start'} space-x-1 mt-1 text-xs text-gray-500 opacity-75">
-                             <span>{format(new Date(message.createdAt), 'h:mm a')}</span>
-                              {message.sender._id === user?._id && message.status && (
-                               <span>
-                                 {/* Status icons - can use checkmarks or similar */}
-                                 {message.status === 'sent' && '✓'}
-                                 {message.status === 'delivered' && '✓✓'}
-                                 {message.status === 'read' && '✓✓'}
-                               </span>
-                             )}
+                     {messagesForDate.map((message) => {
+                       const isMine = message.sender._id === user?._id;
+                       return (
+                         <div
+                           key={message._id}
+                           className={`flex ${isMine ? 'justify-end' : 'justify-start'} mb-2`}
+                         >
+                            <div className={`max-w-[70%] px-4 py-2 rounded-2xl shadow-md ${
+                             isMine
+                               ? 'bg-gradient-to-br from-[#DCF8C6] to-[#b2f0e6] text-black rounded-br-none mr-4'
+                               : 'bg-gradient-to-br from-[#F3F4F6] to-[#e0e7ef] text-black rounded-bl-none ml-2'
+                             }`}>
+                             <p className="pb-1 break-words">{message.text}</p>
+                             <div className={`flex items-center ${isMine ? 'justify-end' : 'justify-start'} space-x-1 mt-1 text-xs text-gray-500 opacity-75`}>
+                               <span>{format(new Date(message.createdAt), 'h:mm a')}</span>
+                               {isMine && message.status && (
+                                 <span className="ml-1">
+                                   {message.status === 'sent' && '✓'}
+                                   {message.status === 'delivered' && '✓✓'}
+                                   {message.status === 'read' && <span className="text-blue-500">✓✓</span>}
+                                 </span>
+                               )}
+                             </div>
                            </div>
                          </div>
-                       </div>
-                     ))}
+                       );
+                     })}
                    </div>
                  ))}
                  {isTyping && (
                    <div className="flex items-center space-x-2 text-sm text-gray-500 italic">
-                     <div>{getParticipantName(selectedConversation.participants.filter(p => p._id !== user?._id))} is typing...</div>
+                     <div className="flex items-center gap-2">
+                       <span>{getParticipantName(selectedConversation.participants.filter(p => p._id !== user?._id))} is typing</span>
+                       <span className="inline-flex gap-1">
+                         <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                         <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '100ms' }}></span>
+                         <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '200ms' }}></span>
+                       </span>
+                     </div>
                    </div>
                  )}
                  <div ref={messagesEndRef} />

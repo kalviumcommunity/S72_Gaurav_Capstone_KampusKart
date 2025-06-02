@@ -18,6 +18,12 @@ const complaintSchema = new mongoose.Schema({
     trim: true,
     maxlength: 1000
   },
+  images: [
+    {
+      public_id: { type: String, required: true },
+      url: { type: String, required: true },
+    }
+  ],
   status: {
     type: String,
     enum: ['Open', 'In Progress', 'Resolved', 'Closed'],

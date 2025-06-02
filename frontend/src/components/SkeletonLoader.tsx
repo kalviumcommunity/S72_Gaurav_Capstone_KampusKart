@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface SkeletonLoaderProps {
-  variant?: 'lostfound' | 'login' | 'signup' | 'home' | 'profile' | 'chat' | 'complaints' | 'dashboard' | 'features' | 'campusmap' | 'landing';
+  variant?: 'lostfound' | 'login' | 'signup' | 'home' | 'profile' | 'chat' | 'complaints' | 'dashboard' | 'features' | 'campusmap' | 'landing' | 'complaint';
 }
 
 const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({ variant = 'lostfound' }) => {
@@ -273,6 +273,49 @@ const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({ variant = 'lostfound' }
       <div className="h-16 bg-gray-200 rounded-lg animate-pulse"></div>
     </div>
   );
+
+  if (variant === 'complaint') {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="bg-white rounded-lg shadow p-6 flex flex-col gap-2 border animate-pulse">
+            {/* Image/Icon Placeholder */}
+            <div className="relative h-48 w-full flex items-center justify-center bg-gray-100 rounded mb-2">
+              <span className="text-5xl text-gray-300">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-16 h-16">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-3A2.25 2.25 0 008.25 5.25V9m7.5 0v10.5A2.25 2.25 0 0113.5 21h-3a2.25 2.25 0 01-2.25-2.25V9m7.5 0H6.75m8.25 0H18m-12 0h2.25" />
+                </svg>
+              </span>
+            </div>
+            {/* Title and Status Badge */}
+            <div className="flex items-center justify-between mb-2">
+              <div className="h-5 w-1/2 bg-gray-200 rounded" />
+              <div className="h-5 w-16 bg-gray-200 rounded-full" />
+            </div>
+            {/* Description Placeholder */}
+            <div className="h-4 w-full bg-gray-200 rounded mb-1" />
+            <div className="h-4 w-5/6 bg-gray-200 rounded mb-1" />
+            {/* Meta Info Placeholder */}
+            <div className="flex items-center gap-4 text-sm text-gray-500 mt-auto">
+              <div className="flex items-center gap-2">
+                <div className="h-4 w-4 bg-gray-200 rounded-full" />
+                <div className="h-4 w-24 bg-gray-200 rounded" />
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="h-4 w-4 bg-gray-200 rounded-full" />
+                <div className="h-4 w-20 bg-gray-200 rounded" />
+              </div>
+            </div>
+            {/* Button Placeholders */}
+            <div className="flex gap-2 pt-3">
+              <div className="h-8 w-20 bg-gray-200 rounded-full" />
+              <div className="h-8 w-20 bg-gray-200 rounded-full" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   switch (variant) {
     case 'lostfound':

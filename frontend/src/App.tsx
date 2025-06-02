@@ -16,6 +16,7 @@ import AuthenticatedLayout from './components/AuthenticatedLayout';
 import Features from './components/Features';
 import Events from './components/Events';
 import News from './components/News';
+import Facilities from './components/Facilities';
 
 // Protected Route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -157,6 +158,16 @@ const App: React.FC = () => {
               <ProtectedRoute>
                 <AuthenticatedLayout>
                   <News />
+                </AuthenticatedLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/facilities"
+            element={
+              <ProtectedRoute>
+                <AuthenticatedLayout>
+                  <Facilities />
                 </AuthenticatedLayout>
               </ProtectedRoute>
             }
