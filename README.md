@@ -1,72 +1,91 @@
-# 🧭 KampusKart – Your Toolkit for College
+# 🧭 KampusKart – MIT ADT University Campus Portal
 
-KampusKart is a dynamic web portal designed to centralize all essential campus information for students, faculty, and visitors of MIT ADT University. From interactive maps and shuttle tracking to mess menus and lost & found, KampusKart is your all-in-one campus companion.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D16.0.0-brightgreen)](https://nodejs.org)
+[![React Version](https://img.shields.io/badge/react-19.1.0-blue)](https://reactjs.org)
 
----
+KampusKart is a comprehensive campus portal for MIT ADT University, providing students, faculty, and visitors with easy access to essential campus information and services. Built with modern web technologies, it offers an intuitive interface for navigating campus life.
+
+## 📋 Table of Contents
+- [Features](#-features)
+- [Tech Stack](#-tech-stack)
+- [Getting Started](#-getting-started)
+- [Installation](#-installation)
+- [Usage](#-usage)
+- [API Documentation](#-api-documentation)
+- [Contributing](#-contributing)
+- [Security](#-security)
+- [License](#-license)
 
 ## 🚀 Features
 
 ### 🗺️ Interactive Campus Map
-- Locate hostels, messes, canteens, libraries, and other key facilities
-- View operating hours and facility details
-- Clickable markers and real-time data
+- Real-time facility locations and details
+- Google Maps integration with custom markers
+- Operating hours and facility information
 
-### 🚌 3D Shuttle Model (Beta)
-- Animated shuttle overlay on the campus map
-- Preset routes with expected arrival times
-- Powered by Three.js and Google Maps API / Mapbox GL
+### 🚌 Campus Navigation
+- Interactive shuttle tracking
+- Route visualization
+- Real-time updates
 
-### 🍽️ Mess & Canteen System
-- Daily food menus and timings
-- Facility ratings and availability
+### 🍽️ Dining Services
+- Mess and canteen menus
+- Operating hours
+- Facility ratings and reviews
 
-### 🏢 Hostel & Facility Information
-- Hostel rules, contact details, and amenities
-- Opening hours of libraries, labs, and other academic zones
+### 🏢 Campus Facilities
+- Hostel information and rules
+- Library and lab schedules
+- Academic zone details
 
-### 📢 Campus News & Events (New!)
-- Stay updated with the latest university happenings
-- Filter by department or interest
+### 📢 Campus Updates
+- News and events feed
+- Department-specific announcements
+- Event calendar integration
 
-### 📬 Feedback & Complaints
-- Submit grievances and improvement suggestions
-- Admin dashboard for managing responses (WIP)
+### 📬 Feedback System
+- Grievance submission
+- Improvement suggestions
+- Admin response tracking
 
-### 🎒 Lost & Found Portal
-- Upload lost item details and search found listings
-- Contact finder anonymously
-
-### 🧠 Fun Daily Features (Coming Soon)
-- Word of the Day / Fun Fact of the Day
-- Quiz or mini-games to boost engagement
-
----
+### 🎒 Lost & Found
+- Item reporting system
+- Search functionality
+- Anonymous contact system
 
 ## ⚙️ Tech Stack
 
 ### Frontend
-- **React.js** – SPA architecture
-- **Tailwind CSS** – Responsive and modern UI
-- **React Router** – Smooth page navigation
-- **Google Maps API / Mapbox GL JS** – Map integration
-- **Three.js** – 3D shuttle rendering
-- **React Context API** – State management
+- **React 19** - Modern UI framework
+- **Vite** - Next-generation build tool
+- **Tailwind CSS** - Utility-first CSS framework
+- **Material-UI** - Component library
+- **React Router** - Client-side routing
+- **Google Maps API** - Map integration
+- **Socket.IO Client** - Real-time updates
+- **Emoji Mart** - Emoji picker integration
 
 ### Backend
-- **Node.js** with **Express.js** – API and server logic
-- **MongoDB** (or Firebase) – Database and user data
-- **JWT** – Secure authentication
-- **Socket.io** – (Future) real-time updates
+- **Node.js** - Runtime environment
+- **Express.js** - Web framework
+- **MongoDB** - Database
+- **Mongoose** - ODM for MongoDB
+- **JWT** - Authentication
+- **Passport.js** - Authentication middleware
+- **Socket.IO** - Real-time communication
+- **Nodemailer** - Email functionality
+- **Cloudinary** - Image management
+- **Node-cron** - Scheduled tasks
 
-### DevOps & Tools
-- **Vercel / Netlify** – Frontend deployment
-- **Render / AWS** – Backend deployment
-- **Git & GitHub** – Version control and issue tracking
-- **Jest** – Unit testing
+### Development Tools
+- **ESLint** - Code linting
+- **Jest** - Testing framework
+- **Nodemon** - Development server
+- **Git** - Version control
 
----
-
-## 🛠️ Installation & Setup
+## 🛠️ Getting Started
 
 ### Prerequisites
 - Node.js (v16 or higher)
@@ -74,87 +93,98 @@ KampusKart is a dynamic web portal designed to centralize all essential campus i
 - MongoDB (v4.4 or higher)
 - Git
 
-### Frontend Setup
-1. Navigate to the frontend directory:
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/KampusKart.git
+   cd KampusKart
+   ```
+
+2. Frontend Setup:
    ```bash
    cd frontend
-   ```
-2. Install dependencies:
-   ```bash
    npm install
    ```
-3. Create a `.env` file in the frontend directory with the following variables:
+
+3. Backend Setup:
+   ```bash
+   cd ../backend
+   npm install
+   ```
+
+4. Environment Configuration:
+
+   Frontend (.env):
    ```
    VITE_API_URL=http://localhost:5000
    VITE_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
    ```
-4. Start the development server:
-   ```bash
-   npm run dev
-   ```
 
-### Backend Setup
-1. Navigate to the backend directory:
-   ```bash
-   cd backend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Create a `.env` file in the backend directory with the following variables:
+   Backend (.env):
    ```
    PORT=5000
    MONGODB_URI=your_mongodb_connection_string
    JWT_SECRET=your_jwt_secret
+   CLOUDINARY_CLOUD_NAME=your_cloud_name
+   CLOUDINARY_API_KEY=your_api_key
+   CLOUDINARY_API_SECRET=your_api_secret
    ```
-4. Start the server:
+
+## 📖 Usage
+
+### Development
+
+1. Start the backend server:
    ```bash
+   cd backend
+   npm run dev
+   ```
+
+2. Start the frontend development server:
+   ```bash
+   cd frontend
+   npm run dev
+   ```
+
+The application will be available at:
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:5000
+
+### Production Build
+
+1. Build the frontend:
+   ```bash
+   cd frontend
+   npm run build
+   ```
+
+2. Start the production server:
+   ```bash
+   cd backend
    npm start
    ```
 
-## 🤝 Contributing
+## 🔒 Security
 
-We welcome contributions to KampusKart! Here's how you can help:
-
-1. Fork the repository
-2. Create a new branch for your feature:
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-3. Make your changes
-4. Commit your changes:
-   ```bash
-   git commit -m "Add your feature description"
-   ```
-5. Push to your fork:
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-6. Create a Pull Request
-
-### Code Style
-- Follow the existing code style
-- Use meaningful variable and function names
-- Add comments for complex logic
-- Write tests for new features
-- Update documentation as needed
-
-### Pull Request Process
-1. Update the README.md with details of changes if needed
-2. Update the documentation if needed
-3. The PR will be merged once you have the sign-off of at least one other developer
+For security concerns, please email security@kampuskart.com instead of using the issue tracker.
 
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 👥 Authors
+## 🤝 Contributing
 
-- Your Name - Initial work
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
 
-## 🙏 Acknowledgments
+## 📞 Support
 
-- MIT ADT University for their support
-- All contributors who have helped shape this project
+For support:
+1. Check the [documentation](docs/)
+2. Search through [existing issues](https://github.com/yourusername/KampusKart/issues)
+3. Create a new issue if needed
+
+## 🔄 Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for a list of notable changes to this project.
 
