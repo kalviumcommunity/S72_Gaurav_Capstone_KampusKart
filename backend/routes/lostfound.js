@@ -349,6 +349,7 @@ router.delete('/:id', authMiddleware, itemRateLimiter, async (req, res) => {
     const itemId = req.params.id;
     const userId = req.user.id;
     const userEmail = req.user.email;
+    const isAdmin = userEmail === 'gauravkhandelwal205@gmail.com';
 
     const item = await LostFoundItem.findById(itemId);
 
@@ -356,13 +357,13 @@ router.delete('/:id', authMiddleware, itemRateLimiter, async (req, res) => {
       return res.status(404).json({ message: 'Item not found' });
     }
 
-    // Check if the item is resolved
-    if (item.resolved) {
+    // Check if the item is resolved - only for non-admin users
+    if (item.resolved && !isAdmin) {
       return res.status(409).json({ message: 'Resolved items cannot be deleted' });
     }
 
     // Allow owner or admin
-    if (item.user.toString() !== userId && userEmail !== 'gauravkhandelwal205@gmail.com') {
+    if (item.user.toString() !== userId && !isAdmin) {
       return res.status(403).json({ message: 'You are not authorized to delete this item' });
     }
 
