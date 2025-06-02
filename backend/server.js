@@ -16,7 +16,6 @@ const http = require('http');
 const { Server } = require('socket.io');
 const newsRoutes = require('./routes/news');
 const eventsRoutes = require('./routes/events');
-const lostFoundRoutes = require('./routes/lostFound');
 const facilitiesRoutes = require('./routes/facilities');
 const Message = require('./models/Message'); // Import Message model
 
@@ -36,7 +35,7 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/complaints', complaintsRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/events', eventsRoutes);
-app.use('/api/lost-found', lostFoundRoutes);
+app.use('/api/lost-found', lostfoundRoutes);
 app.use('/api/facilities', facilitiesRoutes);
 
 // MongoDB Connection
