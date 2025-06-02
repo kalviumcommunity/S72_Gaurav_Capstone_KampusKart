@@ -30,8 +30,13 @@ router.get('/google/callback',
       { expiresIn: '24h' }
     );
 
+    // Determine the frontend URL based on environment
+    const frontendUrl = process.env.NODE_ENV === 'production'
+      ? 'https://kampuskart.netlify.app'
+      : 'http://localhost:3000';
+
     // Redirect to frontend with token
-    res.redirect(`${process.env.FRONTEND_URL}/auth/google/callback?token=${token}`);
+    res.redirect(`${frontendUrl}/auth/google/callback?token=${token}`);
   }
 );
 
