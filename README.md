@@ -1,6 +1,5 @@
 # 🧭 KampusKart – MIT ADT University Campus Portal
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D16.0.0-brightgreen)](https://nodejs.org)
 [![React Version](https://img.shields.io/badge/react-19.1.0-blue)](https://reactjs.org)
@@ -13,10 +12,7 @@ KampusKart is a comprehensive campus portal for MIT ADT University, providing st
 - [Getting Started](#-getting-started)
 - [Installation](#-installation)
 - [Usage](#-usage)
-- [API Documentation](#-api-documentation)
 - [Contributing](#-contributing)
-- [Security](#-security)
-- [License](#-license)
 
 ## 🚀 Features
 
@@ -117,7 +113,6 @@ KampusKart is a comprehensive campus portal for MIT ADT University, providing st
 
    Frontend (.env):
    ```
-   VITE_API_URL=http://localhost:5000
    VITE_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
    ```
 
@@ -126,9 +121,19 @@ KampusKart is a comprehensive campus portal for MIT ADT University, providing st
    PORT=5000
    MONGODB_URI=your_mongodb_connection_string
    JWT_SECRET=your_jwt_secret
+   NODE_ENV=development
    CLOUDINARY_CLOUD_NAME=your_cloud_name
    CLOUDINARY_API_KEY=your_api_key
    CLOUDINARY_API_SECRET=your_api_secret
+   GOOGLE_CLIENT_ID=your_client_id
+   GOOGLE_CLIENT_SECRET=your_client_secret
+   FRONTEND_URL=http://localhost:3000
+   EMAIL_SERVICE=gmail
+   EMAIL_USER=your_email
+   EMAIL_PASS=your_app_pass
+   GOOGLE_MAPS_API_KEY=YOUR_MAPS_API_KEY
+
+
    ```
 
 ## 📖 Usage
@@ -165,14 +170,6 @@ The application will be available at:
    npm start
    ```
 
-## 🔒 Security
-
-For security concerns, please email security@kampuskart.com instead of using the issue tracker.
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## 🤝 Contributing
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
@@ -184,7 +181,5 @@ For support:
 2. Search through [existing issues](https://github.com/yourusername/KampusKart/issues)
 3. Create a new issue if needed
 
-## 🔄 Changelog
 
-See [CHANGELOG.md](CHANGELOG.md) for a list of notable changes to this project.
 
