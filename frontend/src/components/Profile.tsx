@@ -308,7 +308,7 @@ const Profile = () => {
                 <div className="bg-white rounded-lg p-6 border-b border-gray-200 shadow-lg">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Name */}
-                    <div>
+                    <div className="flex flex-col">
                       <label htmlFor="name" className="block text-xs font-semibold text-gray-800 mb-1">Full Name</label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300"><FiUser className="w-5 h-5"/></span>
@@ -329,7 +329,7 @@ const Profile = () => {
                       {!profileData.name.trim() && error && <p className="text-xs text-red-400 mt-1">Name is required.</p>}
                     </div>
                     {/* Email */}
-                    <div>
+                    <div className="flex flex-col">
                       <label htmlFor="email" className="block text-xs font-semibold text-gray-800 mb-1">Email</label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300"><FiMail className="w-5 h-5"/></span>
@@ -348,7 +348,7 @@ const Profile = () => {
                       <p className="text-xs text-gray-400 mt-1">This is your registered email and cannot be changed.</p>
                     </div>
                     {/* Phone */}
-                    <div>
+                    <div className="flex flex-col">
                       <label htmlFor="phone" className="block text-xs font-semibold text-gray-800 mb-1">Phone</label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300"><FiPhone className="w-5 h-5"/></span>
@@ -367,7 +367,7 @@ const Profile = () => {
                       <p className="text-xs text-gray-400 mt-1">Add a phone number for contact (optional).</p>
                     </div>
                     {/* Gender */}
-                    <div>
+                    <div className="flex flex-col">
                       <label htmlFor="gender" className="block text-xs font-semibold text-gray-800 mb-1">Gender</label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300"><FiUser className="w-5 h-5"/></span>
@@ -390,7 +390,7 @@ const Profile = () => {
                       <p className="text-xs text-gray-400 mt-1">Select your gender (optional).</p>
                     </div>
                     {/* Date of Birth */}
-                    <div>
+                    <div className="flex flex-col">
                       <label htmlFor="dateOfBirth" className="block text-xs font-semibold text-gray-800 mb-1">Date of Birth</label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300"><FiCalendar className="w-5 h-5"/></span>
@@ -419,7 +419,7 @@ const Profile = () => {
                 <div className="bg-white rounded-lg p-6 shadow-lg">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Major/Department */}
-                    <div>
+                    <div className="flex flex-col">
                       <label htmlFor="major" className="block text-xs font-semibold text-gray-800 mb-1">Major/Department</label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300"><FiMail className="w-5 h-5"/></span>
@@ -438,7 +438,7 @@ const Profile = () => {
                       <p className="text-xs text-gray-400 mt-1">Your department or major (optional).</p>
                     </div>
                     {/* Program */}
-                    <div>
+                    <div className="flex flex-col">
                       <label htmlFor="program" className="block text-xs font-semibold text-gray-800 mb-1">Program</label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300"><FiBriefcase className="w-5 h-5"/></span>
@@ -457,7 +457,7 @@ const Profile = () => {
                       <p className="text-xs text-gray-400 mt-1">e.g., BSc, MSc, BTech, etc.</p>
                     </div>
                     {/* Year Interval */}
-                    <div>
+                    <div className="flex flex-col">
                       <label htmlFor="yearOfStudy" className="block text-xs font-semibold text-gray-800 mb-1">Year Interval</label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300"><FiCalendar className="w-5 h-5"/></span>

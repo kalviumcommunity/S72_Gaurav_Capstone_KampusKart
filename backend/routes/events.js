@@ -32,7 +32,17 @@ router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
     return res.status(403).json({ message: 'Not authorized to add events.' });
   }
 
-  const { title, description, date, location, status, registerUrl } = req.body;
+  const { 
+    title, 
+    description, 
+    date, 
+    location, 
+    status, 
+    registerUrl,
+    operatingHours,
+    contactInfo,
+    mapLocation
+  } = req.body;
 
   if (!title || !description || !date || !location) {
     return res.status(400).json({ message: 'All fields are required.' });
@@ -55,7 +65,10 @@ router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
             location,
             status: status || 'Upcoming',
             registerUrl,
-            image
+            image,
+            operatingHours,
+            contactInfo: contactInfo ? JSON.parse(contactInfo) : undefined,
+            mapLocation: mapLocation ? JSON.parse(mapLocation) : undefined
           });
           const savedEvent = await event.save();
           res.status(201).json(savedEvent);
@@ -76,7 +89,10 @@ router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
       location,
       status: status || 'Upcoming',
       registerUrl,
-      image
+      image,
+      operatingHours,
+      contactInfo: contactInfo ? JSON.parse(contactInfo) : undefined,
+      mapLocation: mapLocation ? JSON.parse(mapLocation) : undefined
     });
     const savedEvent = await event.save();
     res.status(201).json(savedEvent);
@@ -90,7 +106,18 @@ router.put('/:id', authMiddleware, upload.single('image'), async (req, res) => {
   if (req.user.email !== 'gauravkhandelwal205@gmail.com') {
     return res.status(403).json({ message: 'Only admin can edit events.' });
   }
-  const { title, description, date, location, status, registerUrl } = req.body;
+  const { 
+    title, 
+    description, 
+    date, 
+    location, 
+    status, 
+    registerUrl,
+    operatingHours,
+    contactInfo,
+    mapLocation
+  } = req.body;
+  
   if (!title || !description || !date || !location || !status) {
     return res.status(400).json({ message: 'Missing required fields.' });
   }
@@ -122,6 +149,9 @@ router.put('/:id', authMiddleware, upload.single('image'), async (req, res) => {
           event.location = location;
           event.status = status;
           event.registerUrl = registerUrl;
+          event.operatingHours = operatingHours;
+          event.contactInfo = contactInfo ? JSON.parse(contactInfo) : undefined;
+          event.mapLocation = mapLocation ? JSON.parse(mapLocation) : undefined;
           await event.save();
           res.json(event);
         }
@@ -137,6 +167,9 @@ router.put('/:id', authMiddleware, upload.single('image'), async (req, res) => {
     event.location = location;
     event.status = status;
     event.registerUrl = registerUrl;
+    event.operatingHours = operatingHours;
+    event.contactInfo = contactInfo ? JSON.parse(contactInfo) : undefined;
+    event.mapLocation = mapLocation ? JSON.parse(mapLocation) : undefined;
     await event.save();
     res.json(event);
   } catch (err) {

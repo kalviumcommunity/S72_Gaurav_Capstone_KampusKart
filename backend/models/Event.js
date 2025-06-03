@@ -27,6 +27,21 @@ const eventSchema = new mongoose.Schema({
     url: { type: String },
   },
   registerUrl: { type: String },
+  operatingHours: { type: String },
+  contactInfo: {
+    name: { type: String },
+    email: { type: String },
+    phone: { type: String }
+  },
+  mapLocation: {
+    building: { type: String },
+    floor: { type: String },
+    room: { type: String },
+    coordinates: {
+      lat: { type: Number },
+      lng: { type: Number }
+    }
+  },
   createdAt: {
     type: Date,
     default: Date.now,

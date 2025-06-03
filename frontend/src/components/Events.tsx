@@ -14,6 +14,21 @@ interface Event {
   status: 'Upcoming' | 'Ongoing' | 'Completed' | 'Cancelled';
   registerUrl?: string;
   image?: { public_id?: string; url?: string };
+  operatingHours?: string;
+  contactInfo?: {
+    name?: string;
+    email?: string;
+    phone?: string;
+  };
+  mapLocation?: {
+    building?: string;
+    floor?: string;
+    room?: string;
+    coordinates?: {
+      lat: number;
+      lng: number;
+    };
+  };
 }
 
 const Events = () => {
@@ -23,6 +38,7 @@ const Events = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [events, setEvents] = useState<Event[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [newEvent, setNewEvent] = useState({
     title: '',
@@ -33,6 +49,18 @@ const Events = () => {
     registerUrl: '',
     image: undefined as File | undefined,
     imagePreview: '',
+    operatingHours: '',
+    contactInfo: {
+      name: '',
+      email: '',
+      phone: ''
+    },
+    mapLocation: {
+      building: '',
+      floor: '',
+      room: '',
+      coordinates: undefined as { lat: number; lng: number } | undefined
+    }
   });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -66,6 +94,9 @@ const Events = () => {
       formData.append('location', newEvent.location);
       formData.append('status', newEvent.status);
       formData.append('registerUrl', newEvent.registerUrl);
+      formData.append('operatingHours', newEvent.operatingHours);
+      formData.append('contactInfo', JSON.stringify(newEvent.contactInfo));
+      formData.append('mapLocation', JSON.stringify(newEvent.mapLocation));
       if (newEvent.image) {
         formData.append('image', newEvent.image);
       }
@@ -83,7 +114,19 @@ const Events = () => {
       const savedEvent = await response.json();
       setEvents([savedEvent, ...events]);
       setIsModalOpen(false);
-      setNewEvent({ title: '', description: '', date: '', location: '', status: 'Upcoming', registerUrl: '', image: undefined, imagePreview: '' });
+      setNewEvent({ 
+        title: '', 
+        description: '', 
+        date: '', 
+        location: '', 
+        status: 'Upcoming', 
+        registerUrl: '', 
+        image: undefined, 
+        imagePreview: '',
+        operatingHours: '',
+        contactInfo: { name: '', email: '', phone: '' },
+        mapLocation: { building: '', floor: '', room: '', coordinates: undefined }
+      });
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Failed to add event');
     }
@@ -100,6 +143,9 @@ const Events = () => {
       registerUrl: event.registerUrl || '',
       image: undefined,
       imagePreview: event.image?.url || '',
+      operatingHours: event.operatingHours || '',
+      contactInfo: event.contactInfo || { name: '', email: '', phone: '' },
+      mapLocation: event.mapLocation || { building: '', floor: '', room: '', coordinates: undefined }
     });
     setIsModalOpen(true);
   };
@@ -133,6 +179,9 @@ const Events = () => {
       formData.append('location', newEvent.location);
       formData.append('status', newEvent.status);
       formData.append('registerUrl', newEvent.registerUrl);
+      formData.append('operatingHours', newEvent.operatingHours);
+      formData.append('contactInfo', JSON.stringify(newEvent.contactInfo));
+      formData.append('mapLocation', JSON.stringify(newEvent.mapLocation));
       if (newEvent.image) {
         formData.append('image', newEvent.image);
       }
@@ -157,7 +206,19 @@ const Events = () => {
       }
       setIsModalOpen(false);
       setEditingEvent(null);
-      setNewEvent({ title: '', description: '', date: '', location: '', status: 'Upcoming', registerUrl: '', image: undefined, imagePreview: '' });
+      setNewEvent({ 
+        title: '', 
+        description: '', 
+        date: '', 
+        location: '', 
+        status: 'Upcoming', 
+        registerUrl: '', 
+        image: undefined, 
+        imagePreview: '',
+        operatingHours: '',
+        contactInfo: { name: '', email: '', phone: '' },
+        mapLocation: { building: '', floor: '', room: '', coordinates: undefined }
+      });
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Failed to save event');
     }
@@ -222,7 +283,7 @@ const Events = () => {
               <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search events..."
+                placeholder="Search by event title or description..."
                 className="bg-gray-100 w-full pl-10 pr-4 py-2 rounded-l text-black outline-none text-lg"
                 aria-label="Search events"
                 value={searchInput}
@@ -247,10 +308,21 @@ const Events = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredEvents.map(event => (
-            <div key={event._id} className="bg-white rounded-lg shadow p-6 flex flex-col gap-2 border">
-              {event.image?.url && (
-                <img src={event.image.url} alt="Event" className="w-full h-64 object-cover rounded mb-2" />
-              )}
+            <div 
+              key={event._id} 
+              className="bg-white rounded-lg shadow p-6 flex flex-col gap-2 border cursor-pointer hover:shadow-lg transition-shadow"
+              onClick={() => setSelectedEvent(event)}
+            >
+              <div className="w-full h-64 bg-gray-100 rounded mb-2 relative overflow-hidden">
+                {event.image?.url ? (
+                  <img src={event.image.url} alt={event.title} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
+                    <FiCalendar className="w-16 h-16 mb-2" />
+                    <span className="text-sm font-medium">No Image Available</span>
+                  </div>
+                )}
+              </div>
               <div className="flex items-start gap-2 mb-2 flex-wrap">
                 <div className="flex items-center flex-shrink-0">
                   <FiCalendar className="text-[#00C6A7]" />
@@ -267,7 +339,7 @@ const Events = () => {
                 </span>
               </div>
               <h2 className="text-lg font-bold text-black">{event.title}</h2>
-              <p className="text-gray-600">{event.description}</p>
+              <p className="text-gray-600 line-clamp-3">{event.description}</p>
               <div className="flex items-start gap-2 mt-2 text-sm text-gray-500 flex-wrap">
                 <div className="flex items-center flex-shrink-0">
                  <FiMapPin /> <span>{event.location}</span>
@@ -276,16 +348,13 @@ const Events = () => {
               <button
                 className={`mt-2 px-4 py-2 rounded-full font-semibold text-white ${event.registerUrl ? 'bg-[#00C6A7] hover:bg-[#009e87] cursor-pointer' : 'bg-gray-300 cursor-not-allowed'} transition`}
                 disabled={!event.registerUrl}
-                onClick={() => { if (event.registerUrl) window.open(event.registerUrl, '_blank'); }}
+                onClick={(e) => { 
+                  e.stopPropagation();
+                  if (event.registerUrl) window.open(event.registerUrl, '_blank'); 
+                }}
               >
-                Register
+                {event.registerUrl ? 'Register Now' : 'Registration Closed'}
               </button>
-              {user?.email === "gauravkhandelwal205@gmail.com" && (
-                <div className="flex gap-2 pt-3">
-                  <button onClick={() => handleEditEvent(event)} className="flex-1 px-3 py-2 rounded-full text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors duration-200">Edit</button>
-                  <button onClick={() => handleDeleteEvent(event._id)} className="flex-1 px-3 py-2 rounded-full text-sm font-semibold text-white bg-[#F05A25] hover:bg-red-600 transition-colors duration-200">Delete</button>
-                </div>
-              )}
             </div>
           ))}
           {filteredEvents.length === 0 && (
@@ -302,7 +371,7 @@ const Events = () => {
                   {editingEvent ? 'Edit Event' : 'Add New Event'}
                 </h2>
                 <button
-                  onClick={() => { setIsModalOpen(false); setEditingEvent(null); setNewEvent({ title: '', description: '', date: '', location: '', status: 'Upcoming', registerUrl: '', image: undefined, imagePreview: '' }); }}
+                  onClick={() => { setIsModalOpen(false); setEditingEvent(null); setNewEvent({ title: '', description: '', date: '', location: '', status: 'Upcoming', registerUrl: '', image: undefined, imagePreview: '', operatingHours: '', contactInfo: { name: '', email: '', phone: '' }, mapLocation: { building: '', floor: '', room: '', coordinates: undefined } }); }}
                   aria-label="Close"
                   className="w-12 h-12 flex items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-200 text-black absolute top-4 right-4 z-50 transition-all duration-150 focus:outline-none"
                 >
@@ -333,7 +402,7 @@ const Events = () => {
                           value={newEvent.title}
                           onChange={e => setNewEvent({...newEvent, title: e.target.value})}
                           className="w-full px-10 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
-                          placeholder="e.g. Coding Hackathon"
+                          placeholder="Enter event title (e.g., Annual Tech Symposium 2024)"
                           required
                           aria-label="Event Title"
                         />
@@ -362,7 +431,7 @@ const Events = () => {
                         onChange={e => setNewEvent({...newEvent, description: e.target.value})}
                         className="w-full px-10 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
                         rows={4}
-                        placeholder="Describe the event, any unique features, etc."
+                        placeholder="Provide a detailed description of the event. Include key highlights, agenda, target audience, and any special requirements."
                         required
                         aria-label="Event Description"
                       ></textarea>
@@ -379,7 +448,7 @@ const Events = () => {
                           value={newEvent.location}
                           onChange={e => setNewEvent({...newEvent, location: e.target.value})}
                           className="w-full px-10 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
-                          placeholder="e.g. Main Auditorium"
+                          placeholder="Enter venue details (e.g., Main Auditorium, Block A, Floor 3)"
                           required
                           aria-label="Event Location"
                         />
@@ -412,12 +481,98 @@ const Events = () => {
                         value={newEvent.registerUrl}
                         onChange={e => setNewEvent({...newEvent, registerUrl: e.target.value})}
                         className="w-full px-10 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
-                        placeholder="https://..."
+                        placeholder="https://forms.google.com/..."
                         aria-label="Register URL"
                       />
                       <FiMail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                     </div>
                     <p className="text-xs text-gray-500 mt-1">Add a registration link if available.</p>
+                  </div>
+                  <div className="mt-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">Operating Hours <FiCalendar className="inline text-gray-400" /></label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={newEvent.operatingHours}
+                        onChange={e => setNewEvent({...newEvent, operatingHours: e.target.value})}
+                        className="w-full px-10 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
+                        placeholder="e.g., 9:00 AM - 5:00 PM"
+                        aria-label="Operating Hours"
+                      />
+                      <FiCalendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">Specify the event's operating hours.</p>
+                  </div>
+                  <div className="mt-6">
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">Contact Information</h4>
+                    <div className="space-y-4">
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={newEvent.contactInfo.name}
+                          onChange={e => setNewEvent({...newEvent, contactInfo: {...newEvent.contactInfo, name: e.target.value}})}
+                          className="w-full px-10 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
+                          placeholder="Contact Person Name"
+                          aria-label="Contact Name"
+                        />
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="email"
+                          value={newEvent.contactInfo.email}
+                          onChange={e => setNewEvent({...newEvent, contactInfo: {...newEvent.contactInfo, email: e.target.value}})}
+                          className="w-full px-10 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
+                          placeholder="contact@example.com"
+                          aria-label="Contact Email"
+                        />
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="tel"
+                          value={newEvent.contactInfo.phone}
+                          onChange={e => setNewEvent({...newEvent, contactInfo: {...newEvent.contactInfo, phone: e.target.value}})}
+                          className="w-full px-10 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
+                          placeholder="+1 (555) 123-4567"
+                          aria-label="Contact Phone"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-6">
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">Map Location</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={newEvent.mapLocation.building}
+                          onChange={e => setNewEvent({...newEvent, mapLocation: {...newEvent.mapLocation, building: e.target.value}})}
+                          className="w-full px-10 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
+                          placeholder="Building Name"
+                          aria-label="Building"
+                        />
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={newEvent.mapLocation.floor}
+                          onChange={e => setNewEvent({...newEvent, mapLocation: {...newEvent.mapLocation, floor: e.target.value}})}
+                          className="w-full px-10 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
+                          placeholder="Floor"
+                          aria-label="Floor"
+                        />
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={newEvent.mapLocation.room}
+                          onChange={e => setNewEvent({...newEvent, mapLocation: {...newEvent.mapLocation, room: e.target.value}})}
+                          className="w-full px-10 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
+                          placeholder="Room Number"
+                          aria-label="Room"
+                        />
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-2">Add detailed location information to help attendees find the venue.</p>
                   </div>
                 </div>
                 {/* Images Section */}
@@ -440,7 +595,7 @@ const Events = () => {
                         </label>
                         <p className="pl-1">or drag and drop</p>
                       </div>
-                      <p className="text-xs text-gray-500">PNG, JPG, GIF up to 5MB. Add a clear image to help users recognize the event.</p>
+                      <p className="text-xs text-gray-500">PNG, JPG, GIF up to 5MB. Recommended size: 1200x800px. Add a high-quality image that represents your event.</p>
                     </div>
                   </div>
                   {newEvent.imagePreview && (
@@ -465,7 +620,7 @@ const Events = () => {
                 <div className="flex justify-end space-x-4 pt-4 border-t border-gray-200">
                   <button
                     type="button"
-                    onClick={() => { setIsModalOpen(false); setEditingEvent(null); setNewEvent({ title: '', description: '', date: '', location: '', status: 'Upcoming', registerUrl: '', image: undefined, imagePreview: '' }); }}
+                    onClick={() => { setIsModalOpen(false); setEditingEvent(null); setNewEvent({ title: '', description: '', date: '', location: '', status: 'Upcoming', registerUrl: '', image: undefined, imagePreview: '', operatingHours: '', contactInfo: { name: '', email: '', phone: '' }, mapLocation: { building: '', floor: '', room: '', coordinates: undefined } }); }}
                     className="px-4 py-2 rounded-full text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50"
                   >
                     Cancel
@@ -478,6 +633,157 @@ const Events = () => {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+
+        {/* Event Details Modal */}
+        {selectedEvent && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto relative">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Event Details</h2>
+                <button
+                  onClick={() => setSelectedEvent(null)}
+                  aria-label="Close"
+                  className="w-12 h-12 flex items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-200 text-black absolute top-4 right-4 z-50 transition-all duration-150 focus:outline-none"
+                >
+                  <svg className="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              </div>
+              
+              {selectedEvent.image?.url ? (
+                <img src={selectedEvent.image.url} alt={selectedEvent.title} className="w-full h-64 object-cover rounded-lg mb-6" />
+              ) : (
+                <div className="w-full h-64 bg-gray-100 rounded-lg mb-6 flex flex-col items-center justify-center text-gray-400">
+                  <FiCalendar className="w-16 h-16 mb-2" />
+                  <span className="text-sm font-medium">No Image Available</span>
+                </div>
+              )}
+              
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">{selectedEvent.title}</h3>
+                  <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
+                    <div className="flex items-center gap-1">
+                      <FiCalendar className="text-[#00C6A7]" />
+                      <span>{new Date(selectedEvent.date).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                      })}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <FiMapPin className="text-[#00C6A7]" />
+                      <span>{selectedEvent.location}</span>
+                    </div>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      selectedEvent.status === 'Upcoming' ? 'bg-blue-100 text-blue-800' :
+                      selectedEvent.status === 'Ongoing' ? 'bg-green-100 text-green-800' :
+                      selectedEvent.status === 'Completed' ? 'bg-gray-100 text-gray-800' :
+                      'bg-red-100 text-red-800'
+                    }`}>
+                      {selectedEvent.status}
+                    </span>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-lg font-semibold text-gray-900 mb-2">Description</h4>
+                  <p className="text-gray-600 whitespace-pre-wrap">{selectedEvent.description}</p>
+                </div>
+
+                {selectedEvent.operatingHours && (
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-900 mb-2">Operating Hours</h4>
+                    <p className="text-gray-600">{selectedEvent.operatingHours}</p>
+                  </div>
+                )}
+
+                {selectedEvent.contactInfo && (
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-900 mb-2">Contact Information</h4>
+                    <div className="space-y-2">
+                      {selectedEvent.contactInfo.name && (
+                        <p className="text-gray-600"><span className="font-medium">Contact Person:</span> {selectedEvent.contactInfo.name}</p>
+                      )}
+                      {selectedEvent.contactInfo.email && (
+                        <p className="text-gray-600"><span className="font-medium">Email:</span> {selectedEvent.contactInfo.email}</p>
+                      )}
+                      {selectedEvent.contactInfo.phone && (
+                        <p className="text-gray-600"><span className="font-medium">Phone:</span> {selectedEvent.contactInfo.phone}</p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {selectedEvent.mapLocation && (
+                  <div>
+                    <h4 className="text-lg font-semibold text-gray-900 mb-2">Location Details</h4>
+                    <div className="space-y-2">
+                      {selectedEvent.mapLocation.building && (
+                        <p className="text-gray-600"><span className="font-medium">Building:</span> {selectedEvent.mapLocation.building}</p>
+                      )}
+                      {selectedEvent.mapLocation.floor && (
+                        <p className="text-gray-600"><span className="font-medium">Floor:</span> {selectedEvent.mapLocation.floor}</p>
+                      )}
+                      {selectedEvent.mapLocation.room && (
+                        <p className="text-gray-600"><span className="font-medium">Room:</span> {selectedEvent.mapLocation.room}</p>
+                      )}
+                      {selectedEvent.mapLocation.coordinates && (
+                        <a
+                          href={`https://www.google.com/maps?q=${selectedEvent.mapLocation.coordinates.lat},${selectedEvent.mapLocation.coordinates.lng}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 text-[#00C6A7] hover:text-[#009e87]"
+                        >
+                          <FiMapPin />
+                          <span>View on Map</span>
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {selectedEvent.registerUrl && (
+                  <div className="pt-4">
+                    <a
+                      href={selectedEvent.registerUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block px-6 py-3 rounded-full bg-[#00C6A7] text-white font-semibold hover:bg-[#009e87] transition"
+                    >
+                      Register Now
+                    </a>
+                  </div>
+                )}
+
+                {user?.email === "gauravkhandelwal205@gmail.com" && (
+                  <div className="flex gap-4 pt-4 border-t border-gray-200">
+                    <button
+                      onClick={() => {
+                        setSelectedEvent(null);
+                        handleEditEvent(selectedEvent);
+                      }}
+                      className="flex-1 px-4 py-2 rounded-full text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50"
+                    >
+                      Edit Event
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSelectedEvent(null);
+                        handleDeleteEvent(selectedEvent._id);
+                      }}
+                      className="flex-1 px-4 py-2 rounded-full text-sm font-semibold text-white bg-[#F05A25] hover:bg-red-600"
+                    >
+                      Delete Event
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}

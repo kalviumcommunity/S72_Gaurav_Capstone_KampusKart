@@ -1,4 +1,4 @@
-  import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import Navbar from './Navbar';
 import { useAuth } from '../contexts/AuthContext';
 import { FiSearch, FiX, FiClock, FiMapPin, FiUser, FiCalendar, FiMessageSquare, FiEdit2, FiTrash2, FiCheckCircle, FiInfo, FiTag, FiFileText, FiMail, FiAlertCircle } from 'react-icons/fi';
@@ -365,27 +365,37 @@ const LostFound = () => {
                   </span>
                 </div>
               )}
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="text-lg font-bold text-black truncate mr-2">{item.title}</h2>
-                {renderStatus(item.type, item.resolved)}
+              {/* Status Badges */}
+              <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
+                <h2 className="text-lg font-bold text-black truncate flex-1 min-w-0">{item.title}</h2>
+                <div className="flex-shrink-0">{renderStatus(item.type, item.resolved)}</div>
               </div>
+
               <p className="text-gray-600 text-sm mb-2 line-clamp-3 flex-1">{item.description}</p>
-              <div className="flex items-start gap-4 text-sm text-gray-500 mt-auto flex-wrap">
+
+              {/* Meta Info Row - Location, Date, User */}
+              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mt-auto">
                 {item.location && (
-                  <div className="flex items-center flex-shrink-0">
-                    <FiMapPin className="mr-1" />
-                    <span>{item.location}</span>
-                  </div>
+                  <span className="flex items-center flex-shrink-0">
+                    <FiMapPin className="mr-1"/>
+                    <span className="truncate">{item.location}</span>
+                  </span>
                 )}
-                <div className="flex items-center flex-shrink-0">
-                  <FiCalendar className="mr-1" />
-                  <span>{item.date ? new Date(item.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : ''}</span>
-                </div>
-                <div className="flex items-center flex-shrink-0">
-                  <FiUser className="mr-1" />
-                  <span>{item.userName || item.user.name}</span>
-                </div>
+                {item.date && (
+                  <span className="flex items-center flex-shrink-0">
+                    <FiCalendar className="mr-1"/>
+                    <span>{new Date(item.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                  </span>
+                )}
+                {item.user?.name && (
+                  <span className="flex items-center flex-shrink-0">
+                    <FiUser className="mr-1"/>
+                    <span className="truncate">{item.user.name}</span>
+                  </span>
+                )}
               </div>
+
+              {/* Action Buttons */}
               {user && item.user && item.user._id === user._id && !item.resolved && (
                 <div className="flex gap-2 pt-3">
                   <button
