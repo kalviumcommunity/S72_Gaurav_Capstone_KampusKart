@@ -15,8 +15,26 @@ interface Complaint {
   };
   title: string;
   description: string;
+  category: 'Academic' | 'Administrative' | 'Facilities' | 'IT' | 'Security' | 'Other';
+  priority: 'Low' | 'Medium' | 'High' | 'Urgent';
+  department: 'Academic Affairs' | 'Administration' | 'Facilities Management' | 'IT Services' | 'Security' | 'Student Services';
+  assignedTo?: {
+    _id: string;
+    name: string;
+  };
+  estimatedResolutionTime?: string;
   status: 'Open' | 'In Progress' | 'Resolved' | 'Closed';
+  statusHistory: Array<{
+    status: 'Open' | 'In Progress' | 'Resolved' | 'Closed';
+    comment?: string;
+    updatedBy: {
+      _id: string;
+      name: string;
+    };
+    timestamp: string;
+  }>;
   createdAt: string;
+  lastUpdated: string;
   images?: { url: string }[];
 }
 
@@ -37,6 +55,9 @@ const Complaints = () => {
   const [newComplaint, setNewComplaint] = useState({
     title: '',
     description: '',
+    category: 'Other' as Complaint['category'],
+    priority: 'Medium' as Complaint['priority'],
+    department: 'Student Services' as Complaint['department'],
   });
   const [formError, setFormError] = useState<string | null>(null);
   const [editingComplaint, setEditingComplaint] = useState<Complaint | null>(null);
@@ -118,6 +139,9 @@ const Complaints = () => {
     setNewComplaint({
       title: '',
       description: '',
+      category: 'Other' as Complaint['category'],
+      priority: 'Medium' as Complaint['priority'],
+      department: 'Student Services' as Complaint['department'],
     });
     setFormError(null);
     setIsModalOpen(true);
@@ -128,6 +152,9 @@ const Complaints = () => {
     setNewComplaint({
       title: complaint.title,
       description: complaint.description,
+      category: complaint.category,
+      priority: complaint.priority,
+      department: complaint.department,
     });
     setImages(
       (complaint.images || []).map(img => ({
@@ -147,6 +174,9 @@ const Complaints = () => {
     setNewComplaint({
       title: '',
       description: '',
+      category: 'Other' as Complaint['category'],
+      priority: 'Medium' as Complaint['priority'],
+      department: 'Student Services' as Complaint['department'],
     });
     setFormError(null);
   };
@@ -186,17 +216,23 @@ const Complaints = () => {
       const formData = new FormData();
       formData.append('title', newComplaint.title.trim());
       formData.append('description', newComplaint.description.trim());
+      formData.append('category', newComplaint.category);
+      formData.append('priority', newComplaint.priority);
+      formData.append('department', newComplaint.department);
+      
       // Append new images
       images.forEach((image) => {
         if (image.file) {
           formData.append('images', image.file);
         }
       });
+      
       // For edit: send public_ids of existing images to keep
       if (editingComplaint) {
         const keepPublicIds = images.filter(img => img.public_id).map(img => img.public_id);
         formData.append('keepImages', JSON.stringify(keepPublicIds));
       }
+
       const response = await fetch(url, {
         method,
         headers: {
@@ -204,6 +240,7 @@ const Complaints = () => {
         },
         body: formData,
       });
+      
       const data = await response.json();
       if (response.ok) {
         if (editingComplaint) {
@@ -265,6 +302,97 @@ const Complaints = () => {
       default:
         return null;
     }
+  };
+
+  const renderStatusHistory = (history: Complaint['statusHistory']) => {
+    return (
+      <div className="space-y-2">
+        {history.map((update, index) => (
+          <div key={index} className="bg-gray-50 p-3 rounded-lg">
+            <div className="flex items-center justify-between">
+              <span className="font-medium">{update.status}</span>
+              <span className="text-sm text-gray-500">
+                {format(new Date(update.timestamp), 'MMM d, yyyy h:mm a')}
+              </span>
+            </div>
+            {update.comment && (
+              <p className="text-sm text-gray-600 mt-1">{update.comment}</p>
+            )}
+            <p className="text-xs text-gray-500 mt-1">
+              Updated by: {update.updatedBy.name}
+            </p>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const renderComplaintDetails = (complaint: Complaint) => {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold">{complaint.title}</h3>
+          <span className={`px-3 py-1 rounded-full text-sm ${getStatusColor(complaint.status)}`}>
+            {complaint.status}
+          </span>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <p className="text-sm text-gray-500">Category</p>
+            <p className="font-medium">{complaint.category}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Priority</p>
+            <p className="font-medium">{complaint.priority}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Department</p>
+            <p className="font-medium">{complaint.department}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Assigned To</p>
+            <p className="font-medium">{complaint.assignedTo?.name || 'Not Assigned'}</p>
+          </div>
+        </div>
+
+        {complaint.estimatedResolutionTime && (
+          <div>
+            <p className="text-sm text-gray-500">Estimated Resolution Time</p>
+            <p className="font-medium">
+              {format(new Date(complaint.estimatedResolutionTime), 'MMM d, yyyy h:mm a')}
+            </p>
+          </div>
+        )}
+
+        <div>
+          <p className="text-sm text-gray-500">Description</p>
+          <p className="mt-1">{complaint.description}</p>
+        </div>
+
+        {complaint.images && complaint.images.length > 0 && (
+          <div>
+            <p className="text-sm text-gray-500 mb-2">Images</p>
+            <div className="grid grid-cols-2 gap-2">
+              {complaint.images.map((image, index) => (
+                <img
+                  key={index}
+                  src={image.url}
+                  alt={`Complaint image ${index + 1}`}
+                  className="w-full h-32 object-cover rounded-lg cursor-pointer"
+                  onClick={() => setZoomedImage(image.url)}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div>
+          <p className="text-sm text-gray-500 mb-2">Status History</p>
+          {renderStatusHistory(complaint.statusHistory)}
+        </div>
+      </div>
+    );
   };
 
   if (loading && complaints.length === 0) {
@@ -486,6 +614,7 @@ const Complaints = () => {
                 <div className="border-b pb-6 mb-6 bg-gray-50 rounded-lg p-6">
                   <h3 className="text-lg font-bold mb-4 text-gray-900 flex items-center gap-2">Complaint Details <FiInfo className="text-gray-400" title="Fill in the details of your complaint." /></h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Title */}
                     <div className="col-span-1 md:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">Title <FiTag className="inline text-gray-400" /></label>
                       <div className="relative">
@@ -504,7 +633,70 @@ const Complaints = () => {
                       <p className="text-xs text-gray-500 mt-1">Give a short, descriptive title for the complaint.</p>
                       {!newComplaint.title.trim() && formError && <p className="text-xs text-red-500 mt-1">Title is required.</p>}
                     </div>
-                    {editingComplaint && (
+
+                    {/* Category */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">Category <FiTag className="inline text-gray-400" /></label>
+                      <select
+                        name="category"
+                        value={newComplaint.category}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
+                        required
+                        aria-label="Complaint Category"
+                      >
+                        <option value="Academic">Academic</option>
+                        <option value="Administrative">Administrative</option>
+                        <option value="Facilities">Facilities</option>
+                        <option value="IT">IT</option>
+                        <option value="Security">Security</option>
+                        <option value="Other">Other</option>
+                      </select>
+                      <p className="text-xs text-gray-500 mt-1">Select the category that best fits your complaint.</p>
+                    </div>
+
+                    {/* Priority */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">Priority <FiTag className="inline text-gray-400" /></label>
+                      <select
+                        name="priority"
+                        value={newComplaint.priority}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
+                        required
+                        aria-label="Complaint Priority"
+                      >
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="High">High</option>
+                        <option value="Urgent">Urgent</option>
+                      </select>
+                      <p className="text-xs text-gray-500 mt-1">Indicate the urgency of the complaint.</p>
+                    </div>
+
+                    {/* Department (Admin Only - For now, just display/select) */}
+                    {/* This would ideally be conditionally rendered/editable based on user role */}
+                     <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">Department <FiTag className="inline text-gray-400" /></label>
+                      <select
+                        name="department"
+                        value={newComplaint.department}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
+                        required
+                        aria-label="Assigned Department"
+                      >
+                        <option value="Academic Affairs">Academic Affairs</option>
+                        <option value="Administration">Administration</option>
+                        <option value="Facilities Management">Facilities Management</option>
+                        <option value="IT Services">IT Services</option>
+                        <option value="Security">Security</option>
+                        <option value="Student Services">Student Services</option>
+                      </select>
+                       <p className="text-xs text-gray-500 mt-1">The department responsible for handling this complaint.</p>
+                    </div>
+
+                    {editingComplaint && ( // Only show status dropdown in edit mode
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
                         <select
@@ -521,7 +713,9 @@ const Complaints = () => {
                         <p className="text-xs text-gray-500 mt-1">Update the status of the complaint.</p>
                       </div>
                     )}
+
                   </div>
+                  {/* Description */}
                   <div className="mt-6">
                     <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">Description <FiFileText className="inline text-gray-400" /></label>
                     <div className="relative">
@@ -541,23 +735,7 @@ const Complaints = () => {
                     {!newComplaint.description.trim() && formError && <p className="text-xs text-red-500 mt-1">Description is required.</p>}
                   </div>
                 </div>
-                {/* Contact Section */}
-                <div className="bg-gray-50 rounded-lg p-6">
-                  <h3 className="text-lg font-bold mb-4 text-gray-900 flex items-center gap-2">Contact (Optional) <FiInfo className="text-gray-400" title="Contact is linked to your account." /></h3>
-                  <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">Contact Information <FiMail className="inline text-gray-400" /></label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      name="contact"
-                      className="w-full px-10 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm bg-gray-100 cursor-not-allowed"
-                      placeholder="Email or phone number (optional)"
-                      disabled
-                      aria-label="Contact Information"
-                    />
-                    <FiMail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">(Contact is linked to your account and not editable.)</p>
-                </div>
+
                 {/* Images Section */}
                 <div className="bg-gray-50 rounded-lg p-6">
                   <h3 className="text-lg font-bold mb-4 text-gray-900">Images (Optional, Max 5)</h3>
@@ -622,6 +800,7 @@ const Complaints = () => {
                     </div>
                   )}
                 </div>
+
                 <div className="flex justify-end space-x-4 pt-4 border-t border-gray-200">
                   <button
                     type="button"
