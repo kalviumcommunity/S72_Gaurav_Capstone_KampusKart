@@ -7,11 +7,7 @@ import { format, isSameDay, parseISO } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import Picker from '@emoji-mart/react';
 import emojiData from '@emoji-mart/data';
-
-// Define API_BASE based on environment
-const API_BASE = window.location.hostname === 'localhost' 
-  ? 'http://localhost:5000'
-  : 'https://s72-gaurav-capstone.onrender.com';
+import { API_BASE } from '../config';
 
 interface User {
   _id: string;

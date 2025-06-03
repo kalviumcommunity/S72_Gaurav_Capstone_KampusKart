@@ -2,9 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import SkeletonLoader from './SkeletonLoader';
 import { FiUser, FiMail, FiPhone, FiMapPin, FiEdit2, FiSave, FiXCircle, FiUpload, FiAlertCircle, FiCheckCircle, FiCalendar, FiTag, FiBriefcase } from 'react-icons/fi'; // Importing icons including new ones
-
-// Define API_BASE locally for now to avoid process.env issue
-const API_BASE = 'http://localhost:5000';
+import { API_BASE } from '../config';
 
 // Helper function to format date for display
 const formatDate = (dateString: string | null | undefined) => {

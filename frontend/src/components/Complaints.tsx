@@ -4,8 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { FiPlus, FiEdit2, FiTrash2, FiX, FiAlertCircle, FiCheckCircle, FiUser, FiCalendar, FiTag, FiFileText, FiSearch, FiInfo, FiMail } from 'react-icons/fi';
 import SkeletonLoader from './SkeletonLoader';
 import { format } from 'date-fns';
-
-const API_BASE = 'http://localhost:5000';
+import { API_BASE } from '../config';
 
 interface Complaint {
   _id: string;

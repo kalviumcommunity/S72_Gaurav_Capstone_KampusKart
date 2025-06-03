@@ -1,11 +1,9 @@
-  import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import Navbar from './Navbar';
 import { useAuth } from '../contexts/AuthContext';
 import { FiSearch, FiX, FiClock, FiMapPin, FiUser, FiCalendar, FiMessageSquare, FiEdit2, FiTrash2, FiCheckCircle, FiInfo, FiTag, FiFileText, FiMail, FiAlertCircle } from 'react-icons/fi';
 import SkeletonLoader from './SkeletonLoader';
-
-// Define API_BASE locally for now to avoid process.env issue
-const API_BASE = 'http://localhost:5000';
+import { API_BASE } from '../config';
 
 interface LostFoundItem {
   _id: string;
