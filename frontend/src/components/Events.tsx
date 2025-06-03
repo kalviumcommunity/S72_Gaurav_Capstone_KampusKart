@@ -310,10 +310,10 @@ const Events = () => {
           {filteredEvents.map(event => (
             <div 
               key={event._id} 
-              className="bg-white rounded-lg shadow p-6 flex flex-col gap-2 border cursor-pointer hover:shadow-lg transition-shadow"
+              className="bg-white rounded-lg shadow p-6 flex flex-col gap-2 border cursor-pointer hover:shadow-lg transition-shadow duration-200"
               onClick={() => setSelectedEvent(event)}
             >
-              <div className="w-full h-64 bg-gray-100 rounded mb-2 relative overflow-hidden">
+              <div className="w-full h-64 bg-gray-100 rounded-md mb-3 relative overflow-hidden">
                 {event.image?.url ? (
                   <img src={event.image.url} alt={event.title} className="w-full h-full object-cover" />
                 ) : (
@@ -324,9 +324,21 @@ const Events = () => {
                 )}
               </div>
               <div className="flex items-start gap-2 mb-2 flex-wrap">
+                <h2 className="text-lg font-bold text-black truncate flex-1 min-w-0">{event.title}</h2>
+                <span className={`ml-auto text-xs px-2 py-1 rounded-full ${
+                  event.status === 'Upcoming' ? 'bg-blue-100 text-blue-800' :
+                  event.status === 'Ongoing' ? 'bg-green-100 text-green-800' :
+                  event.status === 'Completed' ? 'bg-gray-100 text-gray-800' :
+                  'bg-red-100 text-red-800'
+                }`}>
+                  {event.status}
+                </span>
+              </div>
+              <p className="text-gray-600 text-sm line-clamp-3 flex-1">{event.description}</p>
+              <div className="flex items-start gap-2 mt-2 text-sm text-gray-500 flex-wrap">
                 <div className="flex items-center flex-shrink-0">
-                  <FiCalendar className="text-[#00C6A7]" />
-                  <span className="font-semibold text-black">
+                  <FiCalendar className="text-[#00C6A7] mr-1" />
+                  <span className="font-semibold text-black text-sm">
                     {new Date(event.date).toLocaleDateString('en-US', { 
                       year: 'numeric', 
                       month: 'long', 
@@ -334,19 +346,12 @@ const Events = () => {
                     })}
                   </span>
                 </div>
-                <span className={`ml-auto text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-800 flex-shrink-0`}>
-                  {event.status}
-                </span>
-              </div>
-              <h2 className="text-lg font-bold text-black">{event.title}</h2>
-              <p className="text-gray-600 line-clamp-3">{event.description}</p>
-              <div className="flex items-start gap-2 mt-2 text-sm text-gray-500 flex-wrap">
                 <div className="flex items-center flex-shrink-0">
-                 <FiMapPin /> <span>{event.location}</span>
+                  <FiMapPin className="mr-1"/> <span className="truncate">{event.location}</span>
                 </div>
               </div>
               <button
-                className={`mt-2 px-4 py-2 rounded-full font-semibold text-white ${event.registerUrl ? 'bg-[#00C6A7] hover:bg-[#009e87] cursor-pointer' : 'bg-gray-300 cursor-not-allowed'} transition`}
+                className={`mt-4 px-4 py-2 rounded-full font-semibold text-white ${event.registerUrl ? 'bg-[#00C6A7] hover:bg-[#009e87] cursor-pointer' : 'bg-gray-300 cursor-not-allowed'} transition`}
                 disabled={!event.registerUrl}
                 onClick={(e) => { 
                   e.stopPropagation();
@@ -667,18 +672,18 @@ const Events = () => {
               <div className="space-y-6">
                 <div>
                   <h3 className="text-xl font-bold text-gray-900 mb-2">{selectedEvent.title}</h3>
-                  <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
-                    <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-4 text-sm text-gray-600 mb-4 flex-wrap">
+                    <div className="flex items-center gap-1 flex-shrink-0">
                       <FiCalendar className="text-[#00C6A7]" />
-                      <span>{new Date(selectedEvent.date).toLocaleDateString('en-US', { 
+                      <span className="font-medium text-black text-sm">{new Date(selectedEvent.date).toLocaleDateString('en-US', { 
                         year: 'numeric', 
                         month: 'long', 
                         day: 'numeric' 
                       })}</span>
                     </div>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 flex-shrink-0">
                       <FiMapPin className="text-[#00C6A7]" />
-                      <span>{selectedEvent.location}</span>
+                      <span className="font-medium text-black text-sm truncate">{selectedEvent.location}</span>
                     </div>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                       selectedEvent.status === 'Upcoming' ? 'bg-blue-100 text-blue-800' :
@@ -693,20 +698,20 @@ const Events = () => {
 
                 <div>
                   <h4 className="text-lg font-semibold text-gray-900 mb-2">Description</h4>
-                  <p className="text-gray-600 whitespace-pre-wrap">{selectedEvent.description}</p>
+                  <p className="text-gray-600 whitespace-pre-wrap text-sm">{selectedEvent.description}</p>
                 </div>
 
                 {selectedEvent.operatingHours && (
                   <div>
                     <h4 className="text-lg font-semibold text-gray-900 mb-2">Operating Hours</h4>
-                    <p className="text-gray-600">{selectedEvent.operatingHours}</p>
+                    <p className="text-gray-600 text-sm">{selectedEvent.operatingHours}</p>
                   </div>
                 )}
 
                 {selectedEvent.contactInfo && (
                   <div>
                     <h4 className="text-lg font-semibold text-gray-900 mb-2">Contact Information</h4>
-                    <div className="space-y-2">
+                    <div className="space-y-2 text-sm">
                       {selectedEvent.contactInfo.name && (
                         <p className="text-gray-600"><span className="font-medium">Contact Person:</span> {selectedEvent.contactInfo.name}</p>
                       )}
@@ -723,7 +728,7 @@ const Events = () => {
                 {selectedEvent.mapLocation && (
                   <div>
                     <h4 className="text-lg font-semibold text-gray-900 mb-2">Location Details</h4>
-                    <div className="space-y-2">
+                    <div className="space-y-2 text-sm">
                       {selectedEvent.mapLocation.building && (
                         <p className="text-gray-600"><span className="font-medium">Building:</span> {selectedEvent.mapLocation.building}</p>
                       )}

@@ -179,7 +179,7 @@ const News = () => {
             <select 
               value={filterCategory} 
               onChange={e => setFilterCategory(e.target.value)} 
-              className="px-4 py-2 rounded bg-gray-100 text-black font-medium"
+              className="px-4 py-2 rounded bg-gray-100 text-black font-medium border border-gray-300"
             >
               <option value="All">All Categories</option>
               <option value="Campus">Campus</option>
@@ -193,7 +193,7 @@ const News = () => {
               <input
                 type="text"
                 placeholder="Search news..."
-                className="bg-gray-100 w-full pl-10 pr-4 py-2 rounded-l text-black outline-none text-lg"
+                className="bg-gray-100 w-full pl-10 pr-4 py-2 rounded-l text-black outline-none text-lg border border-gray-300"
                 value={searchInput}
                 onChange={e => setSearchInput(e.target.value)}
                 onKeyDown={e => {
@@ -216,19 +216,19 @@ const News = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredNews.map(item => (
-            <div key={item._id} className="bg-white rounded-lg shadow p-6 flex flex-col gap-2 border">
+            <div key={item._id} className="bg-white rounded-lg shadow p-6 flex flex-col gap-2 border cursor-pointer hover:shadow-lg transition-shadow duration-200">
               {/* Image Section */}
               {item.images && item.images.length > 0 ? (
-                <div className="relative h-64 overflow-hidden mb-2 rounded-md">
+                <div className="relative h-64 overflow-hidden mb-3 rounded-md">
                   <img
                     src={item.images[0].url}
                     alt={item.title}
-                    className="object-cover w-full h-64 cursor-pointer"
+                    className="object-cover w-full h-full cursor-pointer"
                     onClick={() => setZoomedImage(item.images[0].url)}
                   />
                 </div>
               ) : (
-                <div className="relative h-64 overflow-hidden mb-2 rounded-md flex items-center justify-center bg-gray-100">
+                <div className="relative h-64 overflow-hidden mb-3 rounded-md flex items-center justify-center bg-gray-100">
                   <span className="text-5xl text-gray-300">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-16 h-16">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-3A2.25 2.25 0 008.25 5.25V9m7.5 0v10.5A2.25 2.25 0 0113.5 21h-3a2.25 2.25 0 01-2.25-2.25V9m7.5 0H6.75m8.25 0H18m-12 0h2.25" />
@@ -237,7 +237,8 @@ const News = () => {
                 </div>
               )}
               <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
-                <div className="flex items-center flex-shrink-0">
+                <h2 className="text-lg font-bold text-black truncate flex-1 min-w-0">{item.title}</h2>
+                <div className="flex items-center flex-shrink-0 text-sm text-gray-600">
                   <FiCalendar className="text-[#00C6A7] mr-1" />
                   <span className="font-semibold text-black text-sm">
                     {new Date(item.date).toLocaleDateString('en-US', {
@@ -247,12 +248,12 @@ const News = () => {
                     })}
                   </span>
                 </div>
-                <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-800 flex-shrink-0 whitespace-nowrap">
-                  {item.category}
-                </span>
               </div>
-              <h2 className="text-lg font-bold text-black truncate mb-1">{item.title}</h2>
               <p className="text-gray-600 text-sm line-clamp-3 flex-1">{item.description}</p>
+              <div className="flex items-start gap-2 mt-2 text-sm text-gray-500 flex-wrap">
+                 <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-800 font-semibold flex-shrink-0 whitespace-nowrap"><FiTag className="inline text-gray-400 mr-1"/>{item.category}</span>
+              </div>
+
               {user?.email === "gauravkhandelwal205@gmail.com" && (
                 <div className="flex gap-2 pt-3">
                   <button onClick={() => handleEditNews(item)} className="flex-1 px-3 py-2 rounded-full text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors duration-200">Edit</button>
