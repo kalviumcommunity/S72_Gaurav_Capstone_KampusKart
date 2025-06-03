@@ -79,7 +79,7 @@ router.get('/', protect, async (req, res) => {
 // @route   POST /api/complaints
 // @access  Private
 router.post('/', protect, upload.array('images', 5), async (req, res) => {
-  const { title, description } = req.body;
+  const { title, description, category, priority, department } = req.body;
 
   if (!title || !description) {
     return res.status(400).json({ message: 'Title and description are required.' });
@@ -92,6 +92,9 @@ router.post('/', protect, upload.array('images', 5), async (req, res) => {
       title,
       description,
       images,
+      category,
+      priority,
+      department,
     });
 
     const createdComplaint = await complaint.save();
@@ -106,7 +109,7 @@ router.post('/', protect, upload.array('images', 5), async (req, res) => {
 // @route   PUT /api/complaints/:id
 // @access  Private
 router.put('/:id', protect, upload.array('images', 5), async (req, res) => {
-  const { title, description, status, keepImages } = req.body;
+  const { title, description, status, category, priority, department, keepImages } = req.body;
 
   try {
     const complaint = await Complaint.findById(req.params.id);
@@ -123,6 +126,11 @@ router.put('/:id', protect, upload.array('images', 5), async (req, res) => {
     complaint.title = title || complaint.title;
     complaint.description = description || complaint.description;
     complaint.status = status || complaint.status; // Allow updating status if needed
+
+    // Update new fields if provided
+    if (category) complaint.category = category;
+    if (priority) complaint.priority = priority;
+    if (department) complaint.department = department;
 
     // Handle image deletion and reordering
     let keepPublicIds = [];
