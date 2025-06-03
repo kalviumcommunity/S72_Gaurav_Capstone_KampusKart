@@ -399,13 +399,6 @@ const CampusMap: React.FC<CampusMapProps> = () => {
                   onClick={() => handleMarkerClick(location)}
                 />
               ))}
-              {/* Test Marker at Raj Bungalow */}
-              {isLoaded && (
-                <Marker
-                  position={{ lat: 18.493343843257275, lng: 74.02357135415613 }}
-                  title="Test Raj Bungalow"
-                />
-              )}
               {/* Marker for user location */}
               {isLoaded && userLocation && (
                 <Marker
