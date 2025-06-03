@@ -202,6 +202,24 @@ const CampusMap: React.FC<CampusMapProps> = () => {
       description: "Technology and management education complex",
       category: "Academic",
       // placeId retained in data for future use, but not used in UI or logic
+    },
+    { 
+      id: 17, 
+      name: "Tuck Shop", 
+      lat: 18.493523886263336, 
+      lng: 74.02291451273722,
+      description: "Tuck Shop – Quick bites, chill vibes, heart of MIT ADT.",
+      category: "Landmark",
+      // placeId retained in data for future use, but not used in UI or logic
+    },
+    { 
+      id: 18, 
+      name: "MANET Canteen", 
+      lat: 18.491564033859877, 
+      lng: 74.02410194039003,
+      description: "MANET Canteen – Grab-and-go meals for busy campus days.",
+      category: "Landmark",
+      // placeId retained in data for future use, but not used in UI or logic
     }
   ], []);
 

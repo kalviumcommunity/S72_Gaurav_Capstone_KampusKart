@@ -79,17 +79,73 @@ router.post('/signup', signupLimiter, async (req, res) => {
   try {
     const { email, password, name } = req.body;
 
+    // Enhanced input validation
+    if (!email || !password || !name) {
+      return res.status(400).json({ 
+        message: 'All fields are required',
+        details: {
+          email: !email ? 'Email is required' : null,
+          password: !password ? 'Password is required' : null,
+          name: !name ? 'Name is required' : null
+        }
+      });
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: 'Invalid email format' });
+    }
+
+    // Password strength validation
+    if (password.length < 8) {
+      return res.status(400).json({ 
+        message: 'Password must be at least 8 characters long' 
+      });
+    }
+
+    if (!/[A-Z]/.test(password)) {
+      return res.status(400).json({ 
+        message: 'Password must contain at least one uppercase letter' 
+      });
+    }
+
+    if (!/[a-z]/.test(password)) {
+      return res.status(400).json({ 
+        message: 'Password must contain at least one lowercase letter' 
+      });
+    }
+
+    if (!/[0-9]/.test(password)) {
+      return res.status(400).json({ 
+        message: 'Password must contain at least one number' 
+      });
+    }
+
+    if (!/[!@#$%^&*]/.test(password)) {
+      return res.status(400).json({ 
+        message: 'Password must contain at least one special character (!@#$%^&*)' 
+      });
+    }
+
+    // Name validation
+    if (name.trim().length < 2) {
+      return res.status(400).json({ 
+        message: 'Name must be at least 2 characters long' 
+      });
+    }
+
     // Check if user already exists
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    // Create new user
+    // Create new user with normalized email
     const user = new User({
-      email,
+      email: email.toLowerCase(),
       password,
-      name
+      name: name.trim()
     });
 
     await user.save();
@@ -110,7 +166,11 @@ router.post('/signup', signupLimiter, async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({ message: 'Error creating user', error: error.message });
+    console.error('Signup error:', error);
+    res.status(500).json({ 
+      message: 'Error creating user', 
+      error: error.message 
+    });
   }
 });
 
@@ -119,10 +179,27 @@ router.post('/login', loginLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Find user
-    const user = await User.findOne({ email });
+    // Enhanced input validation
+    if (!email || !password) {
+      return res.status(400).json({ 
+        message: 'Email and password are required',
+        details: {
+          email: !email ? 'Email is required' : null,
+          password: !password ? 'Password is required' : null
+        }
+      });
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: 'Invalid email format' });
+    }
+
+    // Find user with normalized email
+    const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) {
-      return res.status(400).json({ message: 'User not found' });
+      return res.status(400).json({ message: 'Invalid credentials' });
     }
 
     // Check password
@@ -147,7 +224,11 @@ router.post('/login', loginLimiter, async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({ message: 'Error logging in', error: error.message });
+    console.error('Login error:', error);
+    res.status(500).json({ 
+      message: 'Error logging in', 
+      error: error.message 
+    });
   }
 });
 

@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { EyeIcon, EyeSlashIcon, UserIcon, EnvelopeIcon, LockClosedIcon } from '@heroicons/react/24/outline';
 import SkeletonLoader from './SkeletonLoader';
+import axios from 'axios';
 
 const imageUrl = '/login-side.jpg';
 
@@ -23,7 +24,7 @@ const validatePassword = (password: string) => {
   const hasUpperCase = /[A-Z]/.test(password);
   const hasLowerCase = /[a-z]/.test(password);
   const hasNumbers = /\d/.test(password);
-  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+  const hasSpecialChar = /[!@#$%^&*]/.test(password);
   
   return {
     isValid: password.length >= minLength && hasUpperCase && hasLowerCase && hasNumbers && hasSpecialChar,
@@ -32,7 +33,7 @@ const validatePassword = (password: string) => {
       upperCase: !hasUpperCase ? 'Password must contain at least one uppercase letter' : '',
       lowerCase: !hasLowerCase ? 'Password must contain at least one lowercase letter' : '',
       numbers: !hasNumbers ? 'Password must contain at least one number' : '',
-      specialChar: !hasSpecialChar ? 'Password must contain at least one special character' : ''
+      specialChar: !hasSpecialChar ? 'Password must contain at least one special character (!@#$%^&*)' : ''
     }
   };
 };
@@ -70,26 +71,62 @@ const Signup: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Starting signup process...');
     
     // Validate email and password
     if (!validateEmail(email)) {
       setEmailError('Please enter a valid email address');
+      console.log('Email validation failed');
       return;
     }
 
     const passwordValidation = validatePassword(password);
     if (!passwordValidation.isValid) {
       setPasswordErrors(passwordValidation.errors);
+      console.log('Password validation failed:', passwordValidation.errors);
+      return;
+    }
+
+    if (!name.trim()) {
+      setError('Name is required');
+      console.log('Name validation failed');
       return;
     }
 
     try {
       setError('');
       setLoading(true);
+      console.log('Attempting to signup with:', { email, name });
       await signup(email, password, name, remember);
+      console.log('Signup successful, navigating to home...');
       navigate('/home');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to create account');
+      console.error('Signup error details:', {
+        error: err,
+        response: err.response?.data,
+        status: err.response?.status
+      });
+      
+      if (axios.isAxiosError(err)) {
+        if (err.response?.data?.message) {
+          setError(err.response.data.message);
+        } else if (err.response?.data?.details) {
+          const details = err.response.data.details;
+          const errorMessages = Object.entries(details)
+            .filter(([_, value]) => value !== null)
+            .map(([key, value]) => `${key}: ${value}`)
+            .join(', ');
+          setError(errorMessages);
+        } else if (err.code === 'ECONNREFUSED') {
+          setError('Cannot connect to the server. Please make sure the backend server is running.');
+        } else {
+          setError('Failed to create account. Please try again.');
+        }
+      } else if (err.message) {
+        setError(err.message);
+      } else {
+        setError('An unexpected error occurred. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -106,14 +143,14 @@ const Signup: React.FC = () => {
   return (
     <div className="min-h-screen w-screen h-screen flex font-sans bg-white">
       {/* Left: Signup Form */}
-      <div className="flex flex-col justify-center items-center w-full md:w-1/2 px-8 py-12 bg-white rounded-2xl shadow-lg">
+      <div className="flex flex-col items-center w-full md:w-1/2 px-8 py-8 bg-white rounded-2xl shadow-lg overflow-y-auto">
         <div className="w-full max-w-sm">
-          <div className="flex items-center justify-center gap-6 mb-8">
+          <div className="flex items-center justify-center gap-6 mb-6">
             <img src="/Logo.png" alt="KampusKart Logo" className="h-12 w-12 object-contain" style={{ background: 'none', border: 'none', borderRadius: 0, boxShadow: 'none' }} />
             <span className="text-h4 font-extrabold text-black tracking-tight font-sans">Kampuskart</span>
           </div>
-          <h2 className="mb-6 text-h3 font-bold text-black text-center pt-8">Sign Up</h2>
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <h2 className="mb-6 text-h3 font-bold text-black text-center pt-6">Sign Up</h2>
+          <form className="space-y-4" onSubmit={handleSubmit}>
             {error && (
               <div className="rounded-md bg-orange/10 p-4">
                 <div className="text-sm text-orange-700">{error}</div>
@@ -200,8 +237,8 @@ const Signup: React.FC = () => {
             </div>
             <button
               type="submit"
-              disabled={loading || Object.keys(passwordErrors).length > 0 || !!emailError}
-              className={`w-full flex justify-center py-3 px-4 rounded-full text-lg font-semibold text-white bg-[#181818] shadow-lg hover:bg-[#00C6A7] hover:text-white transition ${(Object.keys(passwordErrors).length > 0 || !!emailError) ? 'opacity-50 cursor-not-allowed' : ''}`}
+              disabled={loading}
+              className={`w-full flex justify-center py-3 px-4 rounded-full text-lg font-semibold text-white bg-[#181818] shadow-lg hover:bg-[#00C6A7] hover:text-white transition ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
               style={{ boxShadow: '0 4px 24px 0 rgba(0,0,0,0.10)' }}
             >
               {loading ? 'Creating account...' : 'Sign up'}

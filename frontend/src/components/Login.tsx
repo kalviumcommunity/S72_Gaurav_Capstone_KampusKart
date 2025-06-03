@@ -75,14 +75,14 @@ const Login: React.FC = () => {
   return (
     <div className="min-h-screen w-screen h-screen flex font-sans bg-white">
       {/* Left: Login Form */}
-      <div className="flex flex-col justify-center items-center w-full md:w-1/2 px-8 py-12 bg-white rounded-2xl shadow-lg">
+      <div className="flex flex-col justify-center items-center w-full md:w-1/2 px-8 py-8 bg-white rounded-2xl shadow-lg">
         <div className="w-full max-w-sm">
-          <div className="flex items-center justify-center gap-6 mb-8">
+          <div className="flex items-center justify-center gap-6 mb-6">
             <img src="/Logo.png" alt="KampusKart Logo" className="h-12 w-12 object-contain" style={{ background: 'none', border: 'none', borderRadius: 0, boxShadow: 'none' }} />
             <span className="text-h4 font-extrabold text-black tracking-tight font-sans">Kampuskart</span>
           </div>
-          <h2 className="mb-6 text-h3 font-bold text-black text-center pt-8">Login</h2>
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <h2 className="mb-6 text-h3 font-bold text-black text-center pt-6">Login</h2>
+          <form className="space-y-4" onSubmit={handleSubmit}>
             {error && (
               <div className="rounded-md bg-orange/10 p-4">
                 <div className="text-sm text-orange-700">{error}</div>
