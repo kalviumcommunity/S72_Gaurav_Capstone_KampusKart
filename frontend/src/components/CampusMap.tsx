@@ -53,6 +53,7 @@ const CampusMap: React.FC<CampusMapProps> = () => {
   const [infoWindowPosition, setInfoWindowPosition] = useState<google.maps.LatLng | null>(null);
   const [hasRequestedLocation, setHasRequestedLocation] = useState(false);
   const animationInProgress = useRef(false);
+  const [isPanelOpen, setIsPanelOpen] = useState(window.innerWidth >= 768); // Panel open by default on desktop
 
   // Use the memoized hook
   const { isLoaded, loadError } = useGoogleMaps();
@@ -341,6 +342,11 @@ const CampusMap: React.FC<CampusMapProps> = () => {
     }
   }, [hasRequestedLocation, mapRef, userLocation]);
 
+  // Toggle panel visibility on mobile
+  const togglePanel = useCallback(() => {
+    setIsPanelOpen(prev => !prev);
+  }, []);
+
   // Cleanup debounced function on unmount
   useEffect(() => {
     const fn = debouncedSetSearchQuery;
@@ -366,7 +372,8 @@ const CampusMap: React.FC<CampusMapProps> = () => {
       </div>
       <div className="flex flex-col md:flex-row flex-grow h-0">
         {/* Map Container - Full width on mobile, 2/3 on desktop */}
-        <div className="w-full md:w-2/3 h-[50vh] md:h-full relative">
+        {/* Adjust height dynamically based on panel state on mobile */}
+        <div className={`w-full md:w-2/3 ${isPanelOpen ? 'h-[60vh]' : 'h-[100vh]'} md:h-full relative`}>
           <div className="bg-white shadow-lg overflow-hidden h-full relative">
             <GoogleMap
               mapContainerStyle={MAP_CONTAINER_STYLE}
@@ -498,9 +505,33 @@ const CampusMap: React.FC<CampusMapProps> = () => {
           </div>
         </div>
 
-        {/* Locations List - Full width on mobile, 1/3 on desktop */}
-        <div className="w-full md:w-1/3 flex flex-col h-[50vh] md:h-full">
-          <div className="bg-white shadow-lg p-3 md:p-4 flex-grow overflow-y-auto">
+        {/* Locations List Panel Container - Full width on mobile, 1/3 on desktop */}
+        {/* Added relative positioning for button attachment */}
+        {/* Added transition for smooth opening/closing */}
+        <div className={`w-full md:w-1/3 flex flex-col md:h-full relative transition-height duration-300 ease-in-out ${isPanelOpen ? 'h-[40vh]' : 'h-auto'}`}>
+          {/* Toggle Panel Button - Mobile Only, positioned at the top center */}
+          <button
+            onClick={togglePanel}
+            className="md:hidden absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 bg-white border border-gray-300 shadow-lg rounded-full p-3 flex items-center justify-center hover:bg-blue-100 transition"
+            title={isPanelOpen ? 'Hide Locations' : 'Show Locations'}
+            style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.10)' }}
+          >
+            {isPanelOpen ? (
+              // Icon for Hide (e.g., Chevron Down or X)
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            ) : (
+              // Icon for Show (e.g., Chevron Up or List)
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-700 rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            )}
+          </button>
+
+          {/* Inner container with padding, shadow, and overflow for list */}
+          {/* Added pt-4 to prevent button overlap */}
+          <div className="bg-white shadow-lg p-3 md:p-4 md:flex-grow md:overflow-y-auto pt-8">
             <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-3 md:mb-4">Campus Locations</h2>
             {/* Search Bar - Improved for mobile */}
             <div className="mb-3 md:mb-4 flex">
@@ -528,27 +559,29 @@ const CampusMap: React.FC<CampusMapProps> = () => {
               </button>
             </div>
             {/* Locations List - Improved for mobile */}
-            <ul className="space-y-2">
-              {filteredLocations.map((location) => (
-                <li
-                  key={location.id}
-                  className={`mb-2 pb-2 border-b border-gray-200 text-gray-800 cursor-pointer hover:bg-gray-100 p-2 rounded ${
-                    selectedLocation?.id === location.id ? 'bg-blue-100' : ''
-                  }`}
-                  onClick={() => handleLocationClick(location)}
-                >
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1 min-w-0">
-                      <span className="font-semibold text-sm md:text-base block truncate">{location.id}. {location.name}</span>
-                      <p className="text-xs md:text-sm text-gray-600 mt-1 line-clamp-2">{location.description}</p>
+            {isPanelOpen && (
+              <ul className="space-y-2">
+                {filteredLocations.map((location) => (
+                  <li
+                    key={location.id}
+                    className={`mb-2 pb-2 border-b border-gray-200 text-gray-800 cursor-pointer hover:bg-gray-100 p-2 rounded ${
+                      selectedLocation?.id === location.id ? 'bg-blue-100' : ''
+                    }`}
+                    onClick={() => handleLocationClick(location)}
+                  >
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1 min-w-0">
+                        <span className="font-semibold text-sm md:text-base block truncate">{location.id}. {location.name}</span>
+                        <p className="text-xs md:text-sm text-gray-600 mt-1 line-clamp-2">{location.description}</p>
+                      </div>
+                      <span className="text-xs bg-gray-200 px-2 py-1 rounded-full ml-2 flex-shrink-0">
+                        {location.category}
+                      </span>
                     </div>
-                    <span className="text-xs bg-gray-200 px-2 py-1 rounded-full ml-2 flex-shrink-0">
-                      {location.category}
-                    </span>
-                  </div>
-                </li>
-              ))}
-            </ul>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
       </div>
