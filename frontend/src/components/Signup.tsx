@@ -18,6 +18,30 @@ const accentBtn = 'bg-gradient-to-r from-deep-purple-500 to-hot-pink-500';
 const accentBtnHover = 'hover:from-hot-pink-500 hover:to-deep-purple-500';
 const accentFocus = 'focus:ring-deep-purple-400';
 
+const validatePassword = (password: string) => {
+  const minLength = 8;
+  const hasUpperCase = /[A-Z]/.test(password);
+  const hasLowerCase = /[a-z]/.test(password);
+  const hasNumbers = /\d/.test(password);
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+  
+  return {
+    isValid: password.length >= minLength && hasUpperCase && hasLowerCase && hasNumbers && hasSpecialChar,
+    errors: {
+      length: password.length < minLength ? `Password must be at least ${minLength} characters` : '',
+      upperCase: !hasUpperCase ? 'Password must contain at least one uppercase letter' : '',
+      lowerCase: !hasLowerCase ? 'Password must contain at least one lowercase letter' : '',
+      numbers: !hasNumbers ? 'Password must contain at least one number' : '',
+      specialChar: !hasSpecialChar ? 'Password must contain at least one special character' : ''
+    }
+  };
+};
+
+const validateEmail = (email: string) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
 const Signup: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -26,11 +50,39 @@ const Signup: React.FC = () => {
   const [remember, setRemember] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [passwordErrors, setPasswordErrors] = useState<{[key: string]: string}>({});
+  const [emailError, setEmailError] = useState('');
   const navigate = useNavigate();
   const { signup, loginWithGoogle } = useAuth();
 
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newPassword = e.target.value;
+    setPassword(newPassword);
+    const validation = validatePassword(newPassword);
+    setPasswordErrors(validation.errors);
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newEmail = e.target.value;
+    setEmail(newEmail);
+    setEmailError(validateEmail(newEmail) ? '' : 'Please enter a valid email address');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate email and password
+    if (!validateEmail(email)) {
+      setEmailError('Please enter a valid email address');
+      return;
+    }
+
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
+      setPasswordErrors(passwordValidation.errors);
+      return;
+    }
+
     try {
       setError('');
       setLoading(true);
@@ -93,11 +145,14 @@ const Signup: React.FC = () => {
                   type="email"
                   autoComplete="email"
                   required
-                  className="block w-full pl-10 pr-3 py-3 border-b border-gray-300 focus:border-black focus:ring-0 text-black placeholder-gray-400 bg-transparent"
+                  className={`block w-full pl-10 pr-3 py-3 border-b ${emailError ? 'border-red-500' : 'border-gray-300'} focus:border-black focus:ring-0 text-black placeholder-gray-400 bg-transparent`}
                   placeholder="Email address"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={handleEmailChange}
                 />
+                {emailError && (
+                  <p className="mt-1 text-sm text-red-500">{emailError}</p>
+                )}
               </div>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
@@ -109,10 +164,10 @@ const Signup: React.FC = () => {
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="new-password"
                   required
-                  className="block w-full pl-10 pr-10 py-3 border-b border-gray-300 focus:border-black focus:ring-0 text-black placeholder-gray-400 bg-transparent"
+                  className={`block w-full pl-10 pr-10 py-3 border-b ${Object.keys(passwordErrors).length > 0 ? 'border-red-500' : 'border-gray-300'} focus:border-black focus:ring-0 text-black placeholder-gray-400 bg-transparent`}
                   placeholder="Password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={handlePasswordChange}
                 />
                 <button
                   type="button"
@@ -123,6 +178,13 @@ const Signup: React.FC = () => {
                 >
                   {showPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
                 </button>
+                {Object.keys(passwordErrors).length > 0 && (
+                  <div className="mt-1 space-y-1">
+                    {Object.values(passwordErrors).map((error, index) => (
+                      error && <p key={index} className="text-sm text-red-500">{error}</p>
+                    ))}
+                  </div>
+                )}
               </div>
               <div className="flex items-center justify-between mt-2">
                 <label className="flex items-center text-sm text-gray-500">
@@ -138,8 +200,8 @@ const Signup: React.FC = () => {
             </div>
             <button
               type="submit"
-              disabled={loading}
-              className={`w-full flex justify-center py-3 px-4 rounded-full text-lg font-semibold text-white bg-[#181818] shadow-lg hover:bg-[#00C6A7] hover:text-white transition`}
+              disabled={loading || Object.keys(passwordErrors).length > 0 || !!emailError}
+              className={`w-full flex justify-center py-3 px-4 rounded-full text-lg font-semibold text-white bg-[#181818] shadow-lg hover:bg-[#00C6A7] hover:text-white transition ${(Object.keys(passwordErrors).length > 0 || !!emailError) ? 'opacity-50 cursor-not-allowed' : ''}`}
               style={{ boxShadow: '0 4px 24px 0 rgba(0,0,0,0.10)' }}
             >
               {loading ? 'Creating account...' : 'Sign up'}

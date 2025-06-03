@@ -26,6 +26,7 @@ interface AuthContextType {
   logout: () => void;
   updateProfile: (data: Partial<User>) => Promise<void>;
   loading: boolean;
+  refreshToken: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -34,6 +35,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [initializing, setInitializing] = useState(true);
+  const [refreshTimeout, setRefreshTimeout] = useState<NodeJS.Timeout | null>(null);
 
   // On mount, check both storages for a valid token
   useEffect(() => {
@@ -56,8 +58,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // If no valid token from localStorage, check sessionStorage
     if (!persistedToken) {
       console.log('AuthContext: No persisted token from localStorage, checking sessionStorage');
-    const sessionToken = sessionStorage.getItem('token');
-    if (sessionToken) {
+      const sessionToken = sessionStorage.getItem('token');
+      if (sessionToken) {
         console.log('AuthContext: Found token in sessionStorage');
         persistedToken = sessionToken;
       }
@@ -73,10 +75,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     console.log('AuthContext: Token state changed effect. Current token:', token ? 'present' : 'null');
     if (token) {
       fetchProfile();
+      // Set up token refresh
+      setupTokenRefresh();
     } else {
       setUser(null);
+      // Clear any existing refresh timeout
+      if (refreshTimeout) {
+        clearTimeout(refreshTimeout);
+        setRefreshTimeout(null);
+      }
     }
   }, [token]);
+
+  const setupTokenRefresh = () => {
+    // Clear any existing refresh timeout
+    if (refreshTimeout) {
+      clearTimeout(refreshTimeout);
+    }
+
+    // Set up new refresh timeout (refresh 5 minutes before expiry)
+    const timeout = setTimeout(() => {
+      refreshToken();
+    }, 19 * 60 * 1000); // 19 minutes (assuming 24-hour token expiry)
+
+    setRefreshTimeout(timeout);
+  };
+
+  const refreshToken = async () => {
+    console.log('AuthContext: Attempting to refresh token');
+    try {
+      const response = await axios.post(`${API_BASE}/api/auth/refresh`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const { token: newToken } = response.data;
+      setToken(newToken);
+      localStorage.setItem('token', newToken);
+      localStorage.setItem('token_expiry', (Date.now() + 24 * 60 * 60 * 1000).toString());
+      console.log('AuthContext: Token refreshed successfully');
+    } catch (error) {
+      console.error('AuthContext: Error refreshing token:', error);
+      logout();
+    }
+  };
 
   const fetchProfile = async () => {
     console.log('AuthContext: Attempting to fetch profile with token', token ? 'present' : 'null');
@@ -90,7 +130,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error('AuthContext: Error fetching profile:', error);
       setUser(null);
       if (axios.isAxiosError(error) && error.response?.status === 401) {
-         logout();
+        logout();
       }
     }
   };
@@ -107,9 +147,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(user);
       // Always save token to localStorage with expiry for persistent login
       const expiry = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
-        localStorage.setItem('token', token);
-        localStorage.setItem('token_expiry', expiry.toString());
-        sessionStorage.removeItem('token');
+      localStorage.setItem('token', token);
+      localStorage.setItem('token_expiry', expiry.toString());
+      sessionStorage.removeItem('token');
       console.log('AuthContext: Saved token to localStorage (Remember Me)');
     } catch (error) {
       throw error;
@@ -128,9 +168,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(user);
       // Always save token to localStorage with expiry for persistent login
       const expiry = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
-        localStorage.setItem('token', token);
-        localStorage.setItem('token_expiry', expiry.toString());
-        sessionStorage.removeItem('token');
+      localStorage.setItem('token', token);
+      localStorage.setItem('token_expiry', expiry.toString());
+      sessionStorage.removeItem('token');
       console.log('AuthContext: Saved token to localStorage (Remember Me)');
     } catch (error) {
       throw error;
@@ -145,6 +185,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     sessionStorage.removeItem('token');
     setToken(null);
     setUser(null);
+    if (refreshTimeout) {
+      clearTimeout(refreshTimeout);
+      setRefreshTimeout(null);
+    }
     console.log('AuthContext: Logout complete');
   };
 
@@ -152,21 +196,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const formData = new FormData();
       for (const key in data) {
-          if (data[key as keyof Partial<User>] !== undefined) {
-              if (key === 'dateOfBirth') {
-                   formData.append(key, data[key] === null ? '' : data[key] as string);
-              } else if (key === 'profilePicture' && data[key]) {
-                   formData.append(key, data[key] as Blob);
-              } 
-              else {
-                formData.append(key, String(data[key]));
-              }
+        if (data[key as keyof Partial<User>] !== undefined) {
+          if (key === 'dateOfBirth') {
+            formData.append(key, data[key] === null ? '' : data[key] as string);
+          } else if (key === 'profilePicture' && data[key]) {
+            formData.append(key, data[key] as Blob);
+          } else {
+            formData.append(key, String(data[key]));
           }
+        }
       }
 
       const response = await axios.put(`${API_BASE}/api/profile`, formData, {
-        headers: { 
-            Authorization: `Bearer ${token}`,
+        headers: {
+          Authorization: `Bearer ${token}`,
         }
       });
       setUser(response.data);
@@ -179,7 +222,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const loginWithGoogle = () => {
     console.log('AuthContext: Initiating Google login');
-    const backendUrl = isProduction 
+    const backendUrl = isProduction
       ? 'https://s72-gaurav-capstone.onrender.com'
       : 'http://localhost:5000';
     window.location.href = `${backendUrl}/api/auth/google`;
@@ -213,16 +256,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      token, 
-      login, 
-      signup, 
+    <AuthContext.Provider value={{
+      user,
+      token,
+      login,
+      signup,
       loginWithGoogle,
       handleGoogleCallback,
-      logout, 
+      logout,
       updateProfile,
-      loading: initializing
+      loading: initializing,
+      refreshToken
     }}>
       {children}
     </AuthContext.Provider>

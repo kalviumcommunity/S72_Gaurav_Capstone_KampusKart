@@ -5,6 +5,8 @@ const passport = require('passport');
 const User = require('../models/User');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
+const rateLimit = require('express-rate-limit');
+const bcrypt = require('bcryptjs');
 
 // Create Nodemailer transporter
 const transporter = nodemailer.createTransport({
@@ -13,6 +15,19 @@ const transporter = nodemailer.createTransport({
     user: process.env.EMAIL_USER, // Your email address
     pass: process.env.EMAIL_PASS // Your email password or app-specific password
   }
+});
+
+// Rate limiting configuration
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // limit each IP to 5 requests per windowMs
+  message: { message: 'Too many login attempts, please try again after 15 minutes' }
+});
+
+const signupLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 3, // limit each IP to 3 requests per windowMs
+  message: { message: 'Too many signup attempts, please try again after an hour' }
 });
 
 // Google OAuth routes
@@ -60,7 +75,7 @@ router.get('/google/callback',
 );
 
 // Signup route
-router.post('/signup', async (req, res) => {
+router.post('/signup', signupLimiter, async (req, res) => {
   try {
     const { email, password, name } = req.body;
 
@@ -100,7 +115,7 @@ router.post('/signup', async (req, res) => {
 });
 
 // Login route
-router.post('/login', async (req, res) => {
+router.post('/login', loginLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -207,6 +222,33 @@ router.post('/reset-password', async (req, res) => {
   } catch (error) {
     console.error('Reset password error:', error);
     res.status(500).json({ message: 'Error resetting password', error: error.message });
+  }
+});
+
+// Token refresh route
+router.post('/refresh', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ message: 'No token provided' });
+    }
+
+    // Verify the current token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    
+    // Generate new token
+    const newToken = jwt.sign(
+      { userId: decoded.userId },
+      process.env.JWT_SECRET || 'your-secret-key',
+      { expiresIn: '24h' }
+    );
+
+    res.json({ token: newToken });
+  } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({ message: 'Token expired' });
+    }
+    res.status(401).json({ message: 'Invalid token' });
   }
 });
 

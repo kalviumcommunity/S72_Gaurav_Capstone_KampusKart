@@ -13,6 +13,11 @@ const RightPanel: React.FC = () => (
   </div>
 );
 
+const validateEmail = (email: string) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,11 +25,25 @@ const Login: React.FC = () => {
   const [remember, setRemember] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [emailError, setEmailError] = useState('');
   const navigate = useNavigate();
   const { login, loginWithGoogle } = useAuth();
 
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newEmail = e.target.value;
+    setEmail(newEmail);
+    setEmailError(validateEmail(newEmail) ? '' : 'Please enter a valid email address');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate email
+    if (!validateEmail(email)) {
+      setEmailError('Please enter a valid email address');
+      return;
+    }
+
     try {
       setError('');
       setLoading(true);
@@ -56,13 +75,13 @@ const Login: React.FC = () => {
   return (
     <div className="min-h-screen w-screen h-screen flex font-sans bg-white">
       {/* Left: Login Form */}
-      <div className="flex flex-col justify-center items-center w-full md:w-1/2 px-8 py-12 bg-white">
+      <div className="flex flex-col justify-center items-center w-full md:w-1/2 px-8 py-12 bg-white rounded-2xl shadow-lg">
         <div className="w-full max-w-sm">
           <div className="flex items-center justify-center gap-6 mb-8">
             <img src="/Logo.png" alt="KampusKart Logo" className="h-12 w-12 object-contain" style={{ background: 'none', border: 'none', borderRadius: 0, boxShadow: 'none' }} />
             <span className="text-h4 font-extrabold text-black tracking-tight font-sans">Kampuskart</span>
           </div>
-          <h2 className="mb-6 text-h3 font-bold text-black text-center">Login</h2>
+          <h2 className="mb-6 text-h3 font-bold text-black text-center pt-8">Login</h2>
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
               <div className="rounded-md bg-orange/10 p-4">
@@ -80,11 +99,14 @@ const Login: React.FC = () => {
                   type="email"
                   autoComplete="email"
                   required
-                  className="block w-full pl-10 pr-3 py-3 border-b border-gray-300 focus:border-black focus:ring-0 text-black placeholder-gray-400 bg-transparent"
+                  className={`block w-full pl-10 pr-3 py-3 border-b ${emailError ? 'border-red-500' : 'border-gray-300'} focus:border-black focus:ring-0 text-black placeholder-gray-400 bg-transparent`}
                   placeholder="user name/e-mail"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={handleEmailChange}
                 />
+                {emailError && (
+                  <p className="mt-1 text-sm text-red-500">{emailError}</p>
+                )}
               </div>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
@@ -121,19 +143,18 @@ const Login: React.FC = () => {
                   />
                   Remember me
                 </label>
-                <Link to="/forgot-password" className="text-sm font-medium text-black hover:text-[#F05A25] transition bg-white px-3 py-1 rounded-lg">
-                  Forgot Password?
+                <Link to="/forgot-password" className="text-sm text-[#F05A25] hover:underline">
+                  Forgot password?
                 </Link>
               </div>
             </div>
             <button
               type="submit"
-              disabled={loading}
-              className={`w-full flex justify-center py-3 px-4 rounded-full text-lg font-semibold text-white bg-[#181818] shadow-lg hover:bg-[#00C6A7] hover:text-white transition`}
+              disabled={loading || !!emailError}
+              className={`w-full flex justify-center py-3 px-4 rounded-full text-lg font-semibold text-white bg-[#181818] shadow-lg hover:bg-[#00C6A7] hover:text-white transition ${emailError ? 'opacity-50 cursor-not-allowed' : ''}`}
               style={{ boxShadow: '0 4px 24px 0 rgba(0,0,0,0.10)' }}
             >
               {loading ? 'Logging in...' : 'Login'}
-              <span className="ml-2">→</span>
             </button>
 
             <div className="relative">
