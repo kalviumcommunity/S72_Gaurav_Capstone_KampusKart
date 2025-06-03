@@ -569,12 +569,12 @@ const CampusMap: React.FC<CampusMapProps> = () => {
                     }`}
                     onClick={() => handleLocationClick(location)}
                   >
-                    <div className="flex justify-between items-start">
+                    <div className="flex flex-wrap items-start gap-2">
                       <div className="flex-1 min-w-0">
                         <span className="font-semibold text-sm md:text-base block truncate">{location.id}. {location.name}</span>
                         <p className="text-xs md:text-sm text-gray-600 mt-1 line-clamp-2">{location.description}</p>
                       </div>
-                      <span className="text-xs bg-gray-200 px-2 py-1 rounded-full ml-2 flex-shrink-0">
+                      <span className="text-xs bg-gray-200 px-2 py-1 rounded-full flex-shrink-0 whitespace-nowrap">
                         {location.category}
                       </span>
                     </div>

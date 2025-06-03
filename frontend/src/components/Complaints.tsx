@@ -417,17 +417,17 @@ const Complaints = () => {
                   </span>
                 </div>
               )}
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="text-lg font-bold text-black truncate mr-2">{complaint.title}</h2>
-                {renderStatus(complaint.status)}
+              <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
+                <h2 className="text-lg font-bold text-black truncate flex-1 min-w-0">{complaint.title}</h2>
+                <div className="flex-shrink-0">{renderStatus(complaint.status)}</div>
               </div>
               <p className="text-gray-600 text-sm mb-2 line-clamp-3 flex-1">{complaint.description}</p>
-              <div className="flex items-center gap-4 text-sm text-gray-500 mt-auto">
-                <div className="flex items-center">
+              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mt-auto">
+                <div className="flex items-center flex-shrink-0">
                   <FiUser className="mr-1"/>
-                  <span>Posted by {complaint.user.name}</span>
+                  <span className="truncate">Posted by {complaint.user.name}</span>
                 </div>
-                <div className="flex items-center">
+                <div className="flex items-center flex-shrink-0">
                   <FiCalendar className="mr-1"/>
                   <span>{complaint.createdAt ? new Date(complaint.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : ''}</span>
                 </div>

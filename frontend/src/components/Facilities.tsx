@@ -178,27 +178,27 @@ const Facilities = () => {
                 )}
               </div>
               {/* Title */}
-              <h2 className="text-lg font-bold text-black mb-1">{facility.name}</h2>
+              <h2 className="text-lg font-bold text-black mb-1 truncate">{facility.name}</h2>
               {/* Description */}
               <p className="text-gray-600 mb-2 line-clamp-2">{facility.description}</p>
               {/* Type Badge */}
               <div className="flex gap-2 mb-2">
-                <span className="text-xs px-2 py-1 rounded-full bg-[#F3F4F6] text-gray-800 font-semibold">{facility.type}</span>
+                <span className="text-xs px-2 py-1 rounded-full bg-[#F3F4F6] text-gray-800 font-semibold flex-shrink-0">{facility.type}</span>
               </div>
               {/* Meta Info Row */}
-              <div className="flex items-center gap-3 text-xs text-gray-500 mt-auto pt-2 border-t border-gray-100">
-                <span className="flex items-center gap-1"><FiMapPin /> {facility.location}</span>
+              <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500 mt-auto pt-2 border-t border-gray-100">
+                <span className="flex items-center gap-1 flex-shrink-0"><FiMapPin /> <span className="truncate">{facility.location}</span></span>
                 {/* Optionally add date and user if available */}
                 {facility.createdAt && (
-                  <span className="flex items-center gap-1">
+                  <span className="flex items-center gap-1 flex-shrink-0">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                     {new Date(facility.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
                   </span>
                 )}
                 {facility.createdBy && (
-                  <span className="flex items-center gap-1">
+                  <span className="flex items-center gap-1 flex-shrink-0">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                    {facility.createdBy.name || facility.createdBy.email || 'User'}
+                    <span className="truncate">{facility.createdBy.name || facility.createdBy.email || 'User'}</span>
                   </span>
                 )}
               </div>

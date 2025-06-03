@@ -370,18 +370,18 @@ const LostFound = () => {
                 {renderStatus(item.type, item.resolved)}
               </div>
               <p className="text-gray-600 text-sm mb-2 line-clamp-3 flex-1">{item.description}</p>
-              <div className="flex items-center gap-4 text-sm text-gray-500 mt-auto">
+              <div className="flex items-start gap-4 text-sm text-gray-500 mt-auto flex-wrap">
                 {item.location && (
-                  <div className="flex items-center">
+                  <div className="flex items-center flex-shrink-0">
                     <FiMapPin className="mr-1" />
                     <span>{item.location}</span>
                   </div>
                 )}
-                <div className="flex items-center">
+                <div className="flex items-center flex-shrink-0">
                   <FiCalendar className="mr-1" />
                   <span>{item.date ? new Date(item.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : ''}</span>
                 </div>
-                <div className="flex items-center">
+                <div className="flex items-center flex-shrink-0">
                   <FiUser className="mr-1" />
                   <span>{item.userName || item.user.name}</span>
                 </div>

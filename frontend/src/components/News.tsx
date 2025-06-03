@@ -227,22 +227,32 @@ const News = () => {
                     onClick={() => setZoomedImage(item.images[0].url)}
                   />
                 </div>
-              ) : null}
-              <div className="flex items-center gap-2 mb-2">
-                <FiCalendar className="text-[#00C6A7]" />
-                <span className="font-semibold text-black">
-                  {new Date(item.date).toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                  })}
-                </span>
-                <span className="ml-auto text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-800">
+              ) : (
+                <div className="relative h-64 overflow-hidden mb-2 rounded-md flex items-center justify-center bg-gray-100">
+                  <span className="text-5xl text-gray-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-16 h-16">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-3A2.25 2.25 0 008.25 5.25V9m7.5 0v10.5A2.25 2.25 0 0113.5 21h-3a2.25 2.25 0 01-2.25-2.25V9m7.5 0H6.75m8.25 0H18m-12 0h2.25" />
+                    </svg>
+                  </span>
+                </div>
+              )}
+              <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
+                <div className="flex items-center flex-shrink-0">
+                  <FiCalendar className="text-[#00C6A7] mr-1" />
+                  <span className="font-semibold text-black text-sm">
+                    {new Date(item.date).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  </span>
+                </div>
+                <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-800 flex-shrink-0 whitespace-nowrap">
                   {item.category}
                 </span>
               </div>
-              <h2 className="text-lg font-bold text-black">{item.title}</h2>
-              <p className="text-gray-600">{item.description}</p>
+              <h2 className="text-lg font-bold text-black truncate mb-1">{item.title}</h2>
+              <p className="text-gray-600 text-sm line-clamp-3 flex-1">{item.description}</p>
               {user?.email === "gauravkhandelwal205@gmail.com" && (
                 <div className="flex gap-2 pt-3">
                   <button onClick={() => handleEditNews(item)} className="flex-1 px-3 py-2 rounded-full text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors duration-200">Edit</button>

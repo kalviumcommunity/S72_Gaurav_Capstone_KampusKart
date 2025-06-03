@@ -251,23 +251,27 @@ const Events = () => {
               {event.image?.url && (
                 <img src={event.image.url} alt="Event" className="w-full h-64 object-cover rounded mb-2" />
               )}
-              <div className="flex items-center gap-2 mb-2">
-                <FiCalendar className="text-[#00C6A7]" />
-                <span className="font-semibold text-black">
-                  {new Date(event.date).toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                  })}
-                </span>
-                <span className={`ml-auto text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-800`}>
+              <div className="flex items-start gap-2 mb-2 flex-wrap">
+                <div className="flex items-center flex-shrink-0">
+                  <FiCalendar className="text-[#00C6A7]" />
+                  <span className="font-semibold text-black">
+                    {new Date(event.date).toLocaleDateString('en-US', { 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}
+                  </span>
+                </div>
+                <span className={`ml-auto text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-800 flex-shrink-0`}>
                   {event.status}
                 </span>
               </div>
               <h2 className="text-lg font-bold text-black">{event.title}</h2>
               <p className="text-gray-600">{event.description}</p>
-              <div className="flex items-center gap-2 mt-2 text-sm text-gray-500">
-                <FiMapPin /> {event.location}
+              <div className="flex items-start gap-2 mt-2 text-sm text-gray-500 flex-wrap">
+                <div className="flex items-center flex-shrink-0">
+                 <FiMapPin /> <span>{event.location}</span>
+                </div>
               </div>
               <button
                 className={`mt-2 px-4 py-2 rounded-full font-semibold text-white ${event.registerUrl ? 'bg-[#00C6A7] hover:bg-[#009e87] cursor-pointer' : 'bg-gray-300 cursor-not-allowed'} transition`}
