@@ -539,7 +539,7 @@ const CampusMap: React.FC<CampusMapProps> = () => {
                   aria-label="Search locations"
                 />
               </div>
-               <button
+              <button
                 type="submit"
                 aria-label="Search"
                 className="px-6 py-2 bg-[#00C6A7] text-white font-semibold hover:bg-[#009e87] transition rounded-r-full"

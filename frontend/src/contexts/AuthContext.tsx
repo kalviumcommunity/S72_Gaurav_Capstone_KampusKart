@@ -16,7 +16,7 @@ interface User {
   program?: string;
 }
 
-interface AuthContextType {
+export interface AuthContextType {
   user: User | null;
   token: string | null;
   login: (email: string, password: string, remember?: boolean) => Promise<void>;
