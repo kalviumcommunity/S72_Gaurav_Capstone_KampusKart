@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './Navbar';
-import { FiPlus, FiCalendar, FiMapPin, FiSearch, FiAlertCircle, FiFileText, FiTag, FiMail, FiInfo } from 'react-icons/fi';
+import { FiPlus, FiCalendar, FiMapPin, FiSearch, FiAlertCircle, FiFileText, FiTag, FiMail, FiInfo, FiClock, FiUser, FiPhone } from 'react-icons/fi';
+import { FaSearch } from 'react-icons/fa';
 import { useAuth } from '../contexts/AuthContext';
 import { API_BASE } from '../config';
 import SkeletonLoader from './SkeletonLoader';
@@ -30,6 +31,235 @@ interface Event {
     };
   };
 }
+
+interface EventDetailsProps {
+  event: Event;
+  onClose: () => void;
+  onEdit?: (event: Event) => void;
+  onDelete?: (id: string) => void;
+  isAdmin?: boolean;
+}
+
+const EventDetails: React.FC<EventDetailsProps> = ({ event, onClose, onEdit, onDelete, isAdmin }) => {
+  const [zoomedImage, setZoomedImage] = useState<string | null>(null);
+
+  const handleImageClick = (imageUrl: string) => {
+    setZoomedImage(imageUrl);
+  };
+
+  const closeZoomedImageModal = () => {
+    setZoomedImage(null);
+  };
+
+  const renderStatus = (status: Event['status']) => {
+    let bgColorClass;
+    let textColorClass;
+    switch (status) {
+      case 'Upcoming':
+        bgColorClass = 'bg-blue-100';
+        textColorClass = 'text-blue-800';
+        break;
+      case 'Ongoing':
+        bgColorClass = 'bg-green-100';
+        textColorClass = 'text-green-800';
+        break;
+      case 'Completed':
+        bgColorClass = 'bg-gray-100';
+        textColorClass = 'text-gray-800';
+        break;
+      case 'Cancelled':
+        bgColorClass = 'bg-red-100';
+        textColorClass = 'text-red-800';
+        break;
+      default:
+        bgColorClass = 'bg-gray-100';
+        textColorClass = 'text-gray-800';
+    }
+    return (
+      <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${bgColorClass} ${textColorClass}`}>
+        {status}
+      </span>
+    );
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl shadow-xl p-8 max-w-3xl w-full mx-auto max-h-[90vh] overflow-y-auto relative">
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          aria-label="Close"
+          className="w-12 h-12 flex items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-200 text-black absolute top-4 right-4 z-50 transition-all duration-150 focus:outline-none"
+        >
+          <svg className="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+
+        {/* Title */}
+        <h2 className="text-2xl font-bold text-gray-900 mb-4 pr-8">{event.title}</h2>
+
+        {/* Content: Image and Details side-by-side */}
+        <div className="flex flex-col md:flex-row gap-8">
+          {/* Image or Placeholder */}
+          {event.image?.url ? (
+            <div 
+              className="relative group mb-6 md:mb-0 rounded-lg overflow-hidden shadow-sm w-full md:w-1/2 lg:w-1/2 h-128 flex-shrink-0 mx-auto md:mx-0 max-w-xl cursor-pointer"
+              onClick={() => handleImageClick(event.image?.url || '')}
+            >
+              <img 
+                src={event.image.url} 
+                alt={event.title} 
+                className="block w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
+                
+              />
+              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
+                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <svg className="w-12 h-12 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    <line x1="11" y1="8" x2="11" y2="14" />
+                    <line x1="8" y1="11" x2="14" y2="11" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="w-full md:w-1/2 lg:w-1/2 h-128 bg-gray-100 rounded-lg mb-6 md:mb-0 flex flex-col items-center justify-center text-gray-400 flex-shrink-0 mx-auto md:mx-0 max-w-xl">
+              <FiCalendar className="w-16 h-16 mb-2" />
+              <span className="text-sm font-medium">No Image Available</span>
+            </div>
+          )}
+
+          {/* Details Section */}
+          <div className="space-y-6 text-gray-700 flex-grow">
+            {/* Status Badges */}
+            <div className="flex flex-wrap items-center gap-3">
+              {renderStatus(event.status)}
+            </div>
+
+            {/* Description */}
+            <div>
+              <h4 className="text-lg font-semibold text-gray-900 mb-2">Description</h4>
+              <p className="text-gray-700 whitespace-pre-wrap text-sm">{event.description}</p>
+            </div>
+
+            {/* Meta Info */}
+            <div className="space-y-3 pt-4 border-t border-gray-100">
+              <div className="flex items-center text-sm text-gray-500">
+                <FiCalendar className="w-5 h-5 mr-2 flex-shrink-0 text-gray-500" />
+                <span className="font-medium text-gray-900">
+                  {new Date(event.date).toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                  })}
+                </span>
+              </div>
+              {event.location && (
+                <div className="flex items-center text-sm text-gray-500">
+                  <FiMapPin className="w-5 h-5 mr-2 flex-shrink-0 text-gray-500" />
+                  <span className="truncate">{event.location}</span>
+                </div>
+              )}
+              {event.operatingHours && (
+                <div className="flex items-center text-sm text-gray-500">
+                  <FiClock className="w-5 h-5 mr-2 flex-shrink-0 text-gray-500" />
+                  <span>{event.operatingHours}</span>
+                </div>
+              )}
+              {event.contactInfo?.name && (
+                <div className="flex items-center text-sm text-gray-500">
+                  <FiUser className="w-5 h-5 mr-2 flex-shrink-0 text-gray-500" />
+                  <span>{event.contactInfo.name}</span>
+                </div>
+              )}
+              {event.contactInfo?.email && (
+                <div className="flex items-center text-sm text-gray-500">
+                  <FiMail className="w-5 h-5 mr-2 flex-shrink-0 text-gray-500" />
+                  <a href={`mailto:${event.contactInfo.email}`} className="text-[#00C6A7] hover:underline">{event.contactInfo.email}</a>
+                </div>
+              )}
+              {event.contactInfo?.phone && (
+                <div className="flex items-center text-sm text-gray-500">
+                  <FiPhone className="w-5 h-5 mr-2 flex-shrink-0 text-gray-500" />
+                  <a href={`tel:${event.contactInfo.phone}`} className="text-[#00C6A7] hover:underline">{event.contactInfo.phone}</a>
+                </div>
+              )}
+              {event.mapLocation?.building && (
+                <div className="flex items-center text-sm text-gray-500">
+                  <FiMapPin className="w-5 h-5 mr-2 flex-shrink-0 text-gray-500" />
+                  <span>{event.mapLocation.building}{event.mapLocation.floor ? `, Floor ${event.mapLocation.floor}` : ''}{event.mapLocation.room ? `, Room ${event.mapLocation.room}` : ''}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="mt-6 pt-6 border-t border-gray-200">
+          {event.registerUrl && (
+            <a
+              href={event.registerUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block w-full text-center px-6 py-3 rounded-lg font-bold text-white bg-[#00C6A7] hover:bg-[#009e87] transition mb-4"
+            >
+              Register Now
+            </a>
+          )}
+
+          {isAdmin && (
+            <div className="flex gap-2">
+              <button
+                onClick={() => onEdit?.(event)}
+                className="flex-1 px-3 py-2 rounded-full text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors duration-200"
+              >
+                Edit Event
+              </button>
+              <button
+                onClick={() => onDelete?.(event._id)}
+                className="flex-1 px-3 py-2 rounded-full text-sm font-semibold text-white bg-[#F05A25] hover:bg-red-600 transition-colors duration-200"
+              >
+                Delete Event
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Zoomed Image Modal */}
+      {zoomedImage && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-[60] p-4" 
+          onClick={closeZoomedImageModal}
+        >
+          <div className="relative max-w-[90vw] max-h-[90vh]">
+            <img 
+              src={zoomedImage} 
+              alt="Zoomed" 
+              className="max-h-[90vh] max-w-full rounded-lg shadow-2xl object-contain"
+              onClick={(e) => e.stopPropagation()}
+            />
+            
+            {/* Close Button */}
+            <button
+              onClick={closeZoomedImageModal}
+              aria-label="Close zoomed image"
+              className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm rounded-full p-2 text-white hover:bg-white/50 transition-colors duration-200 z-50"
+            >
+              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const Events = () => {
   const { user, token } = useAuth();
@@ -64,6 +294,38 @@ const Events = () => {
   });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedEventForDetails, setSelectedEventForDetails] = useState<Event | null>(null);
+
+  const renderStatus = (status: Event['status']) => {
+    let bgColorClass;
+    let textColorClass;
+    switch (status) {
+      case 'Upcoming':
+        bgColorClass = 'bg-blue-100';
+        textColorClass = 'text-blue-800';
+        break;
+      case 'Ongoing':
+        bgColorClass = 'bg-green-100';
+        textColorClass = 'text-green-800';
+        break;
+      case 'Completed':
+        bgColorClass = 'bg-gray-100';
+        textColorClass = 'text-gray-800';
+        break;
+      case 'Cancelled':
+        bgColorClass = 'bg-red-100';
+        textColorClass = 'text-red-800';
+        break;
+      default:
+        bgColorClass = 'bg-gray-100';
+        textColorClass = 'text-gray-800';
+    }
+    return (
+      <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${bgColorClass} ${textColorClass}`}>
+        {status}
+      </span>
+    );
+  };
 
   useEffect(() => {
     fetchEvents();
@@ -231,6 +493,14 @@ const Events = () => {
     }
   };
 
+  const openEventDetailsModal = (event: Event) => {
+    setSelectedEventForDetails(event);
+  };
+
+  const closeEventDetailsModal = () => {
+    setSelectedEventForDetails(null);
+  };
+
   const filteredEvents = events.filter(event =>
     (filterStatus === 'All' || event.status === filterStatus) &&
     (event.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -311,7 +581,7 @@ const Events = () => {
             <div 
               key={event._id} 
               className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 overflow-hidden group"
-              onClick={() => setSelectedEvent(event)}
+              onClick={() => openEventDetailsModal(event)}
             >
               {/* Image Section with Overlay */}
               <div className="relative h-64 overflow-hidden">
@@ -334,14 +604,7 @@ const Events = () => {
                 )}
                 {/* Status Badge */}
                 <div className="absolute top-4 right-4">
-                  <span className={`text-xs px-3 py-1.5 rounded-full font-medium shadow-sm bg-white/90 backdrop-blur-sm flex items-center gap-1 ${
-                    event.status === 'Upcoming' ? 'text-blue-800' :
-                    event.status === 'Ongoing' ? 'text-green-800' :
-                    event.status === 'Completed' ? 'text-gray-800' :
-                    'text-red-800'
-                  }`}>
-                    {event.status}
-                  </span>
+                  {renderStatus(event.status)}
                 </div>
               </div>
 
@@ -669,154 +932,14 @@ const Events = () => {
         )}
 
         {/* Event Details Modal */}
-        {selectedEvent && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto relative">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">Event Details</h2>
-                <button
-                  onClick={() => setSelectedEvent(null)}
-                  aria-label="Close"
-                  className="w-12 h-12 flex items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-200 text-black absolute top-4 right-4 z-50 transition-all duration-150 focus:outline-none"
-                >
-                  <svg className="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18" />
-                    <line x1="6" y1="6" x2="18" y2="18" />
-                  </svg>
-                </button>
-              </div>
-              
-              {selectedEvent.image?.url ? (
-                <img src={selectedEvent.image.url} alt={selectedEvent.title} className="w-full h-64 object-cover rounded-lg mb-6" />
-              ) : (
-                <div className="w-full h-64 bg-gray-100 rounded-lg mb-6 flex flex-col items-center justify-center text-gray-400">
-                  <FiCalendar className="w-16 h-16 mb-2" />
-                  <span className="text-sm font-medium">No Image Available</span>
-                </div>
-              )}
-              
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{selectedEvent.title}</h3>
-                  <div className="flex items-center gap-4 text-sm text-gray-600 mb-4 flex-wrap">
-                    <div className="flex items-center gap-1 flex-shrink-0">
-                      <FiCalendar className="text-gray-400" />
-                      <span className="font-medium text-black text-sm">{new Date(selectedEvent.date).toLocaleDateString('en-US', { 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
-                      })}</span>
-                    </div>
-                    <div className="flex items-center gap-1 flex-shrink-0">
-                      <FiMapPin className="text-gray-400" />
-                      <span className="font-medium text-black text-sm truncate">{selectedEvent.location}</span>
-                    </div>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      selectedEvent.status === 'Upcoming' ? 'bg-blue-100 text-blue-800' :
-                      selectedEvent.status === 'Ongoing' ? 'bg-green-100 text-green-800' :
-                      selectedEvent.status === 'Completed' ? 'bg-gray-100 text-gray-800' :
-                      'bg-red-100 text-red-800'
-                    }`}>
-                      {selectedEvent.status}
-                    </span>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="text-lg font-semibold text-gray-900 mb-2">Description</h4>
-                  <p className="text-gray-600 whitespace-pre-wrap text-sm">{selectedEvent.description}</p>
-                </div>
-
-                {selectedEvent.operatingHours && (
-                  <div>
-                    <h4 className="text-lg font-semibold text-gray-900 mb-2">Operating Hours</h4>
-                    <p className="text-gray-600 text-sm">{selectedEvent.operatingHours}</p>
-                  </div>
-                )}
-
-                {selectedEvent.contactInfo && (
-                  <div>
-                    <h4 className="text-lg font-semibold text-gray-900 mb-2">Contact Information</h4>
-                    <div className="space-y-2 text-sm">
-                      {selectedEvent.contactInfo.name && (
-                        <p className="text-gray-600"><span className="font-medium">Contact Person:</span> {selectedEvent.contactInfo.name}</p>
-                      )}
-                      {selectedEvent.contactInfo.email && (
-                        <p className="text-gray-600"><span className="font-medium">Email:</span> {selectedEvent.contactInfo.email}</p>
-                      )}
-                      {selectedEvent.contactInfo.phone && (
-                        <p className="text-gray-600"><span className="font-medium">Phone:</span> {selectedEvent.contactInfo.phone}</p>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {selectedEvent.mapLocation && (
-                  <div>
-                    <h4 className="text-lg font-semibold text-gray-900 mb-2">Location Details</h4>
-                    <div className="space-y-2 text-sm">
-                      {selectedEvent.mapLocation.building && (
-                        <p className="text-gray-600"><span className="font-medium">Building:</span> {selectedEvent.mapLocation.building}</p>
-                      )}
-                      {selectedEvent.mapLocation.floor && (
-                        <p className="text-gray-600"><span className="font-medium">Floor:</span> {selectedEvent.mapLocation.floor}</p>
-                      )}
-                      {selectedEvent.mapLocation.room && (
-                        <p className="text-gray-600"><span className="font-medium">Room:</span> {selectedEvent.mapLocation.room}</p>
-                      )}
-                      {selectedEvent.mapLocation.coordinates && (
-                        <a
-                          href={`https://www.google.com/maps?q=${selectedEvent.mapLocation.coordinates.lat},${selectedEvent.mapLocation.coordinates.lng}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 text-[#00C6A7] hover:text-[#009e87]"
-                        >
-                          <FiMapPin />
-                          <span>View on Map</span>
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {selectedEvent.registerUrl && (
-                  <div className="pt-4">
-                    <a
-                      href={selectedEvent.registerUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-block px-6 py-3 rounded-full bg-[#00C6A7] text-white font-semibold hover:bg-[#009e87] transition"
-                    >
-                      Register Now
-                    </a>
-                  </div>
-                )}
-
-                {user?.email === "gauravkhandelwal205@gmail.com" && (
-                  <div className="flex gap-4 pt-4 border-t border-gray-200">
-                    <button
-                      onClick={() => {
-                        setSelectedEvent(null);
-                        handleEditEvent(selectedEvent);
-                      }}
-                      className="flex-1 px-4 py-2 rounded-full text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50"
-                    >
-                      Edit Event
-                    </button>
-                    <button
-                      onClick={() => {
-                        setSelectedEvent(null);
-                        handleDeleteEvent(selectedEvent._id);
-                      }}
-                      className="flex-1 px-4 py-2 rounded-full text-sm font-semibold text-white bg-[#F05A25] hover:bg-red-600"
-                    >
-                      Delete Event
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+        {selectedEventForDetails && (
+          <EventDetails
+            event={selectedEventForDetails}
+            onClose={closeEventDetailsModal}
+            onEdit={handleEditEvent}
+            onDelete={handleDeleteEvent}
+            isAdmin={user?.email === "gauravkhandelwal205@gmail.com"}
+          />
         )}
       </main>
     </div>
