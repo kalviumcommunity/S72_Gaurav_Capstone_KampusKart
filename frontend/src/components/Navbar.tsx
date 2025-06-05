@@ -158,7 +158,7 @@ const Navbar: React.FC = () => {
       <div className="container mx-auto px-4 py-3">
         {/* Desktop Navigation */}
         <div className="hidden md:flex justify-between items-center">
-          <div className="flex items-center">
+          <div className="flex items-center space-x-6">
             <NavLinks
               user={user}
               location={location}
@@ -171,7 +171,7 @@ const Navbar: React.FC = () => {
             />
           </div>
           <div className="flex items-center gap-3 absolute left-1/2 transform -translate-x-1/2">
-            <img src='/Logo.png' alt='KampusKart Logo' className='h-10 w-10 object-contain' style={{ background: 'none', border: 'none', borderRadius: 0, boxShadow: 'none' }} />
+            <img src='/Logo.png' alt='KampusKart Logo' className='h-10 w-10 object-contain transition-transform duration-300 hover:scale-110' style={{ background: 'none', border: 'none', borderRadius: 0, boxShadow: 'none' }} />
             <span className='text-xl font-extrabold text-black font-sans' style={{ fontFamily: 'Work Sans, sans-serif' }}>Kampuskart</span>
           </div>
           <AuthButtons user={user} location={location} logout={logout} />
@@ -180,12 +180,12 @@ const Navbar: React.FC = () => {
         {/* Mobile Navigation */}
         <div className="md:hidden flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <img src='/Logo.png' alt='KampusKart Logo' className='h-8 w-8 object-contain' style={{ background: 'none', border: 'none', borderRadius: 0, boxShadow: 'none' }} />
+            <img src='/Logo.png' alt='KampusKart Logo' className='h-8 w-8 object-contain transition-transform duration-300 hover:scale-110' style={{ background: 'none', border: 'none', borderRadius: 0, boxShadow: 'none' }} />
             <span className='text-lg font-extrabold text-black font-sans' style={{ fontFamily: 'Work Sans, sans-serif' }}>Kampuskart</span>
           </div>
           <button
             onClick={toggleMobileMenu}
-            className="p-2 rounded-md hover:bg-gray-100 focus:outline-none transition-colors duration-200"
+            className="p-2 rounded-md hover:bg-gray-100 focus:outline-none transition-all duration-300 ease-in-out transform hover:scale-110"
             aria-label="Toggle menu"
             aria-expanded={isMobileMenuOpen}
           >
@@ -199,42 +199,94 @@ const Navbar: React.FC = () => {
 
         {/* Mobile Menu */}
         <div
-          className={`md:hidden absolute top-full left-0 w-full bg-white shadow-lg transition-all duration-300 ease-in-out ${
-            isMobileMenuOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-2 pointer-events-none'
+          className={`md:hidden fixed top-[60px] left-0 w-full bg-white shadow-lg transition-all duration-300 ease-in-out transform ${
+            isMobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
           }`}
+          style={{
+            maxHeight: isMobileMenuOpen ? 'calc(100vh - 60px)' : '0',
+            overflow: 'auto'
+          }}
         >
-          <div className="flex flex-col space-y-4 p-4">
-             {user && (
-                <>
-                  <Link to="/home" className="px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base w-full text-center">Home</Link>
-                  <Link to="/campus-map" className="px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base w-full text-center">Campus Map</Link>
-                   {/* Mobile Features Dropdown (simplified) */}
-                   <div className="w-full">
-                    <button
-                       onClick={handleFeaturesButtonClick}
-                       className="px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base flex items-center justify-center w-full"
-                       aria-expanded={isFeaturesDropdownOpen}
-                       aria-controls="mobile-features-menu"
-                       aria-haspopup="true"
-                       tabIndex={0}
+          <div className="flex flex-col space-y-4 p-6">
+            {user && (
+              <>
+                <Link 
+                  to="/home" 
+                  className="px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-base w-full text-center transform hover:scale-105"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Home
+                </Link>
+                <Link 
+                  to="/campus-map" 
+                  className="px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-base w-full text-center transform hover:scale-105"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Campus Map
+                </Link>
+                {/* Mobile Features Dropdown (simplified) */}
+                <div className="w-full">
+                  <button
+                    onClick={handleFeaturesButtonClick}
+                    className="px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-base flex items-center justify-center w-full transform hover:scale-105"
+                    aria-expanded={isFeaturesDropdownOpen}
+                    aria-controls="mobile-features-menu"
+                    aria-haspopup="true"
+                    tabIndex={0}
+                  >
+                    Features {isFeaturesDropdownOpen ? <IoIosArrowDropup className="ml-1" /> : <IoIosArrowDropdown className="ml-1" />}
+                  </button>
+                  <div
+                    id="mobile-features-menu"
+                    className={`${isFeaturesDropdownOpen ? 'block' : 'hidden'} bg-gray-50 shadow-inner rounded-md w-full mt-2 overflow-hidden transition-all duration-300 ease-in-out`}
+                    style={{ pointerEvents: isFeaturesDropdownOpen ? 'auto' : 'none' }}
+                  >
+                    <Link 
+                      to="/lostfound" 
+                      className="block px-4 py-3 text-black hover:bg-[#FFD166] text-center transition-colors duration-300"
+                      onClick={() => { setIsFeaturesDropdownOpen(false); setIsMobileMenuOpen(false); }}
                     >
-                       Features {isFeaturesDropdownOpen ? <IoIosArrowDropup className="ml-1" /> : <IoIosArrowDropdown className="ml-1" />}
-                    </button>
-                     <div
-                       id="mobile-features-menu"
-                       className={`${isFeaturesDropdownOpen ? 'block' : 'hidden'} bg-gray-100 shadow-inner rounded-md w-full mt-2 overflow-hidden transition-all duration-200 ease-in-out`}
-                       style={{ pointerEvents: isFeaturesDropdownOpen ? 'auto' : 'none' }}
-                     >
-                       <Link to="/lostfound" className="block px-4 py-3 text-black hover:bg-[#FFD166] text-center" onClick={() => { setIsFeaturesDropdownOpen(false); setIsMobileMenuOpen(false); }}>Lost and Found</Link>
-                       <Link to="/complaints" className="block px-4 py-3 text-black hover:bg-[#FFD166] text-center" onClick={() => { setIsFeaturesDropdownOpen(false); setIsMobileMenuOpen(false); }}>Complaints</Link>
-                       <Link to="/events" className="block px-4 py-3 text-black hover:bg-[#FFD166] text-center" onClick={() => { setIsFeaturesDropdownOpen(false); setIsMobileMenuOpen(false); }}>Events</Link>
-                       <Link to="/news" className="block px-4 py-3 text-black hover:bg-[#FFD166] text-center" onClick={() => { setIsFeaturesDropdownOpen(false); setIsMobileMenuOpen(false); }}>News</Link>
-                       <Link to="/facilities" className="block px-4 py-3 text-black hover:bg-[#FFD166] text-center" onClick={() => { setIsFeaturesDropdownOpen(false); setIsMobileMenuOpen(false); }}>Facilities</Link>
-                     </div>
-                   </div>
-                   <Link to="/chat" className="px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base w-full text-center">Chat</Link>
-                 </>
-              )}
+                      Lost and Found
+                    </Link>
+                    <Link 
+                      to="/complaints" 
+                      className="block px-4 py-3 text-black hover:bg-[#FFD166] text-center transition-colors duration-300"
+                      onClick={() => { setIsFeaturesDropdownOpen(false); setIsMobileMenuOpen(false); }}
+                    >
+                      Complaints
+                    </Link>
+                    <Link 
+                      to="/events" 
+                      className="block px-4 py-3 text-black hover:bg-[#FFD166] text-center transition-colors duration-300"
+                      onClick={() => { setIsFeaturesDropdownOpen(false); setIsMobileMenuOpen(false); }}
+                    >
+                      Events
+                    </Link>
+                    <Link 
+                      to="/news" 
+                      className="block px-4 py-3 text-black hover:bg-[#FFD166] text-center transition-colors duration-300"
+                      onClick={() => { setIsFeaturesDropdownOpen(false); setIsMobileMenuOpen(false); }}
+                    >
+                      News
+                    </Link>
+                    <Link 
+                      to="/facilities" 
+                      className="block px-4 py-3 text-black hover:bg-[#FFD166] text-center transition-colors duration-300"
+                      onClick={() => { setIsFeaturesDropdownOpen(false); setIsMobileMenuOpen(false); }}
+                    >
+                      Facilities
+                    </Link>
+                  </div>
+                </div>
+                <Link 
+                  to="/chat" 
+                  className="px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-base w-full text-center transform hover:scale-105"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Chat
+                </Link>
+              </>
+            )}
             <AuthButtons user={user} location={location} logout={logout} />
           </div>
         </div>
