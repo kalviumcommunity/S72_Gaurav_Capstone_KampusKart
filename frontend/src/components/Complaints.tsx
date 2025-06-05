@@ -528,7 +528,7 @@ const Complaints = () => {
               onClick={() => setSelectedComplaintForDetails(complaint)}
             >
               {/* Image Section with Overlay */}
-              <div className="relative h-64 overflow-hidden">
+              <div className="relative h-80 overflow-hidden">
                 {complaint.images && complaint.images.length > 0 ? (
                   <>
                     <img

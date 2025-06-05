@@ -218,7 +218,7 @@ const News = () => {
           {filteredNews.map(item => (
             <div key={item._id} className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 overflow-hidden group">
               {/* Image Section with Overlay */}
-              <div className="relative h-64 overflow-hidden">
+              <div className="relative h-80 overflow-hidden">
                 {item.images && item.images.length > 0 ? (
                   <>
                     <img

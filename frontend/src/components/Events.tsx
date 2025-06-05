@@ -584,7 +584,7 @@ const Events = () => {
               onClick={() => openEventDetailsModal(event)}
             >
               {/* Image Section with Overlay */}
-              <div className="relative h-64 overflow-hidden">
+              <div className="relative h-80 overflow-hidden">
                 {event.image?.url ? (
                   <>
                     <img 

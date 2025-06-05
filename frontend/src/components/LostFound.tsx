@@ -348,7 +348,7 @@ const LostFound = () => {
               onClick={() => setSelectedItemForDetails(item)}
             >
               {/* Image Section with Overlay */}
-              <div className="relative h-64 overflow-hidden">
+              <div className="relative h-80 overflow-hidden">
                 {item.images && item.images.length > 0 ? (
                   <>
                     <img

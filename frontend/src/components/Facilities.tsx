@@ -162,7 +162,7 @@ const Facilities = () => {
               onClick={() => setSelectedFacility(facility)}
             >
               {/* Image Section with Overlay */}
-              <div className="relative h-64 overflow-hidden">
+              <div className="relative h-80 overflow-hidden">
                 {facility.images && facility.images.length > 0 ? (
                   <>
                     <img
