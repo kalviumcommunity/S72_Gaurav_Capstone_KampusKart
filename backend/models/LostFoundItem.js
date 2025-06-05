@@ -51,6 +51,25 @@ const LostFoundItemSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  // Soft delete and notification fields
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
+  deletedAt: {
+    type: Date,
+    default: null,
+  },
+  expirationNotified: {
+    type: Boolean,
+    default: false,
+  },
 });
+
+// Add indexes for query optimization
+LostFoundItemSchema.index({ createdAt: 1 });
+LostFoundItemSchema.index({ resolved: 1 });
+LostFoundItemSchema.index({ resolvedAt: 1 });
+LostFoundItemSchema.index({ isDeleted: 1 });
 
 module.exports = mongoose.model('LostFoundItem', LostFoundItemSchema); 

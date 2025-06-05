@@ -31,6 +31,13 @@ const deleteImages = async (images) => {
     await Promise.all(deletePromises);
 };
 
+const sendExpirationNotification = async (item) => {
+    // TODO: Replace with actual email logic
+    console.log(`Notify user ${item.user} about expiring item ${item._id}`);
+    item.expirationNotified = true;
+    await item.save();
+};
+
 const deleteExpiredItems = async () => {
     try {
         const now = new Date();
@@ -38,37 +45,71 @@ const deleteExpiredItems = async () => {
         fifteenDaysAgo.setDate(now.getDate() - 15);
         const threeDaysAgo = new Date(now);
         threeDaysAgo.setDate(now.getDate() - 3);
+        const oneDayAhead = new Date(now);
+        oneDayAhead.setDate(now.getDate() + 1);
+        const sevenDaysAgo = new Date(now);
+        sevenDaysAgo.setDate(now.getDate() - 7);
 
-        // Find unresolved items older than 15 days
+        // Find unresolved items older than 15 days (to be soft deleted)
         const unresolvedExpiredItems = await LostFoundItem.find({
             resolved: false,
-            createdAt: { $lt: fifteenDaysAgo }
+            createdAt: { $lt: fifteenDaysAgo },
+            isDeleted: { $ne: true }
         });
 
-        // Find resolved items older than 3 days
+        // Find resolved items older than 3 days (to be soft deleted)
         const resolvedExpiredItems = await LostFoundItem.find({
             resolved: true,
-            resolvedAt: { $lt: threeDaysAgo }
+            resolvedAt: { $lt: threeDaysAgo },
+            isDeleted: { $ne: true }
         });
 
-        const itemsToDelete = [...unresolvedExpiredItems, ...resolvedExpiredItems];
+        // Find items that are about to expire in 1 day and not notified
+        const soonToExpire = await LostFoundItem.find({
+            isDeleted: { $ne: true },
+            expirationNotified: false,
+            $or: [
+                { resolved: false, createdAt: { $lt: new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000) } },
+                { resolved: true, resolvedAt: { $lt: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000) } }
+            ]
+        });
+        for (const item of soonToExpire) {
+            try {
+                await sendExpirationNotification(item);
+            } catch (err) {
+                console.error(`Error sending expiration notification for item ${item._id}:`, err);
+            }
+        }
 
-        if (itemsToDelete.length > 0) {
-            console.log(`Found ${itemsToDelete.length} expired items to delete.`);
-
-            for (const item of itemsToDelete) {
+        const itemsToSoftDelete = [...unresolvedExpiredItems, ...resolvedExpiredItems];
+        if (itemsToSoftDelete.length > 0) {
+            console.log(`Found ${itemsToSoftDelete.length} expired items to soft delete.`);
+            for (const item of itemsToSoftDelete) {
                 try {
-                    // Remove images from Cloudinary
-                    await deleteImages(item.images);
-                    
-                    // Delete item from database
-                    await LostFoundItem.deleteOne({ _id: item._id });
-                    console.log(`Deleted item: ${item._id}`);
+                    item.isDeleted = true;
+                    item.deletedAt = new Date();
+                    await item.save();
+                    console.log(`Soft-deleted item: ${item._id}`);
                 } catch (error) {
-                    console.error(`Error deleting item ${item._id}:`, error);
+                    console.error(`Error soft-deleting item ${item._id}:`, error);
                 }
             }
-            console.log('Finished deleting expired items.');
+            console.log('Finished soft-deleting expired items.');
+        }
+
+        // Hard delete items that have been soft-deleted for more than 7 days
+        const itemsToHardDelete = await LostFoundItem.find({
+            isDeleted: true,
+            deletedAt: { $lt: sevenDaysAgo }
+        });
+        for (const item of itemsToHardDelete) {
+            try {
+                await deleteImages(item.images);
+                await LostFoundItem.deleteOne({ _id: item._id });
+                console.log(`Hard-deleted item: ${item._id}`);
+            } catch (error) {
+                console.error(`Error hard-deleting item ${item._id}:`, error);
+            }
         }
     } catch (error) {
         console.error('Error in deleteExpiredItems:', error);

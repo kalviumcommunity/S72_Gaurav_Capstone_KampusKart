@@ -132,7 +132,8 @@ router.get('/suggestions', authMiddleware, async (req, res) => {
                 { title: searchRegex },
                 { description: searchRegex },
                 { location: searchRegex }
-            ]
+            ],
+            isDeleted: { $ne: true }
         })
         .select('title description type resolved location date createdAt') // Include more fields
         .limit(5) // Limit to 5 suggestions
@@ -214,6 +215,8 @@ router.get('/', async (req, res) => {
             { description: searchRegex }
         ];
     }
+
+    filter.isDeleted = { $ne: true };
 
     const count = await LostFoundItem.countDocuments(filter);
     const totalPages = Math.ceil(count / parsedLimit);
@@ -370,9 +373,11 @@ router.delete('/:id', authMiddleware, itemRateLimiter, async (req, res) => {
     // Remove images from Cloudinary
     await deleteImages(item.images);
 
-    await LostFoundItem.deleteOne({ _id: itemId });
+    item.isDeleted = true;
+    item.deletedAt = new Date();
+    await item.save();
 
-    res.status(200).json({ message: 'Item deleted successfully' });
+    res.status(200).json({ message: 'Item soft-deleted successfully' });
   } catch (error) {
     console.error('Delete lost/found item error:', error);
     res.status(500).json({ message: 'Error deleting item' });
