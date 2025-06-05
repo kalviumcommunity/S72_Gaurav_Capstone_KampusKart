@@ -55,8 +55,6 @@ const CampusMap: React.FC<CampusMapProps> = () => {
   const animationInProgress = useRef(false);
   const [isPanelOpen, setIsPanelOpen] = useState(window.innerWidth >= 768); // Panel open by default on desktop
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // Add loading state
-  const [activeItemIndex, setActiveItemIndex] = useState(-1); // State for keyboard navigation
 
   // Use the memoized hook
   const { isLoaded, loadError } = useGoogleMaps();
@@ -241,10 +239,7 @@ const CampusMap: React.FC<CampusMapProps> = () => {
   const debouncedSetSearchQuery = useMemo(
     () => {
       const debouncedFn = debounce((value: string) => {
-        setIsLoading(true); // Set loading true before search
         setSearchQuery(value);
-        // Filtering happens immediately, so set loading false here
-        setIsLoading(false); 
       }, 300);
       return debouncedFn;
     },
@@ -253,23 +248,18 @@ const CampusMap: React.FC<CampusMapProps> = () => {
 
   // Memoize filtered locations
   const filteredLocations = useMemo(() => {
-    // Filtering happens here synchronously
-    const results = locations.filter(location =>
+    return locations.filter(location =>
       location.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       location.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       location.description?.toLowerCase().includes(searchQuery.toLowerCase())
     );
-    // Since filtering is fast, loading state might not be visible, but structure is there
-    // If filtering were async, isLoading would be set to false after results are ready
-    return results;
   }, [locations, searchQuery]);
 
-  // Optimize search input handler
+  // Handle search input change
   const handleSearchInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchInput(e.target.value);
     debouncedSetSearchQuery(e.target.value);
-    // Ensure dropdown is visible when typing
-    setIsSearchFocused(true);
+    // setIsPanelOpen(true); // Panel logic is changing
   }, [debouncedSetSearchQuery]);
 
   // Handle search focus
@@ -279,66 +269,54 @@ const CampusMap: React.FC<CampusMapProps> = () => {
 
   // Handle search blur
   const handleSearchBlur = useCallback(() => {
-    // Use a timeout to allow click events on dropdown items before hiding
+    // Delay to allow click on list items before setting focused to false
     setTimeout(() => {
       setIsSearchFocused(false);
-      setActiveItemIndex(-1); // Reset active item index on blur
-      // Optionally clear search input if blurred and empty
-      if (searchInput === '') {
-         setSearchQuery('');
-      }
-    }, 200); // Adjust delay as needed
-  }, [searchInput]);
-
-  // Handle clearing the search input
-  const handleClearSearch = useCallback(() => {
-    setSearchInput('');
-    setSearchQuery('');
-    setIsSearchFocused(false); // Hide dropdown when clearing
-    setActiveItemIndex(-1); // Reset active item index on clear
+    }, 200);
   }, []);
+
+  // Optimize search button click handler
+  const handleSearchClick = useCallback(() => {
+    setSearchQuery(searchInput);
+  }, [searchInput]);
 
   // Optimize marker click handler
   const handleMarkerClick = useCallback((location: Location) => {
     // InfoWindow open handler
     setSelectedLocation(location);
     setInfoWindowPosition(new google.maps.LatLng(location.lat, location.lng));
-
-    if (mapRef) {
-      if (animationInProgress.current) return; // Prevent overlapping animations
-      animationInProgress.current = true;
-
-      const currentZoom = mapRef.getZoom() || 15;
-      const targetZoom = 18;
-      const zoomSteps = 10;
-      const zoomInterval = 50;
-
-      let currentStep = 0;
-      const zoomIntervalId = setInterval(() => {
-        if (currentStep >= zoomSteps) {
-          clearInterval(zoomIntervalId);
-          setTimeout(() => {
-            // Re-center after zoom animation
-            setMapCenter({ lat: location.lat, lng: location.lng });
-            setMapZoom(targetZoom);
-            animationInProgress.current = false;
-          }, 100);
-          return;
-        }
-        const progress = currentStep / zoomSteps;
-        const newZoom = currentZoom + (targetZoom - currentZoom) * progress;
-        mapRef.setZoom(newZoom);
-        mapRef.panTo({ lat: location.lat, lng: location.lng });
-        currentStep++;
-      }, zoomInterval);
-    }
-
-  }, [mapRef]);
+  }, []);
 
   // Optimize location click handler
   const handleLocationClick = useCallback((location: Location) => {
-    handleMarkerClick(location); // Trigger marker click behavior
-  }, [handleMarkerClick]);
+    if (!mapRef) return;
+    if (animationInProgress.current) return; // Prevent overlapping animations
+    animationInProgress.current = true;
+
+    const currentZoom = mapRef.getZoom() || 15;
+    const targetZoom = 18;
+    const zoomSteps = 10;
+    const zoomInterval = 50;
+
+    let currentStep = 0;
+    const zoomIntervalId = setInterval(() => {
+      if (currentStep >= zoomSteps) {
+        clearInterval(zoomIntervalId);
+        setTimeout(() => {
+          handleMarkerClick(location);
+          setMapCenter({ lat: location.lat, lng: location.lng });
+          setMapZoom(targetZoom);
+          animationInProgress.current = false;
+        }, 100);
+        return;
+      }
+      const progress = currentStep / zoomSteps;
+      const newZoom = currentZoom + (targetZoom - currentZoom) * progress;
+      mapRef.setZoom(newZoom);
+      mapRef.panTo({ lat: location.lat, lng: location.lng });
+      currentStep++;
+    }, zoomInterval);
+  }, [mapRef, handleMarkerClick]);
 
   // Optimize map click handler
   const handleMapClick = useCallback(() => {
@@ -378,31 +356,6 @@ const CampusMap: React.FC<CampusMapProps> = () => {
       mapRef.setZoom(17);
     }
   }, [hasRequestedLocation, mapRef, userLocation]);
-
-  // Handle keyboard navigation in dropdown
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!isSearchFocused || filteredLocations.length === 0) return; // Only navigate if focused and results exist
-
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      setActiveItemIndex(prevIndex =>
-        prevIndex < filteredLocations.length - 1 ? prevIndex + 1 : prevIndex
-      );
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setActiveItemIndex(prevIndex => (prevIndex > 0 ? prevIndex - 1 : 0));
-    } else if (e.key === 'Enter') {
-      e.preventDefault();
-      if (activeItemIndex !== -1) {
-        handleLocationClick(filteredLocations[activeItemIndex]);
-        setIsSearchFocused(false); // Close dropdown on selection
-        setActiveItemIndex(-1); // Reset active index
-      }
-    } else if (e.key === 'Escape') {
-      setIsSearchFocused(false); // Close dropdown on escape
-      setActiveItemIndex(-1); // Reset active index
-    }
-  }, [isSearchFocused, filteredLocations, activeItemIndex, handleLocationClick]); // Added isSearchFocused dependency
 
   // Toggle panel visibility on mobile
   const togglePanel = useCallback(() => {
@@ -453,23 +406,9 @@ const CampusMap: React.FC<CampusMapProps> = () => {
                     onChange={handleSearchInputChange}
                     onFocus={handleSearchFocus}
                     onBlur={handleSearchBlur}
-                    onKeyDown={handleKeyDown} // Add keyboard handler
                     aria-label="Search locations"
                     onClick={() => setIsSearchFocused(true)} // Ensure focus on click
                   />
-                  {/* Clear Button */}
-                  {searchInput && (
-                    <button
-                      type="button"
-                      onClick={handleClearSearch}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
-                      aria-label="Clear search"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  )}
                 </div>
                 <button
                   type="submit"
@@ -481,43 +420,32 @@ const CampusMap: React.FC<CampusMapProps> = () => {
               </form>
 
               {/* Locations Dropdown */}
-              {isSearchFocused && (
+              {isSearchFocused && filteredLocations.length > 0 && (
                 <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 shadow-lg rounded-md mt-1 max-h-60 overflow-y-auto z-20">
-                  {isLoading ? (
-                    <div className="p-4 text-center text-gray-500">Loading...</div>
-                  ) : filteredLocations.length > 0 ? (
-                    <ul className="space-y-2 p-2">
-                      {filteredLocations.map((location, index) => (
-                        <li
-                          key={location.id}
-                          className={`pb-2 border-b border-gray-200 text-gray-800 cursor-pointer hover:bg-gray-100 p-2 rounded transition-all duration-300 ease-in-out transform hover:scale-105 ${
-                            selectedLocation?.id === location.id ? 'bg-blue-100' : ''
-                          } ${index === activeItemIndex ? 'bg-blue-100 text-blue-800' : ''}`} // Enhance active item styling
-                          onClick={() => {
-                            handleLocationClick(location);
-                            setIsSearchFocused(false); // Close dropdown after selection
-                            setActiveItemIndex(-1); // Reset active index
-                          }}
-                          onMouseEnter={() => setActiveItemIndex(index)} // Allow hovering to change active item
-                          onMouseLeave={() => setActiveItemIndex(-1)} // Reset on mouse leave from item
-                        >
-                          <div className="flex flex-wrap items-start gap-2">
-                            <div className="flex-1 min-w-0">
-                              <span className="font-semibold text-sm md:text-base block truncate">{location.id}. {location.name}</span>
-                              <p className="text-xs md:text-sm text-gray-600 mt-1 line-clamp-2">{location.description}</p>
-                            </div>
-                            <span className="text-xs bg-gray-200 px-2 py-1 rounded-full flex-shrink-0 whitespace-nowrap">
-                              {location.category}
-                            </span>
+                  <ul className="space-y-2 p-2">
+                    {filteredLocations.map((location) => (
+                      <li
+                        key={location.id}
+                        className={`pb-2 border-b border-gray-200 text-gray-800 cursor-pointer hover:bg-gray-100 p-2 rounded transition-all duration-300 ease-in-out transform hover:scale-105 ${
+                          selectedLocation?.id === location.id ? 'bg-blue-100' : ''
+                        }`}
+                        onClick={() => {
+                          handleLocationClick(location);
+                          setIsSearchFocused(false); // Close dropdown after selection
+                        }}
+                      >
+                        <div className="flex flex-wrap items-start gap-2">
+                          <div className="flex-1 min-w-0">
+                            <span className="font-semibold text-sm md:text-base block truncate">{location.id}. {location.name}</span>
+                            <p className="text-xs md:text-sm text-gray-600 mt-1 line-clamp-2">{location.description}</p>
                           </div>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : searchInput && filteredLocations.length === 0 ? (
-                    <div className="p-4 text-center text-gray-500">No locations found matching "{searchInput}".</div>
-                  ) : (
-                    <div className="p-4 text-center text-gray-500">Start typing to search for locations or click a marker on the map.</div>
-                  )}
+                          <span className="text-xs bg-gray-200 px-2 py-1 rounded-full flex-shrink-0 whitespace-nowrap">
+                            {location.category}
+                          </span>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               )}
             </div>
@@ -647,10 +575,22 @@ const CampusMap: React.FC<CampusMapProps> = () => {
             </button>
           </div>
         </div>
+
+        {/* Locations List Panel Container - Removed */}
+        {/* The list is now a dropdown below the search bar */}
+        {/* Removed the div completely as it's no longer needed */}
+        {/* <div className={`w-full md:w-1/3 flex flex-col md:h-full relative transition-all duration-300 ease-in-out h-0 md:h-full`}> */}
+          {/* Toggle Panel Button - Removed */}
+
+          {/* Inner container with padding, shadow, and overflow for list - Removed content */}
+          {/* <div className={`bg-white shadow-lg p-3 md:p-4 md:flex-grow transition-all duration-300 ease-in-out opacity-0 h-0 md:opacity-100 md:h-full ${isPanelOpen ? 'overflow-y-auto' : 'overflow-hidden'}`}> */}
+             {/* Content moved to dropdown */}
+          {/* </div> */}
+        {/* </div> */}
       </div>
     </div>
   );
 };
 
 export { CampusMap };
-export default CampusMap;
+export default CampusMap; 
