@@ -56,168 +56,167 @@ const CampusMap: React.FC<CampusMapProps> = () => {
   const [isPanelOpen, setIsPanelOpen] = useState(window.innerWidth >= 768); // Panel open by default on desktop
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
-  // Use the memoized hook
   const { isLoaded, loadError } = useGoogleMaps();
 
   // Memoize locations array to prevent unnecessary re-renders
   const locations = useMemo(() => [
-    { 
-      id: 1, 
-      name: "MIT-ADT Entrance", 
+    {
+      id: 1,
+      name: "MIT-ADT Entrance",
       lat: 18.490173753843422,
       lng: 74.0254303116109,
       description: "Main entrance of MIT-ADT University",
       category: "Entrance",
       // placeId retained in data for future use, but not used in UI or logic
     },
-    { 
-      id: 2, 
-      name: "MANET ADMIN, Vice President Office, Vice Chancellor Office, Registrar Office, School of Law", 
-      lat: 18.490946453598095, 
+    {
+      id: 2,
+      name: "MANET ADMIN, Vice President Office, Vice Chancellor Office, Registrar Office, School of Law",
+      lat: 18.490946453598095,
       lng: 74.02419055616282,
       description: "Administrative block housing key offices and School of Law",
       category: "Administration",
       // placeId retained in data for future use, but not used in UI or logic
     },
-    { 
-      id: 3, 
-      name: "Cricket Ground", 
-      lat: 18.490748499095503,  
+    {
+      id: 3,
+      name: "Cricket Ground",
+      lat: 18.490748499095503,
       lng: 74.02836838570158,
       description: "Main cricket ground for sports activities",
       category: "Sports",
       // placeId retained in data for future use, but not used in UI or logic
     },
-    { 
-      id: 4, 
-      name: "Sports Complex", 
-      lat: 18.491807509791, 
+    {
+      id: 4,
+      name: "Sports Complex",
+      lat: 18.491807509791,
       lng: 74.0284366873852,
       description: "Multi-sport facility with indoor and outdoor sports",
       category: "Sports",
       // placeId retained in data for future use, but not used in UI or logic
     },
-    { 
-      id: 5, 
-      name: "World Peace Dome", 
+    {
+      id: 5,
+      name: "World Peace Dome",
       lat: 18.49262365645109,
       lng: 74.02565779888813,
       description: "Iconic dome structure for major events and ceremonies",
       category: "Landmark",
       // placeId retained in data for future use, but not used in UI or logic
     },
-    { 
-      id: 6, 
-      name: "School of Education & Research", 
-      lat: 18.493802098401595,  
+    {
+      id: 6,
+      name: "School of Education & Research",
+      lat: 18.493802098401595,
       lng: 74.02568599386356,
       description: "Dedicated to education and research programs",
       category: "Academic",
       // placeId retained in data for future use, but not used in UI or logic
     },
-    { 
-      id: 7, 
-      name: "School of Humanities, School of Vedic Sciences", 
-      lat: 18.493614169153485, 
+    {
+      id: 7,
+      name: "School of Humanities, School of Vedic Sciences",
+      lat: 18.493614169153485,
       lng: 74.02490749767114,
       description: "Houses humanities and Vedic studies departments",
       category: "Academic",
       // placeId retained in data for future use, but not used in UI or logic
     },
-    { 
-      id: 8, 
-      name: "School of Vishwashanti Sangeetkala Academy", 
-      lat: 18.494201447370067,  
+    {
+      id: 8,
+      name: "School of Vishwashanti Sangeetkala Academy",
+      lat: 18.494201447370067,
       lng: 74.02342835489087,
       description: "Center for performing arts and music education",
       category: "Arts",
       // placeId retained in data for future use, but not used in UI or logic
     },
-    { 
-      id: 9, 
-      name: "Account Department, Guest House", 
-      lat: 18.493397060315154,  
+    {
+      id: 9,
+      name: "Account Department, Guest House",
+      lat: 18.493397060315154,
       lng: 74.02325704813967,
       description: "Financial services and guest accommodation",
       category: "Administration",
       // placeId retained in data for future use, but not used in UI or logic
     },
-    { 
-      id: 10, 
-      name: "Raj Bungalow", 
-      lat: 18.493343843257275,  
+    {
+      id: 10,
+      name: "Raj Bungalow",
+      lat: 18.493343843257275,
       lng: 74.02357135415613,
       description: "Heritage building and official residence",
       category: "Landmark",
       // placeId retained in data for future use, but not used in UI or logic
     },
-    { 
-      id: 11, 
-      name: "School of Food Technology, MANET Hostel", 
-      lat: 18.491843937146296,  
+    {
+      id: 11,
+      name: "School of Food Technology, MANET Hostel",
+      lat: 18.491843937146296,
       lng: 74.02292535777815,
       description: "Food technology studies and student accommodation",
       category: "Academic",
       // placeId retained in data for future use, but not used in UI or logic
     },
-    { 
-      id: 12, 
-      name: "School of Architecture", 
-      lat: 18.494528998144798,   
+    {
+      id: 12,
+      name: "School of Architecture",
+      lat: 18.494528998144798,
       lng: 74.02184922136568,
       description: "Architecture and design education center",
       category: "Academic",
       // placeId retained in data for future use, but not used in UI or logic
     },
-    { 
-      id: 13, 
-      name: "School of Film & Theatre, School of Bioengineering Sciences & Research, School of Corporate Innovation & Leadership, Atal Incubation Center (AIC), School of Indian Civil Services", 
-      lat: 18.495302450375288,  
+    {
+      id: 13,
+      name: "School of Film & Theatre, School of Bioengineering Sciences & Research, School of Corporate Innovation & Leadership, Atal Incubation Center (AIC), School of Indian Civil Services",
+      lat: 18.495302450375288,
       lng: 74.02196302037389,
       description: "Multi-disciplinary complex for various schools and research centers",
       category: "Academic",
       // placeId retained in data for future use, but not used in UI or logic
     },
-    { 
-      id: 14, 
-      name: "Institute of Design", 
-      lat: 18.49468368348241,  
+    {
+      id: 14,
+      name: "Institute of Design",
+      lat: 18.49468368348241,
       lng: 74.021723522408,
       description: "Design education and research institute",
       category: "Academic",
       // placeId retained in data for future use, but not used in UI or logic
     },
-    { 
-      id: 15, 
-      name: "School of Fine Arts & Applied Arts, Urmilatai Karad Auditorium", 
-      lat: 18.495094204174062,  
+    {
+      id: 15,
+      name: "School of Fine Arts & Applied Arts, Urmilatai Karad Auditorium",
+      lat: 18.495094204174062,
       lng: 74.02049618226005,
       description: "Arts education and performance venue",
       category: "Arts",
       // placeId retained in data for future use, but not used in UI or logic
     },
-    { 
-      id: 16, 
-      name: "IT Building, School of Computing, School of Engineering & Sciences, School of Holistic Development, College of Management (MITCOM), CRIEYA", 
-      lat: 18.493930153250627,  
+    {
+      id: 16,
+      name: "IT Building, School of Computing, School of Engineering & Sciences, School of Holistic Development, College of Management (MITCOM), CRIEYA",
+      lat: 18.493930153250627,
       lng: 74.01912736815999,
       description: "Technology and management education complex",
       category: "Academic",
       // placeId retained in data for future use, but not used in UI or logic
     },
-    { 
-      id: 17, 
-      name: "Tuck Shop", 
-      lat: 18.493523886263336, 
+    {
+      id: 17,
+      name: "Tuck Shop",
+      lat: 18.493523886263336,
       lng: 74.02291451273722,
       description: "Tuck Shop – Quick bites, chill vibes, heart of MIT ADT.",
       category: "Landmark",
       // placeId retained in data for future use, but not used in UI or logic
     },
-    { 
-      id: 18, 
-      name: "MANET Canteen", 
-      lat: 18.491564033859877, 
+    {
+      id: 18,
+      name: "MANET Canteen",
+      lat: 18.491564033859877,
       lng: 74.02410194039003,
       description: "MANET Canteen – Grab-and-go meals for busy campus days.",
       category: "Landmark",
@@ -274,11 +273,6 @@ const CampusMap: React.FC<CampusMapProps> = () => {
       setIsSearchFocused(false);
     }, 200);
   }, []);
-
-  // Optimize search button click handler
-  const handleSearchClick = useCallback(() => {
-    setSearchQuery(searchInput);
-  }, [searchInput]);
 
   // Optimize marker click handler
   const handleMarkerClick = useCallback((location: Location) => {
@@ -362,6 +356,7 @@ const CampusMap: React.FC<CampusMapProps> = () => {
     setIsPanelOpen(prev => !prev);
   }, []);
 
+
   // Cleanup debounced function on unmount
   useEffect(() => {
     const fn = debouncedSetSearchQuery;
@@ -385,13 +380,14 @@ const CampusMap: React.FC<CampusMapProps> = () => {
       <div className="p-4">
          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Campus Map</h1>
       </div>
-      <div className="w-full flex-grow h-0 relative">
-        {/* Map Container - Full width */}
-        <div className={`w-full h-full relative transition-all duration-300 ease-in-out`}>
+      {/* Main flex container for map and panel */}
+      <div className="flex flex-col md:flex-row flex-grow h-0">
+        {/* Map Container - Full width on mobile, 2/3 on desktop */}
+        {/* Adjusted height logic based on panel state on mobile */}
+        <div className={`w-full md:w-2/3 ${isPanelOpen ? 'h-[60vh]' : 'h-[100vh]'} md:h-full relative transition-all duration-300 ease-in-out`}>
           <div className="bg-white shadow-lg overflow-hidden h-full relative">
-            {/* Search Bar and Dropdown - Always visible, positioned over map */}
-            {/* Adjusted positioning and added width control */}
-            <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 w-[90%] md:w-1/3 max-w-md">
+            {/* Mobile Search Bar and Dropdown - Visible on mobile only, positioned over map */}
+            <div className="md:hidden absolute top-4 left-1/2 transform -translate-x-1/2 z-10 w-[90%] max-w-md">
               <form
                 className="relative w-full flex border border-gray-300 overflow-hidden shadow-sm focus-within:ring-1 focus-within:ring-black focus-within:border-black transition-all duration-300 rounded-full bg-white"
                 onSubmit={e => { e.preventDefault(); setSearchQuery(searchInput); }}
@@ -419,7 +415,7 @@ const CampusMap: React.FC<CampusMapProps> = () => {
                 </button>
               </form>
 
-              {/* Locations Dropdown */}
+              {/* Mobile Locations Dropdown */}
               {isSearchFocused && filteredLocations.length > 0 && (
                 <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 shadow-lg rounded-md mt-1 max-h-60 overflow-y-auto z-20">
                   <ul className="space-y-2 p-2">
@@ -456,7 +452,7 @@ const CampusMap: React.FC<CampusMapProps> = () => {
               zoom={animationInProgress.current ? undefined : mapZoom}
               options={{
                 ...MAP_OPTIONS,
-                // Adjust controls for mobile
+                // Adjust controls for mobile and desktop
                 zoomControl: true,
                 mapTypeControl: window.innerWidth >= 768,
                 streetViewControl: window.innerWidth >= 768,
@@ -507,26 +503,14 @@ const CampusMap: React.FC<CampusMapProps> = () => {
                           {selectedLocation.category}
                         </span>
                       </div>
-                      <button
-                        onClick={() => {
-                          const url = `https://www.google.com/maps/dir/?api=1&destination=${selectedLocation.lat},${selectedLocation.lng}`;
-                          window.open(url, '_blank');
-                        }}
-                        className="p-2 text-gray-500 hover:text-blue-600 transition-colors duration-200"
-                        title="Open in Google Maps"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M12 1.586l-4 4v12.828l4-4V1.586zM3.707 3.293A1 1 0 002 4v10a1 1 0 00.293.707L6 18.414V5.586L3.707 3.293zM17.707 5.293L14 1.586v12.828l2.293 2.293A1 1 0 0018 16V6a1 1 0 00-.293-.707z" clipRule="evenodd" />
-                        </svg>
-                      </button>
                     </div>
-                    
+
                     {/* Description Section */}
                     <div className="bg-gray-50 p-4 rounded-lg mb-4">
                       <h4 className="text-sm font-semibold text-gray-700 mb-2">About this location</h4>
                       <p className="text-sm text-gray-600 leading-relaxed">{selectedLocation.description}</p>
                     </div>
-                    
+
                     {/* Location Details Section */}
                     <div className="space-y-2 mb-4">
                       <div className="flex items-center text-sm text-gray-600">
@@ -537,7 +521,7 @@ const CampusMap: React.FC<CampusMapProps> = () => {
                         <span>Location ID: {selectedLocation.id}</span>
                       </div>
                     </div>
-                    
+
                     {/* Action Buttons */}
                     <div className="flex gap-2">
                       <button
@@ -576,21 +560,87 @@ const CampusMap: React.FC<CampusMapProps> = () => {
           </div>
         </div>
 
-        {/* Locations List Panel Container - Removed */}
-        {/* The list is now a dropdown below the search bar */}
-        {/* Removed the div completely as it's no longer needed */}
-        {/* <div className={`w-full md:w-1/3 flex flex-col md:h-full relative transition-all duration-300 ease-in-out h-0 md:h-full`}> */}
-          {/* Toggle Panel Button - Removed */}
+        {/* Locations List Panel Container - Full width on mobile, 1/3 on desktop */}
+        <div className={`w-full md:w-1/3 flex flex-col md:h-full relative transition-all duration-300 ease-in-out ${isPanelOpen ? 'h-[40vh]' : 'h-0'} md:h-full`}>
+          {/* Toggle Panel Button - Mobile Only, positioned at the top center */}
+          <button
+            onClick={togglePanel}
+            className="md:hidden absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 bg-white border border-gray-300 shadow-lg rounded-full p-3 flex items-center justify-center hover:bg-blue-100 transition-all duration-300 ease-in-out transform hover:scale-110"
+            title={isPanelOpen ? 'Hide Locations' : 'Show Locations'}
+            style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.10)' }}
+          >
+            {isPanelOpen ? (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-700 rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            )}
+          </button>
 
-          {/* Inner container with padding, shadow, and overflow for list - Removed content */}
-          {/* <div className={`bg-white shadow-lg p-3 md:p-4 md:flex-grow transition-all duration-300 ease-in-out opacity-0 h-0 md:opacity-100 md:h-full ${isPanelOpen ? 'overflow-y-auto' : 'overflow-hidden'}`}> */}
-             {/* Content moved to dropdown */}
-          {/* </div> */}
-        {/* </div> */}
+          {/* Inner container with padding, shadow, and overflow for list */}
+          {/* Added pt-4 to prevent button overlap */}
+          {/* Adjusted opacity and height based on panel state */}
+          <div className={`bg-white shadow-lg p-3 md:p-4 md:flex-grow transition-all duration-300 ease-in-out ${isPanelOpen ? 'opacity-100 h-full' : 'opacity-0 h-0'} md:opacity-100 md:h-full ${isPanelOpen ? 'pt-8 md:pt-4' : 'pt-0'} overflow-y-auto`}>
+            <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-3 md:mb-4">Campus Locations</h2>
+            {/* Desktop Search Bar - Visible on desktop only */}
+            <form className="hidden md:flex relative mb-6 w-full border border-gray-300 overflow-hidden shadow-sm focus-within:ring-1 focus-within:ring-black focus-within:border-black transition-all duration-300 rounded-full" onSubmit={e => { e.preventDefault(); setSearchQuery(searchInput); }}>
+              <div className="relative flex items-center flex-1">
+                <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search locations..."
+                  className="block w-full pl-10 pr-4 py-2 bg-white text-black outline-none text-lg border-none rounded-l-full"
+                  value={searchInput}
+                  onChange={handleSearchInputChange}
+                  onFocus={handleSearchFocus}
+                  onBlur={handleSearchBlur}
+                  aria-label="Search locations"
+                />
+              </div>
+              <button
+                type="submit"
+                aria-label="Search"
+                className="px-6 py-2 bg-[#00C6A7] text-white font-semibold hover:bg-[#009e87] transition-all duration-300 ease-in-out rounded-r-full transform hover:scale-105"
+              >
+                Search
+              </button>
+            </form>
+            {/* Locations List - Always in panel on desktop, hidden on mobile */}
+            <div className="hidden md:block transition-all duration-300 ease-in-out opacity-100">
+              <ul className="space-y-2">
+                {filteredLocations.map((location) => (
+                  <li
+                    key={location.id}
+                    className={`mb-2 pb-2 border-b border-gray-200 text-gray-800 cursor-pointer hover:bg-gray-100 p-2 rounded transition-all duration-300 ease-in-out transform hover:scale-105 ${
+                      selectedLocation?.id === location.id ? 'bg-blue-100' : ''
+                    }`}
+                    onClick={() => {
+                      handleLocationClick(location);
+                      // On desktop, clicking a list item doesn't close the panel
+                    }}
+                  >
+                    <div className="flex flex-wrap items-start gap-2">
+                      <div className="flex-1 min-w-0">
+                        <span className="font-semibold text-sm md:text-base block truncate">{location.id}. {location.name}</span>
+                        <p className="text-xs md:text-sm text-gray-600 mt-1 line-clamp-2">{location.description}</p>
+                      </div>
+                      <span className="text-xs bg-gray-200 px-2 py-1 rounded-full flex-shrink-0 whitespace-nowrap">
+                        {location.category}
+                      </span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
 export { CampusMap };
-export default CampusMap; 
+export default CampusMap;
