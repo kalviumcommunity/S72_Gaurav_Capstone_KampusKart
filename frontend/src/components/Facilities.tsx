@@ -127,13 +127,15 @@ const Facilities = () => {
               <option value="Accommodation">Accommodation</option>
             </select>
           </div>
-          <form className="relative w-full md:w-[500px] flex" onSubmit={e => { e.preventDefault(); setSearchQuery(searchInput); }}>
+          {/* Search Bar */}
+          <form className="relative w-full md:w-[500px] flex rounded-full border border-gray-300 overflow-hidden shadow-sm focus-within:ring-1 focus-within:ring-black focus-within:border-black" onSubmit={e => { e.preventDefault(); setSearchQuery(searchInput); }}>
             <div className="relative flex items-center flex-1">
               <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search facilities..."
-                className="bg-gray-100 w-full pl-10 pr-4 py-2 rounded-l text-black outline-none text-lg border border-gray-300"
+                placeholder="Search by name, description, or location..."
+                className="w-full pl-10 pr-4 py-2 bg-white text-black outline-none text-lg border-none"
+                aria-label="Search facilities"
                 value={searchInput}
                 onChange={e => setSearchInput(e.target.value)}
                 onKeyDown={e => {
@@ -144,12 +146,11 @@ const Facilities = () => {
               />
             </div>
             <button
-              type="button"
+              type="submit"
               aria-label="Search"
-              className="px-4 py-2 bg-[#00C6A7] text-white rounded-none rounded-r-md font-semibold hover:bg-[#009e87] transition border border-l-0 border-gray-300"
-              onClick={() => setSearchQuery(searchInput)}
+              className="px-6 py-2 bg-[#00C6A7] text-white font-semibold hover:bg-[#009e87] transition rounded-r-full"
             >
-              <FiSearch />
+              Search
             </button>
           </form>
         </div>

@@ -293,8 +293,7 @@ const LostFound = () => {
             <select
               value={filterType}
               onChange={e => setFilterType(e.target.value as 'all' | 'lost' | 'found')}
-              className="px-4 py-2 rounded bg-gray-100 text-black font-medium"
-              aria-label="Filter by type"
+              className="px-4 py-2 rounded bg-gray-100 text-black font-medium border border-gray-300"
             >
               <option value="all">All Types</option>
               <option value="lost">Lost Items</option>
@@ -303,21 +302,21 @@ const LostFound = () => {
             <select
               value={filterResolved}
               onChange={e => setFilterResolved(e.target.value as 'all' | 'resolved' | 'unresolved')}
-              className="px-4 py-2 rounded bg-gray-100 text-black font-medium"
-              aria-label="Filter by status"
+              className="px-4 py-2 rounded bg-gray-100 text-black font-medium border border-gray-300"
             >
               <option value="all">All Statuses</option>
-              <option value="resolved">Resolved</option>
               <option value="unresolved">Unresolved</option>
+              <option value="resolved">Resolved</option>
             </select>
           </div>
-          <div className="relative w-full md:w-[500px] flex">
+          {/* Search Bar */}
+          <form className="relative w-full md:w-[500px] flex rounded-full border border-gray-300 overflow-hidden shadow-sm focus-within:ring-1 focus-within:ring-black focus-within:border-black" onSubmit={e => { e.preventDefault(); setSearchQuery(searchInput); }}>
             <div className="relative flex items-center flex-1">
               <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search by title, description, or location..."
-                className="bg-gray-100 w-full pl-10 pr-4 py-2 rounded-l text-black outline-none text-lg"
+                className="w-full pl-10 pr-4 py-2 bg-white text-black outline-none text-lg border-none"
                 aria-label="Search lost and found items"
                 value={searchInput}
                 onChange={e => setSearchInput(e.target.value)}
@@ -329,14 +328,13 @@ const LostFound = () => {
               />
             </div>
             <button
-              type="button"
+              type="submit"
               aria-label="Search"
-              className="px-4 py-2 bg-[#00C6A7] text-white rounded-none rounded-r-md font-semibold hover:bg-[#009e87] transition border border-l-0 border-gray-300"
-              onClick={() => setSearchQuery(searchInput)}
+              className="px-6 py-2 bg-[#00C6A7] text-white font-semibold hover:bg-[#009e87] transition rounded-r-full"
             >
-              <FiSearch />
+              Search
             </button>
-          </div>
+          </form>
         </div>
         {/* Card Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

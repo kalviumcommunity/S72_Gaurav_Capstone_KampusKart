@@ -526,31 +526,27 @@ const CampusMap: React.FC<CampusMapProps> = () => {
           {/* Added pt-4 to prevent button overlap */}
           <div className="bg-white shadow-lg p-3 md:p-4 md:flex-grow md:overflow-y-auto pt-8">
             <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-3 md:mb-4">Campus Locations</h2>
-            {/* Search Bar - Improved for mobile */}
-            <div className="mb-3 md:mb-4 flex">
+            {/* Search Bar */}
+            <form className="relative mb-6 w-full flex rounded-full border border-gray-300 overflow-hidden shadow-sm focus-within:ring-1 focus-within:ring-black focus-within:border-black" onSubmit={e => { e.preventDefault(); setSearchQuery(searchInput); }}>
               <div className="relative flex items-center flex-1">
+                <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input
                   type="text"
                   placeholder="Search locations..."
-                  className="w-full p-2 text-sm md:text-base border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="block w-full pl-10 pr-4 py-2 bg-white text-black outline-none text-lg border-none"
                   value={searchInput}
                   onChange={handleSearchInputChange}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter') {
-                      handleSearchClick();
-                    }
-                  }}
+                  aria-label="Search locations"
                 />
               </div>
-              <button
-                type="button"
+               <button
+                type="submit"
                 aria-label="Search"
-                className="px-3 md:px-4 py-2 bg-[#00C6A7] text-white rounded-none rounded-r-md font-semibold hover:bg-[#009e87] transition border border-l-0 border-gray-300"
-                onClick={handleSearchClick}
+                className="px-6 py-2 bg-[#00C6A7] text-white font-semibold hover:bg-[#009e87] transition rounded-r-full"
               >
-                <FiSearch className="w-4 h-4 md:w-5 md:h-5" />
+                Search
               </button>
-            </div>
+            </form>
             {/* Locations List - Improved for mobile */}
             {isPanelOpen && (
               <ul className="space-y-2">
