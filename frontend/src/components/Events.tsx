@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './Navbar';
-import { FiPlus, FiCalendar, FiMapPin, FiSearch, FiAlertCircle, FiFileText, FiTag, FiMail, FiInfo } from 'react-icons/fi';
+import { FiPlus, FiCalendar, FiMapPin, FiSearch, FiAlertCircle, FiFileText, FiTag, FiMail, FiInfo, FiUser } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 import { API_BASE } from '../config';
 import SkeletonLoader from './SkeletonLoader';
@@ -29,6 +29,10 @@ interface Event {
       lng: number;
     };
   };
+  user?: {
+    name: string;
+  };
+  createdAt?: string;
 }
 
 const Events = () => {
@@ -64,6 +68,7 @@ const Events = () => {
   });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [zoomedImage, setZoomedImage] = useState<string | null>(null);
 
   useEffect(() => {
     fetchEvents();
@@ -310,56 +315,82 @@ const Events = () => {
           {filteredEvents.map(event => (
             <div 
               key={event._id} 
-              className="bg-white rounded-lg shadow p-6 flex flex-col gap-2 border cursor-pointer hover:shadow-lg transition-shadow duration-200"
+              className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 overflow-hidden group"
               onClick={() => setSelectedEvent(event)}
             >
-              <div className="w-full h-64 bg-gray-100 rounded-md mb-3 relative overflow-hidden">
+              {/* Image Section with Overlay */}
+              <div className="relative h-64 overflow-hidden">
                 {event.image?.url ? (
-                  <img src={event.image.url} alt={event.title} className="w-full h-full object-cover" />
+                  <>
+                    <img 
+                      src={event.image.url} 
+                      alt={event.title} 
+                      className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300" 
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </>
                 ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
-                    <FiCalendar className="w-16 h-16 mb-2" />
-                    <span className="text-sm font-medium">No Image Available</span>
+                  <div className="w-full h-full flex items-center justify-center bg-gray-50">
+                    <div className="flex flex-col items-center justify-center text-gray-300">
+                      <FiCalendar className="w-16 h-16" />
+                      <span className="text-xs mt-2">No Image Available</span>
+                    </div>
                   </div>
                 )}
-              </div>
-              <div className="flex items-start gap-2 mb-2 flex-wrap">
-                <h2 className="text-lg font-bold text-black truncate flex-1 min-w-0">{event.title}</h2>
-                <span className={`ml-auto text-xs px-2 py-1 rounded-full ${
-                  event.status === 'Upcoming' ? 'bg-blue-100 text-blue-800' :
-                  event.status === 'Ongoing' ? 'bg-green-100 text-green-800' :
-                  event.status === 'Completed' ? 'bg-gray-100 text-gray-800' :
-                  'bg-red-100 text-red-800'
-                }`}>
-                  {event.status}
-                </span>
-              </div>
-              <p className="text-gray-600 text-sm line-clamp-3 flex-1">{event.description}</p>
-              <div className="flex items-start gap-2 mt-2 text-sm text-gray-500 flex-wrap">
-                <div className="flex items-center flex-shrink-0">
-                  <FiCalendar className="text-[#00C6A7] mr-1" />
-                  <span className="font-semibold text-black text-sm">
-                    {new Date(event.date).toLocaleDateString('en-US', { 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
-                    })}
+                {/* Status Badge */}
+                <div className="absolute top-4 right-4">
+                  <span className={`text-xs px-3 py-1.5 rounded-full font-medium shadow-sm bg-white/90 backdrop-blur-sm flex items-center gap-1 ${
+                    event.status === 'Upcoming' ? 'text-blue-800' :
+                    event.status === 'Ongoing' ? 'text-green-800' :
+                    event.status === 'Completed' ? 'text-gray-800' :
+                    'text-red-800'
+                  }`}>
+                    {event.status}
                   </span>
                 </div>
-                <div className="flex items-center flex-shrink-0">
-                  <FiMapPin className="mr-1"/> <span className="truncate">{event.location}</span>
+              </div>
+
+              {/* Content Section */}
+              <div className="p-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">{event.title}</h2>
+                <p className="text-gray-600 text-sm mb-4 line-clamp-3">{event.description}</p>
+
+                {/* Meta Info Row */}
+                <div className="space-y-3 pt-4 border-t border-gray-100">
+                  <div className="flex items-center text-sm text-gray-500">
+                    <FiCalendar className="mr-2 flex-shrink-0 text-gray-400" />
+                    <span className="font-medium text-gray-900">
+                      {new Date(event.date).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                      })}
+                    </span>
+                  </div>
+                  <div className="flex items-center text-sm text-gray-500">
+                    <FiMapPin className="mr-2 flex-shrink-0 text-gray-400" />
+                    <span className="truncate">{event.location}</span>
+                  </div>
+                </div>
+
+                {/* Action Button */}
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                  <button
+                    className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
+                      event.registerUrl 
+                        ? 'bg-[#00C6A7] text-white hover:bg-[#009e87]' 
+                        : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    }`}
+                    disabled={!event.registerUrl}
+                    onClick={(e) => { 
+                      e.stopPropagation();
+                      if (event.registerUrl) window.open(event.registerUrl, '_blank'); 
+                    }}
+                  >
+                    {event.registerUrl ? 'Register Now' : 'Registration Closed'}
+                  </button>
                 </div>
               </div>
-              <button
-                className={`mt-4 px-4 py-2 rounded-full font-semibold text-white ${event.registerUrl ? 'bg-[#00C6A7] hover:bg-[#009e87] cursor-pointer' : 'bg-gray-300 cursor-not-allowed'} transition`}
-                disabled={!event.registerUrl}
-                onClick={(e) => { 
-                  e.stopPropagation();
-                  if (event.registerUrl) window.open(event.registerUrl, '_blank'); 
-                }}
-              >
-                {event.registerUrl ? 'Register Now' : 'Registration Closed'}
-              </button>
             </div>
           ))}
           {filteredEvents.length === 0 && (
@@ -645,7 +676,7 @@ const Events = () => {
         {/* Event Details Modal */}
         {selectedEvent && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto relative">
+            <div className="bg-white rounded-xl shadow-xl p-8 max-w-3xl w-full mx-auto max-h-[90vh] overflow-y-auto relative">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-900">Event Details</h2>
                 <button
@@ -672,18 +703,19 @@ const Events = () => {
               <div className="space-y-6">
                 <div>
                   <h3 className="text-xl font-bold text-gray-900 mb-2">{selectedEvent.title}</h3>
-                  <div className="flex items-center gap-4 text-sm text-gray-600 mb-4 flex-wrap">
+                  {/* Date, Location, Status Badges */}
+                  <div className="flex flex-wrap items-center gap-3 mb-4 text-sm text-gray-600">
                     <div className="flex items-center gap-1 flex-shrink-0">
-                      <FiCalendar className="text-[#00C6A7]" />
-                      <span className="font-medium text-black text-sm">{new Date(selectedEvent.date).toLocaleDateString('en-US', { 
+                      <FiCalendar className="text-gray-400" />
+                      <span className="font-medium text-gray-900 text-sm">{new Date(selectedEvent.date).toLocaleDateString('en-US', { 
                         year: 'numeric', 
                         month: 'long', 
                         day: 'numeric' 
                       })}</span>
                     </div>
                     <div className="flex items-center gap-1 flex-shrink-0">
-                      <FiMapPin className="text-[#00C6A7]" />
-                      <span className="font-medium text-black text-sm truncate">{selectedEvent.location}</span>
+                      <FiMapPin className="text-gray-400" />
+                      <span className="font-medium text-gray-900 text-sm truncate">{selectedEvent.location}</span>
                     </div>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                       selectedEvent.status === 'Upcoming' ? 'bg-blue-100 text-blue-800' :
@@ -698,20 +730,30 @@ const Events = () => {
 
                 <div>
                   <h4 className="text-lg font-semibold text-gray-900 mb-2">Description</h4>
-                  <p className="text-gray-600 whitespace-pre-wrap text-sm">{selectedEvent.description}</p>
+                  <p className="text-gray-700 whitespace-pre-wrap text-sm">{selectedEvent.description}</p>
                 </div>
+
+                {/* Posted By and Posted At Combined */}
+                {selectedEvent.user?.name && (selectedEvent as any).createdAt && (
+                  <div className="flex items-center text-sm text-gray-500">
+                    <FiUser className="w-5 h-5 mr-2 text-gray-500" />
+                    <span className="truncate">
+                      Posted by {(selectedEvent as any).user.name} on {new Date((selectedEvent as any).createdAt).toLocaleString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' })}
+                    </span>
+                  </div>
+                )}
 
                 {selectedEvent.operatingHours && (
                   <div>
                     <h4 className="text-lg font-semibold text-gray-900 mb-2">Operating Hours</h4>
-                    <p className="text-gray-600 text-sm">{selectedEvent.operatingHours}</p>
+                    <p className="text-gray-700 text-sm">{selectedEvent.operatingHours}</p>
                   </div>
                 )}
 
                 {selectedEvent.contactInfo && (
                   <div>
                     <h4 className="text-lg font-semibold text-gray-900 mb-2">Contact Information</h4>
-                    <div className="space-y-2 text-sm">
+                    <div className="space-y-2 text-sm text-gray-700">
                       {selectedEvent.contactInfo.name && (
                         <p className="text-gray-600"><span className="font-medium">Contact Person:</span> {selectedEvent.contactInfo.name}</p>
                       )}
@@ -728,7 +770,7 @@ const Events = () => {
                 {selectedEvent.mapLocation && (
                   <div>
                     <h4 className="text-lg font-semibold text-gray-900 mb-2">Location Details</h4>
-                    <div className="space-y-2 text-sm">
+                    <div className="space-y-2 text-sm text-gray-700">
                       {selectedEvent.mapLocation.building && (
                         <p className="text-gray-600"><span className="font-medium">Building:</span> {selectedEvent.mapLocation.building}</p>
                       )}
@@ -790,6 +832,41 @@ const Events = () => {
                 )}
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Zoomed Image Modal */}
+        {zoomedImage && selectedEvent && selectedEvent.image && selectedEvent.image.url && (
+          <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4" onClick={() => setZoomedImage(null)}>
+            {/* Image */}
+            <img 
+              src={zoomedImage} 
+              alt="Zoomed"
+              className="max-h-[90vh] max-w-full lg:max-w-[80vw] rounded-lg shadow-2xl object-contain"
+              onClick={(e) => e.stopPropagation()} // Prevent closing when clicking the image
+            />
+            
+            {/* Note: Events only have one main image, so no navigation needed */}
+
+            {/* Close Button */}
+            <button
+              onClick={() => setZoomedImage(null)}
+              aria-label="Close zoomed image"
+              className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm rounded-full p-2 text-white hover:bg-white/50 transition-colors duration-200 z-50"
+            >
+              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+
+          </div>
+        )}
+
+        {/* Loading Spinner */}
+        {loading && (
+          <div className="flex justify-center items-center mt-8">
+            <SkeletonLoader variant="events" />
           </div>
         )}
       </main>

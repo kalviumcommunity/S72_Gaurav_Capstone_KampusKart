@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import Navbar from './Navbar';
 import { useAuth } from '../contexts/AuthContext';
-import { FiPlus, FiEdit2, FiTrash2, FiX, FiAlertCircle, FiCheckCircle, FiUser, FiCalendar, FiTag, FiFileText, FiSearch, FiInfo, FiMail } from 'react-icons/fi';
+import { FiPlus, FiEdit2, FiTrash2, FiX, FiAlertCircle, FiCheckCircle, FiUser, FiCalendar, FiTag, FiFileText, FiSearch, FiInfo } from 'react-icons/fi';
 import SkeletonLoader from './SkeletonLoader';
 import { format } from 'date-fns';
 import { API_BASE } from '../config';
@@ -524,58 +524,95 @@ const Complaints = () => {
             <div
               key={complaint._id}
               ref={idx === complaints.length - 1 ? lastComplaintRef : undefined}
-              className="bg-white rounded-lg shadow p-6 flex flex-col gap-2 border cursor-pointer"
+              className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 overflow-hidden group"
               onClick={() => setSelectedComplaintForDetails(complaint)}
             >
-              {/* Image Section */}
-              {complaint.images && complaint.images.length > 0 ? (
-                <div className="relative h-64 overflow-hidden mb-2 rounded-md">
-                  <img
-                    src={complaint.images[0].url}
-                    alt={complaint.title}
-                    className="object-cover w-full h-full"
-                  />
-                </div>
-              ) : (
-                <div className="relative h-64 overflow-hidden mb-2 rounded-md flex items-center justify-center bg-gray-100">
-                  <span className="text-5xl text-gray-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-16 h-16">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-3A2.25 2.25 0 008.25 5.25V9m7.5 0v10.5A2.25 2.25 0 0113.5 21h-3a2.25 2.25 0 01-2.25-2.25V9m7.5 0H6.75m8.25 0H18m-12 0h2.25" />
-                    </svg>
+              {/* Image Section with Overlay */}
+              <div className="relative h-64 overflow-hidden">
+                {complaint.images && complaint.images.length > 0 ? (
+                  <>
+                    <img
+                      src={complaint.images[0].url}
+                      alt={complaint.title}
+                      className="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </>
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gray-50">
+                    <span className="text-5xl text-gray-300">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-16 h-16">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-3A2.25 2.25 0 008.25 5.25V9m7.5 0v10.5A2.25 2.25 0 0113.5 21h-3a2.25 2.25 0 01-2.25-2.25V9m7.5 0H6.75m8.25 0H18m-12 0h2.25" />
+                      </svg>
+                    </span>
+                  </div>
+                )}
+                {/* Status and Priority Badges */}
+                <div className="absolute top-4 right-4 flex flex-col gap-2">
+                  <span className={`text-xs px-3 py-1.5 rounded-full font-medium shadow-sm ${
+                    complaint.status === 'Open' ? 'bg-red-100 text-red-800' :
+                    complaint.status === 'In Progress' ? 'bg-yellow-100 text-yellow-800' :
+                    complaint.status === 'Resolved' ? 'bg-green-100 text-green-800' :
+                    'bg-gray-100 text-gray-800'
+                  }`}>
+                    {complaint.status}
+                  </span>
+                  <span className={`text-xs px-3 py-1.5 rounded-full font-medium shadow-sm ${
+                    complaint.priority === 'Urgent' ? 'bg-red-100 text-red-800' :
+                    complaint.priority === 'High' ? 'bg-orange-100 text-orange-800' :
+                    complaint.priority === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
+                    'bg-blue-100 text-blue-800'
+                  }`}>
+                    {complaint.priority} Priority
                   </span>
                 </div>
-              )}
-              <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
-                <h2 className="text-lg font-bold text-black truncate flex-1 min-w-0">{complaint.title}</h2>
-                <div className="flex-shrink-0">{renderStatus(complaint.status)}</div>
               </div>
-              <p className="text-gray-600 text-sm mb-2 line-clamp-3 flex-1">{complaint.description}</p>
-              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mt-auto">
-                <div className="flex items-center flex-shrink-0">
-                  <FiUser className="mr-1"/>
-                  <span className="truncate">Posted by {complaint.user.name}</span>
+
+              {/* Content Section */}
+              <div className="p-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">{complaint.title}</h2>
+                <p className="text-gray-600 text-sm mb-4 line-clamp-3">{complaint.description}</p>
+
+                {/* Meta Info Row */}
+                <div className="space-y-3 pt-4 border-t border-gray-100">
+                  <div className="flex items-center text-sm text-gray-500">
+                    <FiTag className="mr-2 flex-shrink-0" />
+                    <span className="truncate">{complaint.category}</span>
+                  </div>
+                  <div className="flex items-center text-sm text-gray-500">
+                    <FiUser className="mr-2 flex-shrink-0" />
+                    <span className="truncate">Posted by {complaint.user.name}</span>
+                  </div>
+                  <div className="flex items-center text-sm text-gray-500">
+                    <FiCalendar className="mr-2 flex-shrink-0" />
+                    <span>{new Date(complaint.createdAt).toLocaleDateString('en-US', { 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}</span>
+                  </div>
                 </div>
-                <div className="flex items-center flex-shrink-0">
-                  <FiCalendar className="mr-1"/>
-                  <span>{complaint.createdAt ? new Date(complaint.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : ''}</span>
-                </div>
+
+                {/* Action Buttons */}
+                {user && complaint.user && complaint.user._id === user._id && !['Resolved', 'Closed'].includes(complaint.status) && (
+                  <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); openEditComplaintModal(complaint); }}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors duration-200"
+                    >
+                      <FiEdit2 className="w-4 h-4" />
+                      Edit
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleDeleteComplaint(complaint._id); }}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors duration-200"
+                    >
+                      <FiTrash2 className="w-4 h-4" />
+                      Delete
+                    </button>
+                  </div>
+                )}
               </div>
-              {user && complaint.user && complaint.user._id === user._id && ( !['Resolved', 'Closed'].includes(complaint.status)) && (
-                <div className="flex gap-2 pt-3">
-                  <button
-                    onClick={(e) => { e.stopPropagation(); openEditComplaintModal(complaint); }}
-                    className="flex-1 px-3 py-2 rounded-full text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors duration-200 flex items-center justify-center"
-                  >
-                    <FiEdit2 className="mr-1"/> Edit
-                  </button>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); handleDeleteComplaint(complaint._id); }}
-                    className="flex-1 px-3 py-2 rounded-full text-sm font-semibold text-white bg-[#F05A25] hover:bg-red-600 transition-colors duration-200 flex items-center justify-center"
-                  >
-                    <FiTrash2 className="mr-1"/> Delete
-                  </button>
-                </div>
-              )}
             </div>
           ))}
         </div>
@@ -836,7 +873,7 @@ const Complaints = () => {
          {/* Complaint Details Modal */}
          {selectedComplaintForDetails && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                <div className="bg-white rounded-lg p-8 max-w-3xl w-full mx-auto max-h-[90vh] overflow-y-auto relative">
+                <div className="bg-white rounded-xl shadow-xl p-8 max-w-3xl w-full mx-auto max-h-[90vh] overflow-y-auto relative">
                     {/* Close Button */}
                     <button
                         onClick={() => setSelectedComplaintForDetails(null)}
@@ -851,28 +888,38 @@ const Complaints = () => {
 
                     <h2 className="text-2xl font-bold text-gray-900 mb-4 pr-8">{selectedComplaintForDetails.title}</h2>
 
-                    <div className="space-y-4 text-gray-700">
-                        <div className="flex flex-wrap items-center gap-4 mb-2">
+                    {/* Images Section - Moved Up */}
+                    {selectedComplaintForDetails.images && selectedComplaintForDetails.images.length > 0 && (
+                      <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {selectedComplaintForDetails.images.map((image, index) => (
+                          <img
+                            key={index}
+                            src={image.url}
+                            alt={`${selectedComplaintForDetails.title} image ${index + 1}`}
+                            className="w-full h-64 object-cover rounded-md cursor-zoom-in hover:opacity-90 transition-opacity duration-200"
+                            onClick={() => setZoomedImage(image.url)}
+                          />
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="space-y-6 text-gray-700">
+                        {/* Status Badge */}
+                        <div className="flex flex-wrap items-center gap-3 mb-2">
                             {renderStatus(selectedComplaintForDetails.status)}
                         </div>
                         <div>
-                            <p className="text-sm font-medium text-gray-500 mb-1">Description</p>
-                            <p>{selectedComplaintForDetails.description}</p>
+                            <h4 className="text-lg font-semibold text-gray-900 mb-2">Description</h4>
+                            <p className="text-gray-700 whitespace-pre-wrap">{selectedComplaintForDetails.description}</p>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <p className="text-sm font-medium text-gray-500 mb-1">Posted By</p>
-                                <div className="flex items-center">
-                                     <FiUser className="w-5 h-5 mr-2 text-gray-500"/>
-                                    <span>{selectedComplaintForDetails.user.name}</span>
-                                </div>
-                            </div>
-                            <div>
-                                <p className="text-sm font-medium text-gray-500 mb-1">Posted At</p>
-                                <div className="flex items-center">
-                                     <FiCalendar className="w-5 h-5 mr-2 text-gray-500"/>
-                                    <span>{selectedComplaintForDetails.createdAt ? new Date(selectedComplaintForDetails.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : ''}</span>
-                                </div>
+                        {/* Meta Info - Posted By, Posted At */}
+                        <div className="space-y-3 pt-4 border-t border-gray-100">
+                            {/* Posted By and Posted At Combined */}
+                            <div className="flex items-center text-sm text-gray-500">
+                                      <FiUser className="w-5 h-5 mr-2 text-gray-500"/>
+                                     <span className="truncate">
+                                       Posted by {selectedComplaintForDetails.user.name} on {selectedComplaintForDetails.createdAt ? new Date(selectedComplaintForDetails.createdAt).toLocaleString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' }) : ''}
+                                     </span>
                             </div>
                         </div>
                     </div>
@@ -903,29 +950,69 @@ const Complaints = () => {
                             Close
                         </button>
                     </div>
-
-                    {/* Images Section */}
-                    {selectedComplaintForDetails.images && selectedComplaintForDetails.images.length > 0 && (
-                      <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {selectedComplaintForDetails.images.map((image, index) => (
-                          <img
-                            key={index}
-                            src={image.url}
-                            alt={`${selectedComplaintForDetails.title} image ${index + 1}`}
-                            className="w-full h-64 object-cover rounded-md cursor-zoom-in"
-                            onClick={() => setZoomedImage(image.url)}
-                          />
-                        ))}
-                      </div>
-                    )}
                 </div>
             </div>
          )}
 
          {/* Zoomed Image Modal */}
-         {zoomedImage && (
-           <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50" onClick={() => setZoomedImage(null)}>
-             <img src={zoomedImage} alt="Zoomed" className="max-w-3xl max-h-[80vh] rounded-lg shadow-lg" />
+         {zoomedImage && selectedComplaintForDetails && selectedComplaintForDetails.images && selectedComplaintForDetails.images.length > 0 && (
+           <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4" onClick={() => setZoomedImage(null)}>
+             {/* Image */}
+             <img 
+               src={zoomedImage} 
+               alt="Zoomed"
+               className="max-h-[90vh] max-w-full lg:max-w-[80vw] rounded-lg shadow-2xl object-contain"
+               onClick={(e) => e.stopPropagation()} // Prevent closing when clicking the image
+             />
+             
+             {/* Navigation Buttons */}
+             {selectedComplaintForDetails.images.length > 1 && (
+               <>
+                 {/* Previous Button */}
+                 <button
+                   className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/30 backdrop-blur-sm rounded-full p-3 text-white hover:bg-white/50 transition-colors duration-200 z-50"
+                   onClick={(e) => {
+                     e.stopPropagation();
+                     const currentIndex = selectedComplaintForDetails.images.findIndex(img => img.url === zoomedImage);
+                     const prevIndex = (currentIndex - 1 + selectedComplaintForDetails.images.length) % selectedComplaintForDetails.images.length;
+                     setZoomedImage(selectedComplaintForDetails.images[prevIndex].url);
+                   }}
+                   aria-label="Previous image"
+                 >
+                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                   </svg>
+                 </button>
+                 {/* Next Button */}
+                 <button
+                   className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/30 backdrop-blur-sm rounded-full p-3 text-white hover:bg-white/50 transition-colors duration-200 z-50"
+                   onClick={(e) => {
+                     e.stopPropagation();
+                     const currentIndex = selectedComplaintForDetails.images.findIndex(img => img.url === zoomedImage);
+                     const nextIndex = (currentIndex + 1) % selectedComplaintForDetails.images.length;
+                     setZoomedImage(selectedComplaintForDetails.images[nextIndex].url);
+                   }}
+                   aria-label="Next image"
+                 >
+                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                     <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                   </svg>
+                 </button>
+               </>
+             )}
+
+             {/* Close Button */}
+              <button
+               onClick={() => setZoomedImage(null)}
+               aria-label="Close zoomed image"
+               className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm rounded-full p-2 text-white hover:bg-white/50 transition-colors duration-200 z-50"
+             >
+               <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                 <line x1="18" y1="6" x2="6" y2="18" />
+                 <line x1="6" y1="6" x2="18" y2="18" />
+               </svg>
+             </button>
+
            </div>
          )}
 

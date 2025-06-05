@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Navbar from './Navbar';
-import { FiMapPin, FiSearch, FiHome, FiWifi, FiBookOpen, FiCoffee, FiPlus, FiEdit2, FiTag } from 'react-icons/fi';
+import { FiMapPin, FiSearch, FiHome, FiWifi, FiBookOpen, FiCoffee, FiPlus, FiEdit2, FiTag, FiCalendar, FiUser } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 
 const mockFacilities = [
@@ -158,59 +158,82 @@ const Facilities = () => {
           {filteredFacilities.map(facility => (
             <div
               key={facility._id || facility.id}
-              className="bg-white rounded-lg shadow p-6 flex flex-col gap-2 border cursor-pointer hover:shadow-lg transition"
+              className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 overflow-hidden group"
               onClick={() => setSelectedFacility(facility)}
             >
-              {/* Image at the top */}
-              <div className="h-64 w-full rounded-md overflow-hidden mb-3 bg-gray-100 flex items-center justify-center">
+              {/* Image Section with Overlay */}
+              <div className="relative h-64 overflow-hidden">
                 {facility.images && facility.images.length > 0 ? (
-                  <img
-                    src={facility.images[0].url}
-                    alt={facility.name}
-                    className="object-cover w-full h-full"
-                  />
+                  <>
+                    <img
+                      src={facility.images[0].url}
+                      alt={facility.name}
+                      className="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </>
                 ) : (
-                  <div className="flex flex-col items-center justify-center w-full h-full text-gray-300">
-                    <svg className="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h18v18H3zM15 8h.01M9 18h6" /></svg>
-                    <span className="text-xs">No Image</span>
+                  <div className="w-full h-full flex items-center justify-center bg-gray-50">
+                    <div className="flex flex-col items-center justify-center text-gray-300">
+                      {iconOptions.find(opt => opt.value === facility.icon)?.icon || <FiHome className="w-16 h-16" />}
+                      <span className="text-xs mt-2">No Image</span>
+                    </div>
+                  </div>
+                )}
+                {/* Type Badge */}
+                <div className="absolute top-4 left-4">
+                  <span className="text-xs px-3 py-1.5 rounded-full font-medium shadow-sm bg-white/90 backdrop-blur-sm text-gray-800 flex items-center gap-1">
+                    <FiTag className="w-3 h-3" />
+                    {facility.type}
+                  </span>
+                </div>
+                {/* Location Badge */}
+                <div className="absolute top-4 right-4">
+                  <span className="text-xs px-3 py-1.5 rounded-full font-medium shadow-sm bg-white/90 backdrop-blur-sm text-gray-800 flex items-center gap-1">
+                    <FiMapPin className="w-3 h-3" />
+                    {facility.location}
+                  </span>
+                </div>
+              </div>
+
+              {/* Content Section */}
+              <div className="p-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">{facility.name}</h2>
+                <p className="text-gray-600 text-sm mb-4 line-clamp-3">{facility.description}</p>
+
+                {/* Meta Info Row */}
+                <div className="space-y-3 pt-4 border-t border-gray-100">
+                  {facility.createdAt && (
+                    <div className="flex items-center text-sm text-gray-500">
+                      <FiCalendar className="mr-2 flex-shrink-0" />
+                      <span>{new Date(facility.createdAt).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                      })}</span>
+                    </div>
+                  )}
+                  {facility.createdBy && (
+                    <div className="flex items-center text-sm text-gray-500">
+                      <FiUser className="mr-2 flex-shrink-0" />
+                      <span className="truncate">Posted by {facility.createdBy.name || facility.createdBy.email || 'User'}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Action Buttons */}
+                {user?.email === 'gauravkhandelwal205@gmail.com' && (
+                  <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setEditingFacility(facility); setIsEditModalOpen(true); }}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors duration-200"
+                    >
+                      <FiEdit2 className="w-4 h-4" />
+                      Edit
+                    </button>
                   </div>
                 )}
               </div>
-              {/* Title */}
-              <h2 className="text-lg font-bold text-black mb-1 truncate">{facility.name}</h2>
-              {/* Description */}
-              <p className="text-gray-600 text-sm mb-2 line-clamp-2 flex-1">{facility.description}</p>
-              {/* Type Badge */}
-              <div className="flex gap-2 mb-2">
-                <span className="text-xs px-2 py-1 rounded-full bg-[#F3F4F6] text-gray-800 font-semibold flex-shrink-0"><FiTag className="inline text-gray-400 mr-1"/>{facility.type}</span>
-              </div>
-              {/* Meta Info Row */}
-              <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500 mt-auto pt-2 border-t border-gray-100">
-                <span className="flex items-center gap-1 flex-shrink-0"><FiMapPin className="mr-1"/> <span className="truncate">{facility.location}</span></span>
-                {/* Optionally add date and user if available */}
-                {facility.createdAt && (
-                  <span className="flex items-center gap-1 flex-shrink-0">
-                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                    {new Date(facility.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
-                  </span>
-                )}
-                {facility.createdBy && (
-                  <span className="flex items-center gap-1 flex-shrink-0">
-                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                    <span className="truncate">{facility.createdBy.name || facility.createdBy.email || 'User'}</span>
-                  </span>
-                )}
-              </div>
-               {user?.email === 'gauravkhandelwal205@gmail.com' && (
-                <div className="flex gap-2 pt-3">
-                  <button
-                    onClick={(e) => { e.stopPropagation(); setEditingFacility(facility); setIsEditModalOpen(true); }}
-                    className="flex-1 px-3 py-2 rounded-full text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors duration-200 flex items-center justify-center"
-                  >
-                    <FiEdit2 className="mr-1" /> Edit
-                  </button>
-                </div>
-               )}
             </div>
           ))}
           {filteredFacilities.length === 0 && (

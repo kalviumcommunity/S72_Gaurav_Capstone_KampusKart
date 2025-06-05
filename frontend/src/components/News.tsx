@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Navbar from './Navbar';
-import { FiPlus, FiCalendar, FiFileText, FiSearch, FiAlertCircle, FiInfo, FiTag } from 'react-icons/fi';
+import { FiPlus, FiCalendar, FiFileText, FiSearch, FiAlertCircle, FiInfo, FiTag, FiEdit2, FiTrash2 } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 import { API_BASE } from '../config';
 
@@ -216,31 +216,39 @@ const News = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredNews.map(item => (
-            <div key={item._id} className="bg-white rounded-lg shadow p-6 flex flex-col gap-2 border cursor-pointer hover:shadow-lg transition-shadow duration-200">
-              {/* Image Section */}
-              {item.images && item.images.length > 0 ? (
-                <div className="relative h-64 overflow-hidden mb-3 rounded-md">
-                  <img
-                    src={item.images[0].url}
-                    alt={item.title}
-                    className="object-cover w-full h-full cursor-pointer"
-                    onClick={() => setZoomedImage(item.images[0].url)}
-                  />
-                </div>
-              ) : (
-                <div className="relative h-64 overflow-hidden mb-3 rounded-md flex items-center justify-center bg-gray-100">
-                  <span className="text-5xl text-gray-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-16 h-16">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-3A2.25 2.25 0 008.25 5.25V9m7.5 0v10.5A2.25 2.25 0 0113.5 21h-3a2.25 2.25 0 01-2.25-2.25V9m7.5 0H6.75m8.25 0H18m-12 0h2.25" />
-                    </svg>
+            <div key={item._id} className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 overflow-hidden group">
+              {/* Image Section with Overlay */}
+              <div className="relative h-64 overflow-hidden">
+                {item.images && item.images.length > 0 ? (
+                  <>
+                    <img
+                      src={item.images[0].url}
+                      alt={item.title}
+                      className="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-300"
+                      onClick={() => setZoomedImage(item.images[0].url)}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </>
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gray-50">
+                    <span className="text-5xl text-gray-300">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-16 h-16">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-3A2.25 2.25 0 008.25 5.25V9m7.5 0v10.5A2.25 2.25 0 0113.5 21h-3a2.25 2.25 0 01-2.25-2.25V9m7.5 0H6.75m8.25 0H18m-12 0h2.25" />
+                      </svg>
+                    </span>
+                  </div>
+                )}
+                {/* Category Badge */}
+                <div className="absolute top-4 left-4">
+                  <span className="text-xs px-3 py-1.5 rounded-full font-medium shadow-sm bg-white/90 backdrop-blur-sm text-gray-800 flex items-center gap-1">
+                    <FiTag className="w-3 h-3" />
+                    {item.category}
                   </span>
                 </div>
-              )}
-              <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
-                <h2 className="text-lg font-bold text-black truncate flex-1 min-w-0">{item.title}</h2>
-                <div className="flex items-center flex-shrink-0 text-sm text-gray-600">
-                  <FiCalendar className="text-[#00C6A7] mr-1" />
-                  <span className="font-semibold text-black text-sm">
+                {/* Date Badge */}
+                <div className="absolute top-4 right-4">
+                  <span className="text-xs px-3 py-1.5 rounded-full font-medium shadow-sm bg-white/90 backdrop-blur-sm text-gray-800 flex items-center gap-1">
+                    <FiCalendar className="w-3 h-3" />
                     {new Date(item.date).toLocaleDateString('en-US', {
                       year: 'numeric',
                       month: 'long',
@@ -249,17 +257,32 @@ const News = () => {
                   </span>
                 </div>
               </div>
-              <p className="text-gray-600 text-sm line-clamp-3 flex-1">{item.description}</p>
-              <div className="flex items-start gap-2 mt-2 text-sm text-gray-500 flex-wrap">
-                 <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-800 font-semibold flex-shrink-0 whitespace-nowrap"><FiTag className="inline text-gray-400 mr-1"/>{item.category}</span>
-              </div>
 
-              {user?.email === "gauravkhandelwal205@gmail.com" && (
-                <div className="flex gap-2 pt-3">
-                  <button onClick={() => handleEditNews(item)} className="flex-1 px-3 py-2 rounded-full text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors duration-200">Edit</button>
-                  <button onClick={() => handleDeleteNews(item._id)} className="flex-1 px-3 py-2 rounded-full text-sm font-semibold text-white bg-[#F05A25] hover:bg-red-600 transition-colors duration-200">Delete</button>
-                </div>
-              )}
+              {/* Content Section */}
+              <div className="p-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">{item.title}</h2>
+                <p className="text-gray-600 text-sm mb-4 line-clamp-3">{item.description}</p>
+
+                {/* Action Buttons */}
+                {user?.email === "gauravkhandelwal205@gmail.com" && (
+                  <div className="flex gap-2 pt-4 border-t border-gray-100">
+                    <button
+                      onClick={() => handleEditNews(item)}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors duration-200"
+                    >
+                      <FiEdit2 className="w-4 h-4" />
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeleteNews(item._id)}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors duration-200"
+                    >
+                      <FiTrash2 className="w-4 h-4" />
+                      Delete
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           ))}
           {filteredNews.length === 0 && (

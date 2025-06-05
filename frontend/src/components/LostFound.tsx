@@ -344,74 +344,113 @@ const LostFound = () => {
             <div
               key={item._id}
               ref={idx === items.length - 1 ? lastItemRef : undefined}
-              className="bg-white rounded-lg shadow p-6 flex flex-col gap-2 border cursor-pointer hover:shadow-lg transition-shadow duration-200"
+              className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 overflow-hidden group"
               onClick={() => setSelectedItemForDetails(item)}
             >
-              {/* Image Section */}
-              {item.images && item.images.length > 0 ? (
-                <div className="relative h-64 overflow-hidden mb-2 rounded-md">
-                  <img
-                    src={item.images[0].url}
-                    alt={item.title}
-                    className="object-cover w-full h-full"
-                  />
-                </div>
-              ) : (
-                <div className="relative h-64 overflow-hidden mb-2 rounded-md flex items-center justify-center bg-gray-100">
-                  <span className="text-5xl text-gray-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-16 h-16">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-3A2.25 2.25 0 008.25 5.25V9m7.5 0v10.5A2.25 2.25 0 0113.5 21h-3a2.25 2.25 0 01-2.25-2.25V9m7.5 0H6.75m8.25 0H18m-12 0h2.25" />
-                    </svg>
+              {/* Image Section with Overlay */}
+              <div className="relative h-64 overflow-hidden">
+                {item.images && item.images.length > 0 ? (
+                  <>
+                    <img
+                      src={item.images[0].url}
+                      alt={item.title}
+                      className="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </>
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gray-50">
+                    <span className="text-5xl text-gray-300">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-16 h-16">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-3A2.25 2.25 0 008.25 5.25V9m7.5 0v10.5A2.25 2.25 0 0113.5 21h-3a2.25 2.25 0 01-2.25-2.25V9m7.5 0H6.75m8.25 0H18m-12 0h2.25" />
+                      </svg>
+                    </span>
+                  </div>
+                )}
+                {/* Status Badges - Now positioned over the image */}
+                <div className="absolute top-4 right-4 flex flex-col gap-2">
+                  <span className={`text-xs px-3 py-1.5 rounded-full font-medium shadow-sm ${
+                    item.type === 'lost' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
+                  }`}>
+                    {item.type === 'lost' ? 'Lost Item' : 'Found Item'}
+                  </span>
+                  <span className={`text-xs px-3 py-1.5 rounded-full font-medium shadow-sm ${
+                    item.resolved ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'
+                  }`}>
+                    {item.resolved ? 'Resolved' : 'Unresolved'}
                   </span>
                 </div>
-              )}
-              {/* Status Badges */}
-              <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
-                <h2 className="text-lg font-bold text-black truncate flex-1 min-w-0">{item.title}</h2>
-                <div className="flex-shrink-0">{renderStatus(item.type, item.resolved)}</div>
               </div>
 
-              <p className="text-gray-600 text-sm mb-2 line-clamp-3 flex-1">{item.description}</p>
+              {/* Content Section */}
+              <div className="p-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">{item.title}</h2>
+                <p className="text-gray-600 text-sm mb-4 line-clamp-3">{item.description}</p>
 
-              {/* Meta Info Row - Location, Date, User */}
-              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mt-auto">
-                {item.location && (
-                  <span className="flex items-center flex-shrink-0">
-                    <FiMapPin className="mr-1"/>
-                    <span className="truncate">{item.location}</span>
-                  </span>
-                )}
-                {item.date && (
-                  <span className="flex items-center flex-shrink-0">
-                    <FiCalendar className="mr-1"/>
-                    <span>{new Date(item.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
-                  </span>
-                )}
-                {item.user?.name && (
-                  <span className="flex items-center flex-shrink-0">
-                    <FiUser className="mr-1"/>
-                    <span className="truncate">{item.user.name}</span>
-                  </span>
+                {/* Meta Info Row - Location, Date, User */}
+                <div className="space-y-3 pt-4 border-t border-gray-100">
+                  {item.location && (
+                    <div className="flex items-center text-sm text-gray-500">
+                      <FiMapPin className="mr-2 flex-shrink-0" />
+                      <span className="truncate">{item.location}</span>
+                    </div>
+                  )}
+                  {item.date && (
+                    <div className="flex items-center text-sm text-gray-500">
+                      <FiCalendar className="mr-2 flex-shrink-0" />
+                      <span>{new Date(item.date).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                      })}</span>
+                    </div>
+                  )}
+                  {item.user?.name && (
+                    <div className="flex items-center text-sm text-gray-500">
+                      <FiUser className="mr-2 flex-shrink-0" />
+                      <span className="truncate">Posted by {item.user.name}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Action Buttons */}
+                {token && (user?.email === item.user?.email || user?.email === 'gauravkhandelwal205@gmail.com') && (
+                  <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
+                    {!item.resolved && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleMarkResolved(item._id);
+                        }}
+                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors duration-200"
+                      >
+                        <FiCheckCircle className="w-4 h-4" />
+                        Mark Resolved
+                      </button>
+                    )}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openEditItemModal(item);
+                      }}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors duration-200"
+                    >
+                      <FiEdit2 className="w-4 h-4" />
+                      Edit
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteItem(item._id);
+                      }}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors duration-200"
+                    >
+                      <FiTrash2 className="w-4 h-4" />
+                      Delete
+                    </button>
+                  </div>
                 )}
               </div>
-
-              {/* Action Buttons */}
-              {user && item.user && item.user._id === user._id && !item.resolved && (
-                <div className="flex gap-2 pt-3">
-                  <button
-                    onClick={(e) => { e.stopPropagation(); openEditItemModal(item); }}
-                    className="flex-1 px-3 py-2 rounded-full text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors duration-200 flex items-center justify-center"
-                  >
-                    <FiEdit2 className="mr-1"/> Edit
-                  </button>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); handleDeleteItem(item._id); }}
-                    className="flex-1 px-3 py-2 rounded-full text-sm font-semibold text-white bg-[#F05A25] hover:bg-red-600 transition-colors duration-200 flex items-center justify-center"
-                  >
-                    <FiTrash2 className="mr-1"/> Delete
-                  </button>
-                </div>
-              )}
             </div>
           ))}
         </div>
@@ -734,7 +773,7 @@ const LostFound = () => {
       {/* Item Details Modal */}
       {selectedItemForDetails && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-8 max-w-3xl w-full mx-auto max-h-[90vh] overflow-y-auto relative">
+          <div className="bg-white rounded-xl shadow-xl p-8 max-w-3xl w-full mx-auto max-h-[90vh] overflow-y-auto relative">
             {/* Close Button */}
             <button
               onClick={() => setSelectedItemForDetails(null)}
@@ -765,32 +804,38 @@ const LostFound = () => {
             )}
 
             {/* Details Section */}
-            <div className="space-y-4 text-gray-700">
-              <div className="flex flex-wrap items-center gap-4 mb-2">
+            <div className="space-y-6 text-gray-700">
+              {/* Status Badges */}
+              <div className="flex flex-wrap items-center gap-3 mb-2">
                 {renderStatus(selectedItemForDetails.type, selectedItemForDetails.resolved)}
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500 mb-1">Description</p>
-                <p>{selectedItemForDetails.description}</p>
+                <h4 className="text-lg font-semibold text-gray-900 mb-2">Description</h4>
+                <p className="text-gray-700 whitespace-pre-wrap">{selectedItemForDetails.description}</p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Meta Info - Location, Date, Posted By */}
+              <div className="space-y-3 pt-4 border-t border-gray-100">
                 {selectedItemForDetails.location && (
                   <div>
-                    <p className="text-sm font-medium text-gray-500 mb-1">Location</p>
-                    <div className="flex items-center">
+                    <div className="flex items-center text-sm text-gray-500">
                       <FiMapPin className="w-5 h-5 mr-2 text-gray-500"/>
                       <span>{selectedItemForDetails.location}</span>
                     </div>
                   </div>
                 )}
                 <div>
-                  <p className="text-sm font-medium text-gray-500 mb-1">Date</p>
-                  <div className="flex items-center">
+                  <div className="flex items-center text-sm text-gray-500">
                     <FiCalendar className="w-5 h-5 mr-2 text-gray-500"/>
                     <span>{new Date(selectedItemForDetails.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                   </div>
                 </div>
+                {selectedItemForDetails.user?.name && selectedItemForDetails.createdAt && (
+                  <div className="flex items-center text-sm text-gray-500">
+                    <FiUser className="w-5 h-5 mr-2 text-gray-500" />
+                    <span className="truncate">Posted by {selectedItemForDetails.user.name} on {new Date(selectedItemForDetails.createdAt).toLocaleString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' })}</span>
+                  </div>
+                )}
               </div>
 
               <div>
@@ -802,23 +847,6 @@ const LostFound = () => {
                   ) : (
                     <a href={`tel:${selectedItemForDetails.contact}`} className="text-[#00C6A7] hover:underline">{selectedItemForDetails.contact}</a>
                   ))}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm font-medium text-gray-500 mb-1">Posted By</p>
-                  <div className="flex items-center">
-                    <FiUser className="w-5 h-5 mr-2 text-gray-500"/>
-                    <span>{selectedItemForDetails.user.name}</span>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500 mb-1">Posted At</p>
-                  <div className="flex items-center">
-                    <FiClock className="w-5 h-5 mr-2 text-gray-500"/>
-                    <span>{getTimeAgo(new Date(selectedItemForDetails.createdAt))}</span>
-                  </div>
                 </div>
               </div>
             </div>
@@ -861,6 +889,68 @@ const LostFound = () => {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Zoomed Image Modal */}
+      {zoomedImage && selectedItemForDetails && selectedItemForDetails.images && selectedItemForDetails.images.length > 0 && (
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4" onClick={() => setZoomedImage(null)}>
+          {/* Image */}
+          <img 
+            src={zoomedImage} 
+            alt="Zoomed"
+            className="max-h-[90vh] max-w-full lg:max-w-[80vw] rounded-lg shadow-2xl object-contain"
+            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking the image
+          />
+          
+          {/* Navigation Buttons */}
+          {selectedItemForDetails.images.length > 1 && (
+            <>
+              {/* Previous Button */}
+              <button
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/30 backdrop-blur-sm rounded-full p-3 text-white hover:bg-white/50 transition-colors duration-200 z-50"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const currentIndex = selectedItemForDetails.images.findIndex(img => img.url === zoomedImage);
+                  const prevIndex = (currentIndex - 1 + selectedItemForDetails.images.length) % selectedItemForDetails.images.length;
+                  setZoomedImage(selectedItemForDetails.images[prevIndex].url);
+                }}
+                aria-label="Previous image"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                </svg>
+              </button>
+              {/* Next Button */}
+              <button
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/30 backdrop-blur-sm rounded-full p-3 text-white hover:bg-white/50 transition-colors duration-200 z-50"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const currentIndex = selectedItemForDetails.images.findIndex(img => img.url === zoomedImage);
+                  const nextIndex = (currentIndex + 1) % selectedItemForDetails.images.length;
+                  setZoomedImage(selectedItemForDetails.images[nextIndex].url);
+                }}
+                aria-label="Next image"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                </svg>
+              </button>
+            </>
+          )}
+
+          {/* Close Button */}
+           <button
+            onClick={() => setZoomedImage(null)}
+            aria-label="Close zoomed image"
+            className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm rounded-full p-2 text-white hover:bg-white/50 transition-colors duration-200 z-50"
+          >
+            <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+
         </div>
       )}
     </div>
