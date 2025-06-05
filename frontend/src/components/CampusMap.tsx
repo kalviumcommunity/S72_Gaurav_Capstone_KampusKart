@@ -569,13 +569,13 @@ const CampusMap: React.FC<CampusMapProps> = () => {
           <div className={`bg-white shadow-lg p-3 md:p-4 md:flex-grow transition-all duration-300 ease-in-out ${isPanelOpen ? 'opacity-100' : 'opacity-0 md:opacity-100'} ${isPanelOpen ? 'pt-8 md:pt-4' : 'pt-0'} ${isPanelOpen ? 'overflow-y-auto' : 'overflow-hidden'}`}>
             <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-3 md:mb-4">Campus Locations</h2>
             {/* Search Bar - Desktop Only */}
-            <form className="hidden md:block relative mb-6 w-full flex rounded-full border border-gray-300 overflow-hidden shadow-sm focus-within:ring-1 focus-within:ring-black focus-within:border-black transition-all duration-300" onSubmit={e => { e.preventDefault(); setSearchQuery(searchInput); }}>
+            <form className="hidden md:flex relative mb-6 w-full border border-gray-300 overflow-hidden shadow-sm focus-within:ring-1 focus-within:ring-black focus-within:border-black transition-all duration-300 rounded-full" onSubmit={e => { e.preventDefault(); setSearchQuery(searchInput); }}>
               <div className="relative flex items-center flex-1">
                 <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input
                   type="text"
                   placeholder="Search locations..."
-                  className="block w-full pl-10 pr-4 py-2 bg-white text-black outline-none text-lg border-none"
+                  className="block w-full pl-10 pr-4 py-2 bg-white text-black outline-none text-lg border-none rounded-l-full"
                   value={searchInput}
                   onChange={handleSearchInputChange}
                   onFocus={handleSearchFocus}
