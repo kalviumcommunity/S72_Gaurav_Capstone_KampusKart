@@ -54,6 +54,7 @@ const CampusMap: React.FC<CampusMapProps> = () => {
   const [hasRequestedLocation, setHasRequestedLocation] = useState(false);
   const animationInProgress = useRef(false);
   const [isPanelOpen, setIsPanelOpen] = useState(window.innerWidth >= 768); // Panel open by default on desktop
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   // Use the memoized hook
   const { isLoaded, loadError } = useGoogleMaps();
@@ -258,7 +259,25 @@ const CampusMap: React.FC<CampusMapProps> = () => {
   const handleSearchInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchInput(e.target.value);
     debouncedSetSearchQuery(e.target.value);
+    setIsPanelOpen(true); // Open panel when typing
   }, [debouncedSetSearchQuery]);
+
+  // Handle search focus
+  const handleSearchFocus = useCallback(() => {
+    setIsSearchFocused(true);
+    setIsPanelOpen(true);
+  }, []);
+
+  // Handle search blur
+  const handleSearchBlur = useCallback(() => {
+    setIsSearchFocused(false);
+    // Don't close panel immediately to allow clicking on results
+    setTimeout(() => {
+      if (!isSearchFocused) {
+        setIsPanelOpen(false);
+      }
+    }, 200);
+  }, [isSearchFocused]);
 
   // Optimize search button click handler
   const handleSearchClick = useCallback(() => {
@@ -366,15 +385,40 @@ const CampusMap: React.FC<CampusMapProps> = () => {
   }
 
   return (
-    <div className="w-full h-full flex flex-col bg-gray-100 relative">
+    <div className="w-full h-full flex flex-col bg-gray-100 relative overflow-hidden">
       <div className="p-4">
          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Campus Map</h1>
       </div>
       <div className="flex flex-col md:flex-row flex-grow h-0">
         {/* Map Container - Full width on mobile, 2/3 on desktop */}
-        {/* Adjust height dynamically based on panel state on mobile */}
-        <div className={`w-full md:w-2/3 ${isPanelOpen ? 'h-[60vh]' : 'h-[100vh]'} md:h-full relative`}>
+        <div className={`w-full md:w-2/3 ${isPanelOpen ? 'h-[60vh] md:h-full' : 'h-[100vh] md:h-full'} relative transition-all duration-300 ease-in-out`}>
           <div className="bg-white shadow-lg overflow-hidden h-full relative">
+            {/* Search Bar - Always visible on mobile */}
+            <div className="md:hidden absolute top-4 left-4 right-4 z-10">
+              <form className="relative w-full flex rounded-full border border-gray-300 overflow-hidden shadow-sm focus-within:ring-1 focus-within:ring-black focus-within:border-black transition-all duration-300" onSubmit={e => { e.preventDefault(); setSearchQuery(searchInput); }}>
+                <div className="relative flex items-center flex-1">
+                  <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search locations..."
+                    className="block w-full pl-10 pr-4 py-2 bg-white text-black outline-none text-lg border-none"
+                    value={searchInput}
+                    onChange={handleSearchInputChange}
+                    onFocus={handleSearchFocus}
+                    onBlur={handleSearchBlur}
+                    aria-label="Search locations"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  aria-label="Search"
+                  className="px-6 py-2 bg-[#00C6A7] text-white font-semibold hover:bg-[#009e87] transition-all duration-300 ease-in-out rounded-r-full transform hover:scale-105"
+                >
+                  Search
+                </button>
+              </form>
+            </div>
+
             <GoogleMap
               mapContainerStyle={MAP_CONTAINER_STYLE}
               center={animationInProgress.current ? undefined : mapCenter}
@@ -397,6 +441,7 @@ const CampusMap: React.FC<CampusMapProps> = () => {
                   position={{ lat: location.lat, lng: location.lng }}
                   title={location.name}
                   onClick={() => handleMarkerClick(location)}
+                  animation={google.maps.Animation.DROP}
                 />
               ))}
               {/* Marker for user location */}
@@ -405,6 +450,7 @@ const CampusMap: React.FC<CampusMapProps> = () => {
                   position={userLocation}
                   icon={'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'}
                   title="Your Location"
+                  animation={google.maps.Animation.BOUNCE}
                 />
               )}
               {/* InfoWindow for location details */}
@@ -417,7 +463,8 @@ const CampusMap: React.FC<CampusMapProps> = () => {
                   }}
                   options={{
                     pixelOffset: new window.google.maps.Size(0, -30),
-                    maxWidth: 380
+                    maxWidth: 380,
+                    disableAutoPan: false
                   }}
                 >
                   <div className="p-3 max-w-sm bg-white rounded-lg shadow-lg">
@@ -482,7 +529,7 @@ const CampusMap: React.FC<CampusMapProps> = () => {
             {/* Recenter Button - Adjusted for mobile */}
             <button
               onClick={handleRecenter}
-              className="absolute bottom-4 md:bottom-6 left-4 md:left-6 z-10 bg-white border border-gray-300 shadow-lg rounded-full p-2 md:p-3 flex items-center justify-center hover:bg-blue-100 transition"
+              className="absolute bottom-4 md:bottom-6 left-4 md:left-6 z-10 bg-white border border-gray-300 shadow-lg rounded-full p-2 md:p-3 flex items-center justify-center hover:bg-blue-100 transition-all duration-300 ease-in-out transform hover:scale-110"
               title="Re-center map on your location"
               style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.10)' }}
             >
@@ -498,24 +545,20 @@ const CampusMap: React.FC<CampusMapProps> = () => {
           </div>
         </div>
 
-        {/* Locations List Panel Container - Full width on mobile, 1/3 on desktop */}
-        {/* Added relative positioning for button attachment */}
-        {/* Added transition for smooth opening/closing */}
-        <div className={`w-full md:w-1/3 flex flex-col md:h-full relative transition-height duration-300 ease-in-out ${isPanelOpen ? 'h-[40vh]' : 'h-auto'}`}>
-          {/* Toggle Panel Button - Mobile Only, positioned at the top center */}
+        {/* Locations List Panel Container */}
+        <div className={`w-full md:w-1/3 flex flex-col md:h-full relative transition-all duration-300 ease-in-out ${isPanelOpen ? 'h-[40vh] md:h-full' : 'h-0 md:h-full'}`}>
+          {/* Toggle Panel Button - Mobile Only */}
           <button
             onClick={togglePanel}
-            className="md:hidden absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 bg-white border border-gray-300 shadow-lg rounded-full p-3 flex items-center justify-center hover:bg-blue-100 transition"
+            className="md:hidden absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 bg-white border border-gray-300 shadow-lg rounded-full p-3 flex items-center justify-center hover:bg-blue-100 transition-all duration-300 ease-in-out transform hover:scale-110"
             title={isPanelOpen ? 'Hide Locations' : 'Show Locations'}
             style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.10)' }}
           >
             {isPanelOpen ? (
-              // Icon for Hide (e.g., Chevron Down or X)
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
             ) : (
-              // Icon for Show (e.g., Chevron Up or List)
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-700 rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
@@ -523,11 +566,10 @@ const CampusMap: React.FC<CampusMapProps> = () => {
           </button>
 
           {/* Inner container with padding, shadow, and overflow for list */}
-          {/* Added pt-4 to prevent button overlap */}
-          <div className="bg-white shadow-lg p-3 md:p-4 md:flex-grow md:overflow-y-auto pt-8">
+          <div className={`bg-white shadow-lg p-3 md:p-4 md:flex-grow transition-all duration-300 ease-in-out ${isPanelOpen ? 'opacity-100' : 'opacity-0 md:opacity-100'} ${isPanelOpen ? 'pt-8 md:pt-4' : 'pt-0'} ${isPanelOpen ? 'overflow-y-auto' : 'overflow-hidden'}`}>
             <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-3 md:mb-4">Campus Locations</h2>
-            {/* Search Bar */}
-            <form className="relative mb-6 w-full flex rounded-full border border-gray-300 overflow-hidden shadow-sm focus-within:ring-1 focus-within:ring-black focus-within:border-black" onSubmit={e => { e.preventDefault(); setSearchQuery(searchInput); }}>
+            {/* Search Bar - Desktop Only */}
+            <form className="hidden md:block relative mb-6 w-full flex rounded-full border border-gray-300 overflow-hidden shadow-sm focus-within:ring-1 focus-within:ring-black focus-within:border-black transition-all duration-300" onSubmit={e => { e.preventDefault(); setSearchQuery(searchInput); }}>
               <div className="relative flex items-center flex-1">
                 <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input
@@ -536,27 +578,32 @@ const CampusMap: React.FC<CampusMapProps> = () => {
                   className="block w-full pl-10 pr-4 py-2 bg-white text-black outline-none text-lg border-none"
                   value={searchInput}
                   onChange={handleSearchInputChange}
+                  onFocus={handleSearchFocus}
+                  onBlur={handleSearchBlur}
                   aria-label="Search locations"
                 />
               </div>
               <button
                 type="submit"
                 aria-label="Search"
-                className="px-6 py-2 bg-[#00C6A7] text-white font-semibold hover:bg-[#009e87] transition rounded-r-full"
+                className="px-6 py-2 bg-[#00C6A7] text-white font-semibold hover:bg-[#009e87] transition-all duration-300 ease-in-out rounded-r-full transform hover:scale-105"
               >
                 Search
               </button>
             </form>
-            {/* Locations List - Improved for mobile */}
-            {isPanelOpen && (
+            {/* Locations List */}
+            <div className={`transition-all duration-300 ease-in-out ${isPanelOpen ? 'opacity-100' : 'opacity-0 md:opacity-100'}`}>
               <ul className="space-y-2">
                 {filteredLocations.map((location) => (
                   <li
                     key={location.id}
-                    className={`mb-2 pb-2 border-b border-gray-200 text-gray-800 cursor-pointer hover:bg-gray-100 p-2 rounded ${
+                    className={`mb-2 pb-2 border-b border-gray-200 text-gray-800 cursor-pointer hover:bg-gray-100 p-2 rounded transition-all duration-300 ease-in-out transform hover:scale-105 ${
                       selectedLocation?.id === location.id ? 'bg-blue-100' : ''
                     }`}
-                    onClick={() => handleLocationClick(location)}
+                    onClick={() => {
+                      handleLocationClick(location);
+                      setIsPanelOpen(false); // Close panel after selection on mobile
+                    }}
                   >
                     <div className="flex flex-wrap items-start gap-2">
                       <div className="flex-1 min-w-0">
@@ -570,7 +617,7 @@ const CampusMap: React.FC<CampusMapProps> = () => {
                   </li>
                 ))}
               </ul>
-            )}
+            </div>
           </div>
         </div>
       </div>
