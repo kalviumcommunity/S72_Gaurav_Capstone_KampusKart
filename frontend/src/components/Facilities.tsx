@@ -723,7 +723,7 @@ const Facilities = () => {
         {/* Facility Details Modal */}
         {selectedFacility && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg p-8 max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto relative">
+            <div className="bg-white rounded-xl shadow-xl p-8 max-w-3xl w-full mx-auto max-h-[90vh] overflow-y-auto relative">
               <button
                 onClick={() => setSelectedFacility(null)}
                 aria-label="Close"
@@ -754,16 +754,38 @@ const Facilities = () => {
               )}
               {/* Details Section */}
               <div className="space-y-6 text-gray-700">
-                <div className="flex flex-wrap items-center gap-4 mb-2">
-                  <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-800 font-semibold">{selectedFacility.type}</span>
-                  <span className="flex items-center gap-1 text-sm text-gray-500"><FiMapPin /> {selectedFacility.location}</span>
-                </div>
+                {/* Description */}
                 <div>
-                  <p className="text-sm font-medium text-gray-500 mb-1">Description</p>
-                  <p>{selectedFacility.description}</p>
+                  <h4 className="text-lg font-semibold text-gray-900 mb-2">Description</h4>
+                  <p className="text-gray-700 whitespace-pre-wrap">{selectedFacility.description}</p>
+                </div>
+                {/* Meta Info - Location, Date, Posted By */}
+                <div className="space-y-3 pt-4 border-t border-gray-100">
+                  {selectedFacility.location && (
+                    <div className="flex items-center text-sm text-gray-500">
+                      <FiMapPin className="w-5 h-5 mr-2 flex-shrink-0"/>
+                      <span>{selectedFacility.location}</span>
+                    </div>
+                  )}
+                  {selectedFacility.createdAt && (
+                    <div className="flex items-center text-sm text-gray-500">
+                      <FiCalendar className="w-5 h-5 mr-2 flex-shrink-0"/>
+                      <span>{new Date(selectedFacility.createdAt).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                      })}</span>
+                    </div>
+                  )}
+                  {selectedFacility.createdBy && selectedFacility.createdAt && (
+                    <div className="flex items-center text-sm text-gray-500">
+                      <FiUser className="w-5 h-5 mr-2 text-gray-500" />
+                      <span className="truncate">Posted by {selectedFacility.createdBy.name || selectedFacility.createdBy.email || 'User'} on {new Date(selectedFacility.createdAt).toLocaleString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' })}</span>
+                    </div>
+                  )}
                 </div>
               </div>
-              {/* Admin Controls */}
+              {/* Owner/Admin Actions */}
               {user?.email === 'gauravkhandelwal205@gmail.com' && (
                 <div className="flex gap-2 pt-6">
                   <button
@@ -808,9 +830,64 @@ const Facilities = () => {
           </div>
         )}
         {/* Zoomed Image Modal */}
-        {zoomedImage && (
-          <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50" onClick={() => setZoomedImage(null)}>
-            <img src={zoomedImage} alt="Zoomed" className="max-h-[90vh] max-w-[90vw] rounded-lg shadow-2xl" />
+        {zoomedImage && selectedFacility && selectedFacility.images && selectedFacility.images.length > 0 && (
+          <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4" onClick={() => setZoomedImage(null)}>
+            {/* Image */}
+            <img 
+              src={zoomedImage} 
+              alt="Zoomed"
+              className="max-h-[90vh] max-w-full lg:max-w-[80vw] rounded-lg shadow-2xl object-contain"
+              onClick={(e) => e.stopPropagation()} // Prevent closing when clicking the image
+            />
+            
+            {/* Navigation Buttons */}
+            {selectedFacility.images.length > 1 && (
+              <>
+                {/* Previous Button */}
+                <button
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/30 backdrop-blur-sm rounded-full p-3 text-white hover:bg-white/50 transition-colors duration-200 z-50"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const currentIndex = selectedFacility.images.findIndex(img => img.url === zoomedImage);
+                    const prevIndex = (currentIndex - 1 + selectedFacility.images.length) % selectedFacility.images.length;
+                    setZoomedImage(selectedFacility.images[prevIndex].url);
+                  }}
+                  aria-label="Previous image"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                  </svg>
+                </button>
+                {/* Next Button */}
+                <button
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/30 backdrop-blur-sm rounded-full p-3 text-white hover:bg-white/50 transition-colors duration-200 z-50"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const currentIndex = selectedFacility.images.findIndex(img => img.url === zoomedImage);
+                    const nextIndex = (currentIndex + 1) % selectedFacility.images.length;
+                    setZoomedImage(selectedFacility.images[nextIndex].url);
+                  }}
+                  aria-label="Next image"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                  </svg>
+                </button>
+              </>
+            )}
+
+            {/* Close Button */}
+             <button
+              onClick={() => setZoomedImage(null)}
+              aria-label="Close zoomed image"
+              className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm rounded-full p-2 text-white hover:bg-white/50 transition-colors duration-200 z-50"
+            >
+              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+
           </div>
         )}
       </main>
