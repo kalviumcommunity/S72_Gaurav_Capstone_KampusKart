@@ -63,6 +63,7 @@ const Complaints = () => {
   const [editingComplaint, setEditingComplaint] = useState<Complaint | null>(null);
   const [selectedComplaintForDetails, setSelectedComplaintForDetails] = useState<Complaint | null>(null);
   const [filterStatus, setFilterStatus] = useState<'All' | 'Open' | 'In Progress' | 'Resolved' | 'Closed'>('All');
+  const [filterCategory, setFilterCategory] = useState<'all' | 'Academic' | 'Administrative' | 'Facilities' | 'IT' | 'Security' | 'Other'>('all');
   const [images, setImages] = useState<ModalImage[]>([]);
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
   const dragItem = useRef<number | null>(null);
@@ -415,7 +416,7 @@ const Complaints = () => {
               <select
                 value={filterStatus}
                 onChange={e => setFilterStatus(e.target.value as any)}
-                className="px-4 py-2 rounded bg-gray-100 text-black font-medium"
+                className="px-4 py-2 rounded-md bg-gray-100 text-black font-medium border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
               >
                 <option value="All">All Statuses</option>
                 <option value="Open">Open</option>
@@ -476,12 +477,28 @@ const Complaints = () => {
           </button>
         </div>
         {/* Filter/Search Row */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-          <div className="flex gap-4 w-full md:w-auto">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4 px-4 md:px-0">
+          <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+            {/* Filter by Category */}
+            <select
+              value={filterCategory}
+              onChange={e => setFilterCategory(e.target.value as any)}
+              // Enhanced styling for rounded corners and border
+              className="px-4 py-2 rounded-md bg-gray-100 text-black font-medium border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
+            >
+              <option value="Academic">Academic</option>
+              <option value="Administrative">Administrative</option>
+              <option value="Facilities">Facilities</option>
+              <option value="IT">IT</option>
+              <option value="Security">Security</option>
+              <option value="Other">Other</option>
+            </select>
+            {/* Filter by Status */}
             <select
               value={filterStatus}
-              onChange={e => setFilterStatus(e.target.value as any)}
-              className="px-4 py-2 rounded bg-gray-100 text-black font-medium"
+              onChange={e => setFilterStatus(e.target.value as 'all' | 'Open' | 'InProgress' | 'Resolved' | 'Closed')}
+              // Enhanced styling for rounded corners and border
+              className="px-4 py-2 rounded-md bg-gray-100 text-black font-medium border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
             >
               <option value="All">All Statuses</option>
               <option value="Open">Open</option>
