@@ -275,7 +275,7 @@ const LostFound = () => {
   return (
     <div className="min-h-screen flex flex-col bg-white font-sans">
       <Navbar />
-      <main className="flex-1 container mx-auto px-12 py-8 pt-[100px]">
+      <main className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-[100px]">
         {/* Top Bar: Heading + Add Button */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
           <h1 className="text-h2 font-extrabold text-black">Lost and Found</h1>
@@ -350,7 +350,7 @@ const LostFound = () => {
               onClick={() => setSelectedItemForDetails(item)}
             >
               {/* Image Section with Overlay */}
-              <div className="relative h-80 overflow-hidden">
+              <div className="relative h-60 sm:h-80 overflow-hidden">
                 {item.images && item.images.length > 0 ? (
                   <>
                     <img

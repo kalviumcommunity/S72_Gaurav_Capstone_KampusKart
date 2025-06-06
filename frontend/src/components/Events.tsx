@@ -521,7 +521,7 @@ const Events = () => {
   return (
     <div className="min-h-screen bg-white font-sans">
       <Navbar />
-      <main className="container mx-auto px-12 py-8 pt-[100px]">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-[100px]">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
           <h1 className="text-h2 font-extrabold text-black">Campus Events</h1>
           {user?.email === "gauravkhandelwal205@gmail.com" && (
@@ -584,7 +584,7 @@ const Events = () => {
               onClick={() => openEventDetailsModal(event)}
             >
               {/* Image Section with Overlay */}
-              <div className="relative h-80 overflow-hidden">
+              <div className="relative h-60 sm:h-80 overflow-hidden">
                 {event.image?.url ? (
                   <>
                     <img 
