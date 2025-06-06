@@ -409,9 +409,10 @@ const CampusMap: React.FC<CampusMapProps> = () => {
                 <button
                   type="submit"
                   aria-label="Search"
-                  className="px-6 py-2 bg-[#00C6A7] text-white font-semibold hover:bg-[#009e87] transition-all duration-300 ease-in-out rounded-r-full transform hover:scale-105"
+                  className="px-6 py-2 bg-[#00C6A7] text-white font-semibold hover:bg-[#009e87] transition-all duration-300 ease-in-out rounded-r-full transform hover:scale-105 flex items-center justify-center"
                 >
-                  Search
+                  <FiSearch className="md:hidden" />
+                  <span className="hidden md:inline">Search</span>
                 </button>
               </form>
 
