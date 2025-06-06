@@ -190,9 +190,9 @@ const Navbar: React.FC = () => {
             aria-expanded={isMobileMenuOpen}
           >
             {isMobileMenuOpen ? (
-              <HiX className="h-6 w-6 text-[#ffffff]" />
+              <HiX className="h-6 w-6 text-[#00C6A7]" />
             ) : (
-              <HiMenu className="h-6 w-6 text-[#ffffff]" />
+              <HiMenu className="h-6 w-6 text-[#00C6A7]" />
             )}
           </button>
         </div>

@@ -274,21 +274,21 @@ const Events = () => {
     title: '',
     description: '',
     date: '',
-    location: '',
-    status: 'Upcoming' as const,
+    location: '' as string | undefined,
+    status: 'Upcoming' as Event['status'],
     registerUrl: '',
     image: undefined as File | undefined,
     imagePreview: '',
     operatingHours: '',
     contactInfo: {
-      name: '',
-      email: '',
-      phone: ''
+      name: undefined as string | undefined,
+      email: undefined as string | undefined,
+      phone: undefined as string | undefined,
     },
     mapLocation: {
-      building: '',
-      floor: '',
-      room: '',
+      building: undefined as string | undefined,
+      floor: undefined as string | undefined,
+      room: undefined as string | undefined,
       coordinates: undefined as { lat: number; lng: number } | undefined
     }
   });
@@ -353,12 +353,12 @@ const Events = () => {
       formData.append('title', newEvent.title);
       formData.append('description', newEvent.description);
       formData.append('date', newEvent.date);
-      formData.append('location', newEvent.location);
+      formData.append('location', newEvent.location || '');
       formData.append('status', newEvent.status);
       formData.append('registerUrl', newEvent.registerUrl);
       formData.append('operatingHours', newEvent.operatingHours);
       formData.append('contactInfo', JSON.stringify(newEvent.contactInfo));
-      formData.append('mapLocation', JSON.stringify(newEvent.mapLocation));
+      formData.append('mapLocation', JSON.stringify(newEvent.mapLocation || { building: undefined, floor: undefined, room: undefined, coordinates: undefined }));
       if (newEvent.image) {
         formData.append('image', newEvent.image);
       }
@@ -386,8 +386,8 @@ const Events = () => {
         image: undefined, 
         imagePreview: '',
         operatingHours: '',
-        contactInfo: { name: '', email: '', phone: '' },
-        mapLocation: { building: '', floor: '', room: '', coordinates: undefined }
+        contactInfo: { name: undefined, email: undefined, phone: undefined },
+        mapLocation: { building: undefined, floor: undefined, room: undefined, coordinates: undefined }
       });
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Failed to add event');
@@ -400,14 +400,14 @@ const Events = () => {
       title: event.title,
       description: event.description,
       date: event.date.split('T')[0],
-      location: event.location,
+      location: event.location || '',
       status: event.status,
       registerUrl: event.registerUrl || '',
       image: undefined,
       imagePreview: event.image?.url || '',
       operatingHours: event.operatingHours || '',
-      contactInfo: event.contactInfo || { name: '', email: '', phone: '' },
-      mapLocation: event.mapLocation || { building: '', floor: '', room: '', coordinates: undefined }
+      contactInfo: event.contactInfo || { name: undefined, email: undefined, phone: undefined },
+      mapLocation: event.mapLocation || { building: undefined, floor: undefined, room: undefined, coordinates: undefined }
     });
     setIsModalOpen(true);
   };
@@ -438,12 +438,12 @@ const Events = () => {
       formData.append('title', newEvent.title);
       formData.append('description', newEvent.description);
       formData.append('date', newEvent.date);
-      formData.append('location', newEvent.location);
+      formData.append('location', newEvent.location || '');
       formData.append('status', newEvent.status);
       formData.append('registerUrl', newEvent.registerUrl);
       formData.append('operatingHours', newEvent.operatingHours);
       formData.append('contactInfo', JSON.stringify(newEvent.contactInfo));
-      formData.append('mapLocation', JSON.stringify(newEvent.mapLocation));
+      formData.append('mapLocation', JSON.stringify(newEvent.mapLocation || { building: undefined, floor: undefined, room: undefined, coordinates: undefined }));
       if (newEvent.image) {
         formData.append('image', newEvent.image);
       }
@@ -478,8 +478,8 @@ const Events = () => {
         image: undefined, 
         imagePreview: '',
         operatingHours: '',
-        contactInfo: { name: '', email: '', phone: '' },
-        mapLocation: { building: '', floor: '', room: '', coordinates: undefined }
+        contactInfo: { name: undefined, email: undefined, phone: undefined },
+        mapLocation: { building: undefined, floor: undefined, room: undefined, coordinates: undefined }
       });
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Failed to save event');
@@ -512,7 +512,7 @@ const Events = () => {
       <div className="min-h-screen flex flex-col bg-white font-sans">
         <Navbar />
         <main className="flex-1 container mx-auto px-12 py-8 pt-[100px]">
-          <SkeletonLoader variant="events" />
+          <SkeletonLoader variant="lostfound" />
         </main>
       </div>
     );
@@ -665,7 +665,7 @@ const Events = () => {
                   {editingEvent ? 'Edit Event' : 'Add New Event'}
                 </h2>
                 <button
-                  onClick={() => { setIsModalOpen(false); setEditingEvent(null); setNewEvent({ title: '', description: '', date: '', location: '', status: 'Upcoming', registerUrl: '', image: undefined, imagePreview: '', operatingHours: '', contactInfo: { name: '', email: '', phone: '' }, mapLocation: { building: '', floor: '', room: '', coordinates: undefined } }); }}
+                  onClick={() => { setIsModalOpen(false); setEditingEvent(null); setNewEvent({ title: '', description: '', date: '', location: '', status: 'Upcoming', registerUrl: '', image: undefined, imagePreview: '', operatingHours: '', contactInfo: { name: undefined, email: undefined, phone: undefined }, mapLocation: { building: undefined, floor: undefined, room: undefined, coordinates: undefined } }); }}
                   aria-label="Close"
                   className="w-12 h-12 flex items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-200 text-black absolute top-4 right-4 z-50 transition-all duration-150 focus:outline-none"
                 >
@@ -914,7 +914,7 @@ const Events = () => {
                 <div className="flex justify-end space-x-4 pt-4 border-t border-gray-200">
                   <button
                     type="button"
-                    onClick={() => { setIsModalOpen(false); setEditingEvent(null); setNewEvent({ title: '', description: '', date: '', location: '', status: 'Upcoming', registerUrl: '', image: undefined, imagePreview: '', operatingHours: '', contactInfo: { name: '', email: '', phone: '' }, mapLocation: { building: '', floor: '', room: '', coordinates: undefined } }); }}
+                    onClick={() => { setIsModalOpen(false); setEditingEvent(null); setNewEvent({ title: '', description: '', date: '', location: '', status: 'Upcoming', registerUrl: '', image: undefined, imagePreview: '', operatingHours: '', contactInfo: { name: undefined, email: undefined, phone: undefined }, mapLocation: { building: undefined, floor: undefined, room: undefined, coordinates: undefined } }); }}
                     className="px-4 py-2 rounded-full text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50"
                   >
                     Cancel
