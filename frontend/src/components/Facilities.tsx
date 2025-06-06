@@ -3,41 +3,6 @@ import Navbar from './Navbar';
 import { FiMapPin, FiSearch, FiHome, FiWifi, FiBookOpen, FiCoffee, FiPlus, FiEdit2, FiTag, FiCalendar, FiUser } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 
-const mockFacilities = [
-  {
-    id: '1',
-    name: 'Main Library',
-    description: 'A large collection of academic books, journals, and digital resources.',
-    location: 'Central Block',
-    icon: <FiBookOpen className="text-[#00C6A7] w-8 h-8" />,
-    type: 'Academic',
-  },
-  {
-    id: '2',
-    name: 'Cafeteria',
-    description: 'Serves a variety of meals, snacks, and beverages throughout the day.',
-    location: 'Food Court',
-    icon: <FiCoffee className="text-[#F05A25] w-8 h-8" />,
-    type: 'Food',
-  },
-  {
-    id: '3',
-    name: 'WiFi Zones',
-    description: 'High-speed wireless internet available across campus.',
-    location: 'All Buildings',
-    icon: <FiWifi className="text-blue-500 w-8 h-8" />,
-    type: 'Service',
-  },
-  {
-    id: '4',
-    name: 'Hostel',
-    description: 'On-campus accommodation for students with all amenities.',
-    location: 'North Wing',
-    icon: <FiHome className="text-purple-500 w-8 h-8" />,
-    type: 'Accommodation',
-  },
-];
-
 const Facilities = () => {
   const { token, user } = useAuth();
   const [searchInput, setSearchInput] = useState('');
@@ -51,7 +16,7 @@ const Facilities = () => {
     type: 'Academic',
     icon: 'FiBookOpen',
   });
-  const [facilities, setFacilities] = useState(mockFacilities);
+  const [facilities, setFacilities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [facilityImages, setFacilityImages] = useState<{ file?: File; previewUrl: string }[]>([]);
