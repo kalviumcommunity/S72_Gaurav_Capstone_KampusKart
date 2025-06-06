@@ -562,29 +562,16 @@ const CampusMap: React.FC<CampusMapProps> = () => {
         </div>
 
         {/* Locations List Panel Container - Full width on mobile, 1/3 on desktop */}
-        <div className={`w-full md:w-1/3 flex flex-col md:h-full relative transition-all duration-300 ease-in-out ${isPanelOpen ? 'h-[40vh]' : 'h-0'} md:h-full`}>
+        {/* Added hidden class for mobile, removed mobile toggle button */}
+        <div className={`hidden md:flex w-full md:w-1/3 flex-col md:h-full relative transition-all duration-300 ease-in-out md:opacity-100 md:h-full`}>
           {/* Toggle Panel Button - Mobile Only, positioned at the top center */}
-          <button
-            onClick={togglePanel}
-            className="md:hidden absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 bg-white border border-gray-300 shadow-lg rounded-full p-3 flex items-center justify-center hover:bg-blue-100 transition-all duration-300 ease-in-out transform hover:scale-110"
-            title={isPanelOpen ? 'Hide Locations' : 'Show Locations'}
-            style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.10)' }}
-          >
-            {isPanelOpen ? (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-              </svg>
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-700 rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-              </svg>
-            )}
-          </button>
+          {/* Removed this button as the panel is now hidden on mobile */}
 
           {/* Inner container with padding, shadow, and overflow for list */}
           {/* Added pt-4 to prevent button overlap */}
           {/* Adjusted opacity and height based on panel state */}
-          <div className={`bg-white shadow-lg p-3 md:p-4 md:flex-grow transition-all duration-300 ease-in-out ${isPanelOpen ? 'opacity-100 h-full' : 'opacity-0 h-0'} md:opacity-100 md:h-full ${isPanelOpen ? 'pt-8 md:pt-4' : 'pt-0'} overflow-y-auto`}>
+          {/* Removed mobile specific height/opacity classes */}
+          <div className={`bg-white shadow-lg p-3 md:p-4 md:flex-grow transition-all duration-300 ease-in-out opacity-100 h-full overflow-y-auto`}>
             <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-3 md:mb-4">Campus Locations</h2>
             {/* Desktop Search Bar - Visible on desktop only */}
             <form className="hidden md:flex relative mb-6 w-full border border-gray-300 overflow-hidden shadow-sm focus-within:ring-1 focus-within:ring-black focus-within:border-black transition-all duration-300 rounded-full" onSubmit={e => { e.preventDefault(); setSearchQuery(searchInput); }}>
