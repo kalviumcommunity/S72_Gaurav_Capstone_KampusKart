@@ -124,6 +124,9 @@ const io = new Server(server, {
   maxHttpBufferSize: 1e8, // 100MB
 });
 
+// Make io accessible in routes
+app.set('io', io);
+
 // Keep track of online users
 const onlineUsers = new Map();
 

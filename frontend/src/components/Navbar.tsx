@@ -5,6 +5,12 @@ import { HiMenu, HiX } from "react-icons/hi";
 import { IoIosArrowDropup, IoIosArrowDropdown } from "react-icons/io";
 import { FaComments } from "react-icons/fa";
 import { AuthContextType } from '../contexts/AuthContext';
+import HomeIcon from '@mui/icons-material/Home';
+import MapIcon from '@mui/icons-material/Map';
+import ChatIcon from '@mui/icons-material/Chat';
+import StarIcon from '@mui/icons-material/Star';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 // Refactored NavLinks Component
 interface NavLinksProps {
@@ -31,10 +37,16 @@ const NavLinks: React.FC<NavLinksProps> = ({
   <>
     {user && (
       <>
-        <Link to="/home" className="px-5 py-3 md:py-2 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base w-full md:w-auto text-center">Home</Link>
-        <Link to="/campus-map" className="px-5 py-3 md:py-2 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base w-full md:w-auto text-center">Campus Map</Link>
+        <Link to="/home" className="px-5 py-3 md:py-2 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base w-full md:w-auto text-center">
+          <HomeIcon sx={{ mr: 1 }} />
+          Home
+        </Link>
+        <Link to="/campus-map" className="px-5 py-3 md:py-2 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base w-full md:w-auto text-center">
+          <MapIcon sx={{ mr: 1 }} />
+          Campus Map
+        </Link>
         <Link to="/chat" className="px-5 py-3 md:py-2 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base w-full md:w-auto text-center flex items-center justify-center gap-2">
-          <FaComments className="w-5 h-5" />
+          <ChatIcon sx={{ mr: 1 }} />
           Chat
         </Link>
         {/* Desktop Features Dropdown */}
@@ -62,6 +74,7 @@ const NavLinks: React.FC<NavLinksProps> = ({
                 }
               }}
             >
+              <StarIcon sx={{ mr: 1 }} />
               Features {isFeaturesDropdownOpen ? <IoIosArrowDropup className="ml-1" /> : <IoIosArrowDropdown className="ml-1" />}
             </button>
             <div
@@ -115,11 +128,15 @@ const AuthButtons: React.FC<AuthButtonsProps> = ({ user, location, logout }) => 
     )}
     {user && (
       <>
-        <Link to="/profile" className="px-5 py-3 md:py-2 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base w-full md:w-auto text-center">Profile</Link>
+        <Link to="/profile" className="px-5 py-3 md:py-2 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base w-full md:w-auto text-center">
+          <AccountCircleIcon sx={{ mr: 1 }} />
+          Profile
+        </Link>
         <button
           onClick={logout}
           className="px-5 py-3 md:py-2 rounded-full font-bold text-white bg-[#181818] hover:bg-[#00C6A7] hover:text-white transition-colors duration-200 text-base w-full md:w-auto"
         >
+          <LogoutIcon sx={{ mr: 1 }} />
           Logout
         </button>
       </>
@@ -220,6 +237,7 @@ const Navbar: React.FC = () => {
                   className="px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-base w-full text-center transform hover:scale-105"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
+                  <HomeIcon sx={{ mr: 1 }} />
                   Home
                 </Link>
                 <Link 
@@ -227,6 +245,7 @@ const Navbar: React.FC = () => {
                   className="px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-base w-full text-center transform hover:scale-105"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
+                  <MapIcon sx={{ mr: 1 }} />
                   Campus Map
                 </Link>
                 {/* Mobile Features Dropdown (simplified) */}
@@ -239,6 +258,7 @@ const Navbar: React.FC = () => {
                     aria-haspopup="true"
                     tabIndex={0}
                   >
+                    <StarIcon sx={{ mr: 1 }} />
                     Features {isFeaturesDropdownOpen ? <IoIosArrowDropup className="ml-1" /> : <IoIosArrowDropdown className="ml-1" />}
                   </button>
                   <div

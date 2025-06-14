@@ -4,6 +4,7 @@ const Chat = require('../models/Chat');
 const auth = require('../middleware/auth');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
+const streamifier = require('streamifier');
 
 // Configure Cloudinary
 cloudinary.config({
@@ -20,6 +21,23 @@ const upload = multer({
     fileSize: 5 * 1024 * 1024 // 5MB limit
   }
 });
+
+// Helper function to upload a file buffer to Cloudinary
+const uploadToCloudinary = (file) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        resource_type: 'auto',
+        folder: 'chat_attachments'
+      },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result);
+      }
+    );
+    streamifier.createReadStream(file.buffer).pipe(uploadStream);
+  });
+};
 
 // Get recent chat messages with pagination
 router.get('/messages', auth, async (req, res) => {
@@ -79,11 +97,7 @@ router.post('/messages', auth, upload.array('attachments', 5), async (req, res) 
     // Handle file uploads
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
-        const result = await cloudinary.uploader.upload_stream({
-          resource_type: 'auto',
-          folder: 'chat_attachments'
-        }).end(file.buffer);
-
+        const result = await uploadToCloudinary(file);
         attachments.push({
           type: file.mimetype.startsWith('image/') ? 'image' : 'file',
           url: result.secure_url,
@@ -107,7 +121,13 @@ router.post('/messages', auth, upload.array('attachments', 5), async (req, res) 
       .populate('sender', 'name profilePicture')
       .populate('replyTo')
       .lean();
-    
+
+    // Emit to all clients in real time
+    const io = req.app.get('io');
+    if (io) {
+      io.to('global-chat').emit('new-message', populatedMessage);
+    }
+
     res.status(201).json(populatedMessage);
   } catch (error) {
     res.status(500).json({ message: 'Error sending message', error: error.message });
