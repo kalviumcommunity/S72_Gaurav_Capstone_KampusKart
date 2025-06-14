@@ -9,7 +9,6 @@ const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const lostfoundRoutes = require('./routes/lostfound');
 const profileRoutes = require('./routes/profile');
-const chatRoutes = require('./routes/chat');
 const complaintsRoutes = require('./routes/complaints');
 const startDeletionCronJob = require('./cron/deleteItems');
 const http = require('http');
@@ -17,7 +16,8 @@ const { Server } = require('socket.io');
 const newsRoutes = require('./routes/news');
 const eventsRoutes = require('./routes/events');
 const facilitiesRoutes = require('./routes/facilities');
-const Message = require('./models/Message'); // Import Message model
+const chatRoutes = require('./routes/chat');
+const Chat = require('./models/Chat');
 
 const app = express();
 
@@ -43,7 +43,7 @@ app.use(cors({
     return callback(null, true);
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
 }));
 app.use(express.json());
@@ -54,12 +54,12 @@ app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/lostfound', lostfoundRoutes);
 app.use('/api/profile', profileRoutes);
-app.use('/api/chat', chatRoutes);
 app.use('/api/complaints', complaintsRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/events', eventsRoutes);
 app.use('/api/lost-found', lostfoundRoutes);
 app.use('/api/facilities', facilitiesRoutes);
+app.use('/api/chat', chatRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -117,131 +117,75 @@ const io = new Server(server, {
       return callback(null, true);
     },
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
   },
   transports: ['websocket', 'polling'],
   maxHttpBufferSize: 1e8, // 100MB
 });
 
-// Keep track of online users: userId -> socketId
-let onlineUsers = {};
-
-// Keep track of user's active conversations
-let userConversations = {};
+// Keep track of online users
+const onlineUsers = new Map();
 
 io.on('connection', (socket) => {
-  console.log('Connected to socket.io');
+  console.log('New client connected');
 
-  // Setup user and add to online users list
-  socket.on('setup', (userData) => {
-    socket.join(userData._id);
-    onlineUsers[userData._id] = socket.id;
-    socket.emit('connected');
-    console.log(`User ${userData.name} (${userData._id}) connected. Online users: ${Object.keys(onlineUsers).length}`);
-
-    // Emit online users list to the user who just connected
-    socket.emit('online users', Object.keys(onlineUsers));
-
-    // Broadcast the new user's online status to others
-    socket.broadcast.emit('user online', userData._id);
+  // User joins the chat
+  socket.on('join', async (userData) => {
+    onlineUsers.set(socket.id, userData);
+    socket.join('global-chat');
+    
+    // Send online users list to all clients
+    io.emit('online-users', Array.from(onlineUsers.values()));
+    
+    // Send last 50 messages to the new user
+    const messages = await Chat.find({ isDeleted: false })
+      .sort({ timestamp: -1 })
+      .limit(50)
+      .populate('sender', 'name profilePicture')
+      .lean();
+    
+    socket.emit('previous-messages', messages.reverse());
   });
 
-  // Join a chat room (conversation)
-  socket.on('join chat', (room) => {
-    socket.join(room);
-    const userId = Object.keys(onlineUsers).find(key => onlineUsers[key] === socket.id);
-    if (userId) {
-      if (!userConversations[userId]) {
-        userConversations[userId] = new Set();
-      }
-      userConversations[userId].add(room);
-    }
-    console.log('User Joined Room: ' + room);
-  });
-
-  // Send new message
-  socket.on('new message', (newMessageReceived) => {
-    const chat = newMessageReceived.conversation;
-    if (!chat.participants) return console.log('Chat participants not defined');
-
-    // Emit to all participants in the chat
-    chat.participants.forEach((user) => {
-      if (user._id === newMessageReceived.sender._id) return;
-
-      // Check if the recipient is online
-      const recipientSocketId = onlineUsers[user._id];
-      if (recipientSocketId) {
-        // If online, emit with 'delivered' status
-        io.to(recipientSocketId).emit('message received', {
-          ...newMessageReceived,
-          status: 'delivered'
-        });
-      } else {
-        // If offline, emit with 'sent' status
-        io.to(user._id).emit('message received', {
-          ...newMessageReceived,
-          status: 'sent'
-        });
-      }
-    });
-  });
-
-  // Handle message delivered
-  socket.on('message delivered', async ({ messageId, userId }) => {
+  // Handle new messages
+  socket.on('send-message', async (messageData) => {
     try {
-      await Message.findByIdAndUpdate(messageId, { status: 'delivered' });
-      // Optionally, emit to sender/recipient as you already do
-    } catch (err) {
-      console.error('Failed to update message status to delivered:', err);
+      const chatMessage = new Chat({
+        sender: messageData.senderId,
+        message: messageData.message
+      });
+      
+      await chatMessage.save();
+      
+      const populatedMessage = await Chat.findById(chatMessage._id)
+        .populate('sender', 'name profilePicture')
+        .lean();
+      
+      io.to('global-chat').emit('new-message', populatedMessage);
+    } catch (error) {
+      console.error('Error saving message:', error);
+      socket.emit('error', 'Failed to send message');
     }
   });
 
-  // Message read status
-  socket.on('message read', async (data) => {
-    const { conversationId, messageId, senderId } = data;
-    const userId = Object.keys(onlineUsers).find(key => onlineUsers[key] === socket.id);
-
-    if (userId) {
-      try {
-        await Message.findByIdAndUpdate(messageId, { status: 'read' });
-        // Notify all participants except the reader
-        socket.to(conversationId).emit('message read', {
-          messageId,
-          readBy: userId
-        });
-        // Notify the sender directly for blue ✓✓
-        if (senderId && onlineUsers[senderId]) {
-          io.to(onlineUsers[senderId]).emit('message read', {
-            messageId,
-            readBy: userId
-          });
-        }
-      } catch (err) {
-        console.error('Failed to update message status to read:', err);
-      }
-    }
+  // Handle typing indicator
+  socket.on('typing', (userData) => {
+    socket.to('global-chat').emit('user-typing', userData);
   });
 
-  // Typing indicator (broadcast to all except sender, with userId and conversationId)
-  socket.on('typing', (data) => {
-    // data: { conversationId, userId }
-    socket.to(data.conversationId).emit('typing', data);
-  });
-  socket.on('stop typing', (data) => {
-    // data: { conversationId, userId }
-    socket.to(data.conversationId).emit('stop typing', data);
+  // Handle stop typing
+  socket.on('stop-typing', (userData) => {
+    socket.to('global-chat').emit('user-stop-typing', userData);
   });
 
-  // Disconnect user and remove from online users list
+  // Handle disconnection
   socket.on('disconnect', () => {
-    const userId = Object.keys(onlineUsers).find(key => onlineUsers[key] === socket.id);
-    if (userId) {
-      delete onlineUsers[userId];
-      delete userConversations[userId];
-      console.log(`User ${userId} disconnected. Online users: ${Object.keys(onlineUsers).length}`);
-      // Broadcast the user's offline status to others
-      socket.broadcast.emit('user offline', userId);
+    const userData = onlineUsers.get(socket.id);
+    if (userData) {
+      onlineUsers.delete(socket.id);
+      io.emit('online-users', Array.from(onlineUsers.values()));
+      io.emit('user-left', userData);
     }
   });
 });

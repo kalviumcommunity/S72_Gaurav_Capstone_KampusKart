@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FiMap, FiSearch, FiCalendar, FiFileText, FiAlertCircle, FiHome } from 'react-icons/fi';
+import { FaComments } from 'react-icons/fa';
 import Navbar from './Navbar';
 
 const features = [
@@ -39,6 +40,12 @@ const features = [
     description: 'Discover campus facilities and services.',
     icon: <FiHome className="w-8 h-8 text-green-500" />, 
     link: '/facilities',
+  },
+  {
+    name: 'Global Chat',
+    description: 'Chat with other campus members in real-time.',
+    icon: <FaComments className="w-8 h-8 text-indigo-500" />, 
+    link: '/chat',
   },
 ];
 

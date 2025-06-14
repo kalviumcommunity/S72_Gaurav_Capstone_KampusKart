@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { HiMenu, HiX } from "react-icons/hi";
 import { IoIosArrowDropup, IoIosArrowDropdown } from "react-icons/io";
+import { FaComments } from "react-icons/fa";
 import { AuthContextType } from '../contexts/AuthContext';
 
 // Refactored NavLinks Component
@@ -32,6 +33,10 @@ const NavLinks: React.FC<NavLinksProps> = ({
       <>
         <Link to="/home" className="px-5 py-3 md:py-2 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base w-full md:w-auto text-center">Home</Link>
         <Link to="/campus-map" className="px-5 py-3 md:py-2 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base w-full md:w-auto text-center">Campus Map</Link>
+        <Link to="/chat" className="px-5 py-3 md:py-2 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base w-full md:w-auto text-center flex items-center justify-center gap-2">
+          <FaComments className="w-5 h-5" />
+          Chat
+        </Link>
         {/* Desktop Features Dropdown */}
         <div className="hidden md:block">
           <div
@@ -83,7 +88,7 @@ const NavLinks: React.FC<NavLinksProps> = ({
           <Link to="/news" className="px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base w-full text-center">News</Link>
           <Link to="/facilities" className="px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base w-full text-center">Facilities</Link>
         </div> */}
-        <Link to="/chat" className="px-5 py-3 md:py-2 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base w-full md:w-auto text-center">Chat</Link>
+
       </>
     )}
   </>
@@ -278,16 +283,9 @@ const Navbar: React.FC = () => {
                     </Link>
                   </div>
                 </div>
-                <Link 
-                  to="/chat" 
-                  className="px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-base w-full text-center transform hover:scale-105"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Chat
-                </Link>
+                <AuthButtons user={user} location={location} logout={logout} />
               </>
             )}
-            <AuthButtons user={user} location={location} logout={logout} />
           </div>
         </div>
       </div>

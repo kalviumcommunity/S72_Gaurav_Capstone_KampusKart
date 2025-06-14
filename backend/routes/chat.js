@@ -1,244 +1,213 @@
 const express = require('express');
 const router = express.Router();
-const protect = require('../middleware/authMiddleware');
-const User = require('../models/User');
-// Import Conversation and Message models
-const Conversation = require('../models/Conversation');
-const Message = require('../models/Message');
+const Chat = require('../models/Chat');
+const auth = require('../middleware/auth');
+const multer = require('multer');
+const cloudinary = require('cloudinary').v2;
 
-// @desc    Search for users to start a chat
-// @route   GET /api/chat/users
-// @access  Private
-router.get('/users', protect, async (req, res) => {
-  const keyword = req.query.search
-    ? {
-        $or: [
-          { name: { $regex: req.query.search, $options: 'i' } },
-          { email: { $regex: req.query.search, $options: 'i' } },
-        ],
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+// Configure multer for file uploads
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  }
+});
+
+// Get recent chat messages with pagination
+router.get('/messages', auth, async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 50;
+    const skip = (page - 1) * limit;
+
+    const messages = await Chat.find({ isDeleted: false })
+      .sort({ timestamp: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate('sender', 'name profilePicture')
+      .populate('replyTo')
+      .lean();
+    
+    const total = await Chat.countDocuments({ isDeleted: false });
+    
+    res.json({
+      messages: messages.reverse(),
+      pagination: {
+        total,
+        page,
+        pages: Math.ceil(total / limit)
       }
-    : {};
-
-  const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
-  res.send(users);
-});
-
-// @desc    Create or fetch a conversation
-// @route   POST /api/chat
-// @access  Private
-router.post('/', protect, async (req, res) => {
-  const { userId } = req.body;
-
-  if (!userId) {
-    console.log('UserId param not sent with request');
-    return res.sendStatus(400);
-  }
-
-  var isChat = await Conversation.find({
-    $and: [
-      { participants: { $eq: req.user._id } },
-      { participants: { $eq: userId } },
-    ],
-  }).populate('participants', '-password').populate('latestMessage');
-
-  isChat = await User.populate(isChat, {
-    path: 'latestMessage.sender',
-    select: 'name profilePicture email',
-  });
-
-  if (isChat.length > 0) {
-    const chat = isChat[0];
-    if (!chat.readBy.includes(req.user._id)) {
-        chat.readBy.push(req.user._id);
-        await chat.save();
-    }
-    res.send(chat);
-  } else {
-    var chatData = {
-      participants: [req.user._id, userId],
-      readBy: [req.user._id],
-    };
-
-    try {
-      const createdChat = await Conversation.create(chatData);
-      const FullChat = await Conversation.findOne({ _id: createdChat._id }).populate('participants', '-password').populate('latestMessage');
-      const PopulatedChat = await User.populate(FullChat, {
-        path: 'latestMessage.sender',
-        select: 'name profilePicture email',
-      });
-      res.status(200).json(PopulatedChat);
-    } catch (error) {
-      res.status(400);
-      throw new Error(error.message);
-    }
-  }
-});
-
-// @desc    Fetch all conversations for a user
-// @route   GET /api/chat
-// @access  Private
-router.get('/', protect, async (req, res) => {
-  try {
-    Conversation.find({ participants: { $eq: req.user._id } })
-      .populate('participants', '-password')
-      .populate('latestMessage')
-      .populate('readBy', 'name')
-      .sort({ updatedAt: -1 })
-      .then(async (results) => {
-        results = await User.populate(results, {
-          path: 'latestMessage.sender',
-          select: 'name profilePicture email',
-        });
-        res.status(200).send(results);
-      });
+    });
   } catch (error) {
-    res.status(400);
-    throw new Error(error.message);
+    res.status(500).json({ message: 'Error fetching messages', error: error.message });
   }
 });
 
-// @desc    Get all messages for a conversation
-// @route   GET /api/chat/:conversationId/messages
-// @access  Private
-router.get('/:conversationId/messages', protect, async (req, res) => {
+// Search messages
+router.get('/search', auth, async (req, res) => {
   try {
-    const messages = await Message.find({ conversation: req.params.conversationId })
-      .populate('sender', 'name profilePicture email');
-
-    await Conversation.findByIdAndUpdate(
-      req.params.conversationId,
-      { $addToSet: { readBy: req.user._id } },
-      { new: true }
-    );
-
+    const { query } = req.query;
+    const messages = await Chat.find(
+      { $text: { $search: query }, isDeleted: false },
+      { score: { $meta: 'textScore' } }
+    )
+      .sort({ score: { $meta: 'textScore' } })
+      .populate('sender', 'name profilePicture')
+      .limit(20)
+      .lean();
+    
     res.json(messages);
   } catch (error) {
-    res.status(400);
-    throw new Error(error.message);
+    res.status(500).json({ message: 'Error searching messages', error: error.message });
   }
 });
 
-// @desc    Send a message
-// @route   POST /api/chat/:conversationId/messages
-// @access  Private
-router.post('/:conversationId/messages', protect, async (req, res) => {
-  const { text } = req.body;
-  const conversationId = req.params.conversationId;
-
-  if (!text || !conversationId) {
-    console.log('Invalid data passed into request');
-    return res.sendStatus(400);
-  }
-
-  var newMessage = {
-    sender: req.user._id,
-    text: text,
-    conversation: conversationId,
-  };
-
+// Send new message
+router.post('/messages', auth, upload.array('attachments', 5), async (req, res) => {
   try {
-    var message = await Message.create(newMessage);
+    const { message, replyTo } = req.body;
+    const attachments = [];
 
-    message = await message.populate('sender', 'name profilePicture');
-    message = await message.populate('conversation');
-    message = await User.populate(message, {
-      path: 'conversation.participants',
-      select: 'name profilePicture email',
+    // Handle file uploads
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const result = await cloudinary.uploader.upload_stream({
+          resource_type: 'auto',
+          folder: 'chat_attachments'
+        }).end(file.buffer);
+
+        attachments.push({
+          type: file.mimetype.startsWith('image/') ? 'image' : 'file',
+          url: result.secure_url,
+          name: file.originalname,
+          size: file.size,
+          mimeType: file.mimetype
+        });
+      }
+    }
+
+    const chatMessage = new Chat({
+      sender: req.user._id,
+      message,
+      attachments,
+      replyTo
     });
 
-    await Conversation.findByIdAndUpdate(conversationId, {
-      latestMessage: message,
-      readBy: [req.user._id],
-    });
-
-    res.json(message);
+    await chatMessage.save();
+    
+    const populatedMessage = await Chat.findById(chatMessage._id)
+      .populate('sender', 'name profilePicture')
+      .populate('replyTo')
+      .lean();
+    
+    res.status(201).json(populatedMessage);
   } catch (error) {
-    res.status(400);
-    throw new Error(error.message);
+    res.status(500).json({ message: 'Error sending message', error: error.message });
   }
 });
 
-// @desc    Create a new group chat
-// @route   POST /api/chat/group
-// @access  Private
-router.post('/group', protect, async (req, res) => {
-  const { name, members } = req.body;
-
-  if (!name || !members || members.length < 2) {
-    return res.status(400).json({ message: 'Please provide a group name and select at least two members.' });
-  }
-
-  // Add the current user to the members list if not already present
-  if (!members.includes(req.user._id)) {
-      members.push(req.user._id);
-  }
-
+// Edit message
+router.patch('/messages/:messageId', auth, async (req, res) => {
   try {
-    const groupChat = await Conversation.create({
-      isGroupChat: true,
-      name: name,
-      participants: members,
-      groupAdmin: req.user._id,
-      readBy: [req.user._id]
-    });
+    const { message } = req.body;
+    const chatMessage = await Chat.findById(req.params.messageId);
+    
+    if (!chatMessage) {
+      return res.status(404).json({ message: 'Message not found' });
+    }
 
-    const fullGroupChat = await Conversation.findOne({ _id: groupChat._id })
-      .populate('participants', '-password')
-      .populate('groupAdmin', '-password');
+    if (chatMessage.sender.toString() !== req.user._id) {
+      return res.status(403).json({ message: 'Not authorized to edit this message' });
+    }
 
-    res.status(201).json(fullGroupChat);
+    chatMessage.message = message;
+    chatMessage.edited = true;
+    chatMessage.editedAt = new Date();
+    await chatMessage.save();
+    
+    const updatedMessage = await Chat.findById(chatMessage._id)
+      .populate('sender', 'name profilePicture')
+      .populate('replyTo')
+      .lean();
+    
+    res.json(updatedMessage);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(500).json({ message: 'Error editing message', error: error.message });
   }
 });
 
-// @desc    Delete a conversation
-// @route   DELETE /api/chat/:conversationId
-// @access  Private
-router.delete('/:conversationId', protect, async (req, res) => {
+// Delete message (soft delete)
+router.delete('/messages/:messageId', auth, async (req, res) => {
   try {
-    const conversationId = req.params.conversationId;
-
-    // Optional: Add authorization check to ensure only participants can delete
-    const conversation = await Conversation.findById(conversationId);
-    if (!conversation) {
-      return res.status(404).json({ message: 'Conversation not found' });
+    const message = await Chat.findById(req.params.messageId);
+    
+    if (!message) {
+      return res.status(404).json({ message: 'Message not found' });
     }
 
-    // Ensure the user is a participant in the conversation
-    if (!conversation.participants.includes(req.user._id)) {
-        return res.status(403).json({ message: 'Not authorized to delete this conversation' });
+    if (message.sender.toString() !== req.user._id && !req.user.isAdmin) {
+      return res.status(403).json({ message: 'Not authorized to delete this message' });
     }
 
-    // Delete associated messages (optional, depending on desired behavior)
-    await Message.deleteMany({ conversation: conversationId });
-
-    // Delete the conversation
-    await Conversation.findByIdAndDelete(conversationId);
-
-    res.status(200).json({ message: 'Conversation deleted successfully' });
-
+    message.isDeleted = true;
+    await message.save();
+    
+    res.json({ message: 'Message deleted successfully' });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(500).json({ message: 'Error deleting message', error: error.message });
   }
 });
 
-// Update the route to mark a conversation as read
-router.post('/:conversationId/read', protect, async (req, res) => {
-  const { conversationId } = req.params;
-  const userId = req.user._id; // Use the authenticated user's ID
+// Add/remove reaction
+router.post('/messages/:messageId/reactions', auth, async (req, res) => {
   try {
-    const conversation = await Conversation.findById(conversationId);
-    if (!conversation) {
-      return res.status(404).json({ error: 'Conversation not found' });
+    const { emoji } = req.body;
+    const message = await Chat.findById(req.params.messageId);
+    
+    if (!message) {
+      return res.status(404).json({ message: 'Message not found' });
     }
-    if (!conversation.readBy.includes(userId)) {
-      conversation.readBy.push(userId);
-      await conversation.save();
+
+    await message.addReaction(req.user._id, emoji);
+    
+    const updatedMessage = await Chat.findById(message._id)
+      .populate('sender', 'name profilePicture')
+      .populate('reactions.user', 'name profilePicture')
+      .lean();
+    
+    res.json(updatedMessage);
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating reaction', error: error.message });
+  }
+});
+
+// Mark message as read
+router.post('/messages/:messageId/read', auth, async (req, res) => {
+  try {
+    const message = await Chat.findById(req.params.messageId);
+    
+    if (!message) {
+      return res.status(404).json({ message: 'Message not found' });
     }
-    res.status(200).json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to mark as read' });
+
+    await message.markAsRead(req.user._id);
+    
+    const updatedMessage = await Chat.findById(message._id)
+      .populate('sender', 'name profilePicture')
+      .populate('readBy.user', 'name profilePicture')
+      .lean();
+    
+    res.json(updatedMessage);
+  } catch (error) {
+    res.status(500).json({ message: 'Error marking message as read', error: error.message });
   }
 });
 

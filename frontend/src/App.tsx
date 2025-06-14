@@ -9,7 +9,6 @@ import ForgotPassword from './components/ForgotPassword';
 import Home from './components/Home';
 import LostFound from './components/LostFound';
 import Profile from './components/Profile';
-import Chat from './components/Chat';
 import Complaints from './components/Complaints';
 import CampusMap from './components/CampusMap';
 import AuthenticatedLayout from './components/AuthenticatedLayout';
@@ -17,6 +16,7 @@ import Features from './components/Features';
 import Events from './components/Events';
 import News from './components/News';
 import Facilities from './components/Facilities';
+import ChatWindow from './components/Chat/ChatWindow';
 
 // Protected Route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -73,21 +73,21 @@ const App: React.FC = () => {
             }
           />
           <Route
-            path="/lostfound"
+            path="/chat"
             element={
               <ProtectedRoute>
                 <AuthenticatedLayout>
-                  <LostFound />
+                  <ChatWindow />
                 </AuthenticatedLayout>
               </ProtectedRoute>
             }
           />
           <Route
-            path="/chat"
+            path="/lostfound"
             element={
               <ProtectedRoute>
                 <AuthenticatedLayout>
-                  <Chat />
+                  <LostFound />
                 </AuthenticatedLayout>
               </ProtectedRoute>
             }
