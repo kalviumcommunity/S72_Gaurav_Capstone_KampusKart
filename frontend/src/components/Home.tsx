@@ -66,23 +66,23 @@ const socials = [
 
 const Home = () => {
   return (
-    <div className="relative min-h-screen bg-white font-sans overflow-hidden pt-24">
+    <div className="relative min-h-screen bg-white font-sans overflow-hidden pt-16 md:pt-24">
       <Navbar />
       {/* SVG Blobs for background */}
       <svg className="absolute left-[-120px] top-[-80px] w-[340px] h-[220px] -z-10" viewBox="0 0 340 220" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M60,40 Q120,0 200,60 T340,40 Q320,120 200,180 T60,180 Q0,120 60,40Z" fill="#FFD166"/></svg>
       <svg className="absolute right-[-120px] top-20 w-[320px] h-[200px] -z-10" viewBox="0 0 320 200" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M40,60 Q100,0 180,40 T320,60 Q300,140 180,180 T40,140 Q0,100 40,60Z" fill="#F05A25"/></svg>
       <svg className="absolute left-[-100px] bottom-[-80px] w-[300px] h-[180px] -z-10" viewBox="0 0 300 180" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M60,40 Q120,0 200,60 T300,40 Q280,120 200,160 T60,160 Q0,120 60,40Z" fill="#00C6A7"/></svg>
       {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center text-center min-h-[60vh] pt-36 pb-16 px-4">
-        <h1 className="text-4xl md:text-5xl font-extrabold text-black mb-6 leading-tight" style={{ fontWeight: 900, letterSpacing: '-0.02em', lineHeight: '1.05' }}>Welcome to Kampuskart</h1>
-        <p className="text-lg md:text-xl text-gray-700 mb-8 max-w-2xl mx-auto">Your all-in-one campus companion for navigation, events, news, lost & found, complaints, and more!</p>
-        <Link to="/campus-map" className="inline-block px-8 py-4 bg-[#00C6A7] text-white rounded-full font-bold text-lg shadow hover:bg-[#009e87] hover:text-white transition">Explore Campus Map</Link>
+      <section className="flex flex-col items-center justify-center text-center min-h-[60vh] pt-20 md:pt-36 pb-12 md:pb-16 px-4">
+        <h1 className="text-3xl md:text-5xl font-extrabold text-black mb-4 md:mb-6 leading-tight" style={{ fontWeight: 900, letterSpacing: '-0.02em', lineHeight: '1.05' }}>Welcome to Kampuskart</h1>
+        <p className="text-base md:text-xl text-gray-700 mb-6 md:mb-8 max-w-2xl mx-auto">Your all-in-one campus companion for navigation, events, news, lost & found, complaints, and more!</p>
+        <Link to="/campus-map" className="inline-block px-6 md:px-8 py-3 md:py-4 bg-[#00C6A7] text-white rounded-full font-bold text-base md:text-lg shadow hover:bg-[#009e87] hover:text-white transition">Explore Campus Map</Link>
       </section>
 
       {/* Features Section */}
-      <section className="container mx-auto px-8 md:px-16 py-16">
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-800 text-center mb-10">Features</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+      <section className="container mx-auto px-4 md:px-16 py-12 md:py-16">
+        <h2 className="text-xl md:text-3xl font-bold text-gray-800 text-center mb-6 md:mb-10">Features</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
           {features.map((feature) => (
             <Link to={feature.link} key={feature.name} className="bg-white rounded-xl shadow hover:shadow-lg p-8 flex flex-col items-center text-center transition group border border-gray-100">
               <div className="mb-4">{feature.icon}</div>

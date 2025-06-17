@@ -221,7 +221,7 @@ const Navbar: React.FC = () => {
 
         {/* Mobile Menu */}
         <div
-          className={`md:hidden fixed top-[60px] left-0 w-full bg-white shadow-lg transition-all duration-300 ease-in-out transform ${
+          className={`md:hidden fixed top-[60px] left-0 w-full bg-white shadow-lg z-[100] transition-all duration-300 ease-in-out transform ${
             isMobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
           }`}
           style={{
@@ -252,7 +252,7 @@ const Navbar: React.FC = () => {
                 <div className="w-full">
                   <button
                     onClick={handleFeaturesButtonClick}
-                    className="px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-base flex items-center justify-center w-full transform hover:scale-105"
+                    className="px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-300 ease-in-out text-base flex items-center justify-center w-full transform hover:scale-105"
                     aria-expanded={isFeaturesDropdownOpen}
                     aria-controls="mobile-features-menu"
                     aria-haspopup="true"
@@ -305,6 +305,10 @@ const Navbar: React.FC = () => {
                 </div>
                 <AuthButtons user={user} location={location} logout={logout} />
               </>
+            )}
+            {/* Show AuthButtons for unauthenticated users as well */}
+            {!user && (
+              <AuthButtons user={user} location={location} logout={logout} />
             )}
           </div>
         </div>
