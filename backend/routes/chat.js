@@ -168,18 +168,29 @@ router.patch('/messages/:messageId', auth, async (req, res) => {
 router.delete('/messages/:messageId', auth, async (req, res) => {
   try {
     const message = await Chat.findById(req.params.messageId);
-    
+
+    // Debug logging
+    console.log('User:', req.user);
+    console.log('User.isAdmin:', req.user.isAdmin);
+    console.log('Message sender:', message ? message.sender : null);
+
     if (!message) {
       return res.status(404).json({ message: 'Message not found' });
     }
 
-    if (message.sender.toString() !== req.user._id && !req.user.isAdmin) {
+    if (message.sender.toString() !== req.user._id.toString() && !req.user.isAdmin) {
       return res.status(403).json({ message: 'Not authorized to delete this message' });
     }
 
     message.isDeleted = true;
     await message.save();
-    
+
+    // Emit message-deleted event
+    const io = req.app.get('io');
+    if (io) {
+      io.to('global-chat').emit('message-deleted', { _id: message._id });
+    }
+
     res.json({ message: 'Message deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Error deleting message', error: error.message });

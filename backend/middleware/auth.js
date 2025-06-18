@@ -22,6 +22,8 @@ const auth = async (req, res, next) => {
 
     // Add user to request object
     req.user = user;
+    // Set isAdmin if email matches admin
+    req.user.isAdmin = user.email === 'gauravkhandelwal205@gmail.com';
     next();
   } catch (error) {
     console.error('Auth middleware error:', error);

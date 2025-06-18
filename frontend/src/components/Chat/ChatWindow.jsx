@@ -129,6 +129,13 @@ const ChatWindow = () => {
       }
     });
 
+    // Listen for message-deleted
+    socketRef.current.on('message-deleted', (data) => {
+      if (data && data._id) {
+        setMessages((prev) => prev.filter((msg) => msg._id !== data._id));
+      }
+    });
+
     return () => {
       socketRef.current.disconnect();
     };
@@ -208,15 +215,6 @@ const ChatWindow = () => {
 
       if (!response.ok) throw new Error('Failed to send message');
 
-      // Emit socket event for real-time update
-      if (socketRef.current) {
-        socketRef.current.emit('send-message', {
-          senderId: user._id,
-          message: newMessage,
-          // Optionally add attachments and replyTo if needed by backend
-        });
-      }
-
       setNewMessage('');
       setAttachments([]);
       setReplyTo(null);
@@ -258,11 +256,6 @@ const ChatWindow = () => {
     setSelectedMessage(message);
   };
 
-  const handleEditMessage = async () => {
-    if (!selectedMessage) return;
-    setAnchorEl(null);
-  };
-
   const handleDeleteMessage = async () => {
     if (!selectedMessage) return;
     try {
@@ -279,26 +272,7 @@ const ChatWindow = () => {
       console.error('Error deleting message:', error);
     }
     setAnchorEl(null);
-  };
-
-  const handleAddReaction = async (emoji) => {
-    if (!selectedMessage) return;
-    try {
-      await fetch(
-        `${API_BASE}/api/chat/messages/${selectedMessage._id}/reactions`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-          body: JSON.stringify({ emoji }),
-        }
-      );
-    } catch (error) {
-      console.error('Error adding reaction:', error);
-    }
-    setAnchorEl(null);
+    setSelectedMessage(null);
   };
 
   const markMessageAsRead = async (messageId) => {
@@ -321,22 +295,34 @@ const ChatWindow = () => {
     }
   }, [messages]);
 
-  // Chat header
+  // Fix logo import for Avatar
+  const logoUrl = '/Logo.png';
+
+  // Simple chat header
   const ChatHeader = () => (
-    <Paper elevation={2} sx={{
-      p: 2,
-      mb: 1,
-      bgcolor: '#f7f7fa',
-      borderRadius: '0 0 16px 16px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      borderBottom: '1px solid #e0e0e0',
-    }}>
+    <Paper
+      elevation={1}
+      sx={{
+        p: 2,
+        mb: 1,
+        bgcolor: '#fff',
+        borderRadius: '0 0 16px 16px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        borderBottom: '1px solid #e0e0e0',
+        boxShadow: 'none',
+      }}
+    >
       <Box display="flex" alignItems="center" gap={2}>
-        <Avatar src={typeof '/Logo.png' === 'string' ? '/Logo.png' : undefined} sx={{ bgcolor: 'primary.main', width: 40, height: 40 }} />
+        <Avatar
+          src={logoUrl}
+          sx={{ bgcolor: 'primary.main', width: 40, height: 40 }}
+        />
         <Box>
-          <Typography variant="h6" fontWeight={700} color="primary.main">KampusKart Chat</Typography>
+          <Typography variant="h6" fontWeight={700} color="primary.main">
+            KampusKart Chat
+          </Typography>
           <Typography variant="caption" color="text.secondary">
             {onlineUsers.length} online
           </Typography>
@@ -370,7 +356,11 @@ const ChatWindow = () => {
       >
         <ListItemAvatar sx={{ minWidth: 48 }}>
           <Avatar
-            src={typeof message.sender.profilePicture === 'string' ? message.sender.profilePicture : undefined}
+            src={
+              typeof message.sender.profilePicture === 'string'
+                ? message.sender.profilePicture
+                : message.sender.profilePicture?.url
+            }
             alt={message.sender.name}
             sx={{ border: isOwnMessage ? '2px solid #1976d2' : '2px solid #e0e0e0' }}
           />
@@ -455,6 +445,13 @@ const ChatWindow = () => {
       </ListItem>
     );
   };
+
+  useEffect(() => {
+    if (anchorEl && !document.body.contains(anchorEl)) {
+      setAnchorEl(null);
+      setSelectedMessage(null);
+    }
+  }, [anchorEl, messages]);
 
   if (loading && (!messages || messages.length === 0)) {
     return (
@@ -597,29 +594,11 @@ const ChatWindow = () => {
         onClose={() => setAnchorEl(null)}
       >
         {selectedMessage?.sender._id === user._id && (
-          <>
-            <MenuItem onClick={handleEditMessage}>
-              <EditIcon fontSize="small" sx={{ mr: 1 }} />
-              Edit
-            </MenuItem>
-            <MenuItem onClick={handleDeleteMessage}>
-              <DeleteIcon fontSize="small" sx={{ mr: 1 }} />
-              Delete
-            </MenuItem>
-          </>
+          <MenuItem onClick={handleDeleteMessage}>
+            <DeleteIcon fontSize="small" sx={{ mr: 1 }} />
+            Delete
+          </MenuItem>
         )}
-        <MenuItem onClick={() => {
-          setReplyTo(selectedMessage);
-          setAnchorEl(null);
-        }}>
-          <ReplyIcon fontSize="small" sx={{ mr: 1 }} />
-          Reply
-        </MenuItem>
-        <MenuItem onClick={() => handleAddReaction('👍')}>👍</MenuItem>
-        <MenuItem onClick={() => handleAddReaction('❤️')}>❤️</MenuItem>
-        <MenuItem onClick={() => handleAddReaction('😂')}>😂</MenuItem>
-        <MenuItem onClick={() => handleAddReaction('😮')}>😮</MenuItem>
-        <MenuItem onClick={() => handleAddReaction('😢')}>😢</MenuItem>
       </Menu>
 
       {/* Search Results Dialog */}

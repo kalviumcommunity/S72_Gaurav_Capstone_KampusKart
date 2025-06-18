@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FiMap, FiSearch, FiCalendar, FiFileText, FiAlertCircle, FiHome } from 'react-icons/fi';
+import { FiMap, FiSearch, FiCalendar, FiFileText, FiAlertCircle, FiHome, FiUsers } from 'react-icons/fi';
 import { FaComments } from 'react-icons/fa';
 import Navbar from './Navbar';
 
@@ -46,6 +46,12 @@ const features = [
     description: 'Chat with other campus members in real-time.',
     icon: <FaComments className="w-8 h-8 text-indigo-500" />, 
     link: '/chat',
+  },
+  {
+    name: 'Clubs Recruitment',
+    description: 'Apply to join campus clubs and societies.',
+    icon: <FiUsers className="w-8 h-8 text-pink-500" />, 
+    link: '/clubs-recruitment',
   },
 ];
 
