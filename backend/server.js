@@ -17,6 +17,7 @@ const newsRoutes = require('./routes/news');
 const eventsRoutes = require('./routes/events');
 const facilitiesRoutes = require('./routes/facilities');
 const chatRoutes = require('./routes/chat');
+const clubsRoutes = require('./routes/clubs');
 const Chat = require('./models/Chat');
 
 const app = express();
@@ -60,6 +61,7 @@ app.use('/api/events', eventsRoutes);
 app.use('/api/lost-found', lostfoundRoutes);
 app.use('/api/facilities', facilitiesRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/clubs', clubsRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

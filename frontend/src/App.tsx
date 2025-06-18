@@ -17,6 +17,7 @@ import Events from './components/Events';
 import News from './components/News';
 import Facilities from './components/Facilities';
 import ChatWindow from './components/Chat/ChatWindow';
+import ClubsRecruitment from './components/ClubsRecruitment';
 
 // Protected Route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -168,6 +169,16 @@ const App: React.FC = () => {
               <ProtectedRoute>
                 <AuthenticatedLayout>
                   <Facilities />
+                </AuthenticatedLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/clubs-recruitment"
+            element={
+              <ProtectedRoute>
+                <AuthenticatedLayout>
+                  <ClubsRecruitment />
                 </AuthenticatedLayout>
               </ProtectedRoute>
             }

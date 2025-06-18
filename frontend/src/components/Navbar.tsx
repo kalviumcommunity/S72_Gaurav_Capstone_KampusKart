@@ -88,6 +88,7 @@ const NavLinks: React.FC<NavLinksProps> = ({
               <Link to="/lostfound" className="block px-4 py-3 md:py-2 text-black hover:bg-[#FFD166] text-center md:text-left" onClick={() => setIsFeaturesDropdownOpen(false)} role="menuitem" tabIndex={-1}>Lost and Found</Link>
               <Link to="/complaints" className="block px-4 py-3 md:py-2 text-black hover:bg-[#FFD166] text-center md:text-left" onClick={() => setIsFeaturesDropdownOpen(false)} role="menuitem" tabIndex={-1}>Complaints</Link>
               <Link to="/events" className="block px-4 py-3 md:py-2 text-black hover:bg-[#FFD166] text-center md:text-left" onClick={() => setIsFeaturesDropdownOpen(false)} role="menuitem" tabIndex={-1}>Events</Link>
+              <Link to="/clubs-recruitment" className="block px-4 py-3 md:py-2 text-black hover:bg-[#FFD166] text-center md:text-left" onClick={() => setIsFeaturesDropdownOpen(false)} role="menuitem" tabIndex={-1}>Clubs Recruitment</Link>
               <Link to="/news" className="block px-4 py-3 md:py-2 text-black hover:bg-[#FFD166] text-center md:text-left" onClick={() => setIsFeaturesDropdownOpen(false)} role="menuitem" tabIndex={-1}>News</Link>
               <Link to="/facilities" className="block px-4 py-3 md:py-2 text-black hover:bg-[#FFD166] text-center md:text-left" onClick={() => setIsFeaturesDropdownOpen(false)} role="menuitem" tabIndex={-1}>Facilities</Link>
             </div>
@@ -286,6 +287,13 @@ const Navbar: React.FC = () => {
                       onClick={() => { setIsFeaturesDropdownOpen(false); setIsMobileMenuOpen(false); }}
                     >
                       Events
+                    </Link>
+                    <Link 
+                      to="/clubs-recruitment" 
+                      className="block px-4 py-3 text-black hover:bg-[#FFD166] text-center transition-colors duration-300"
+                      onClick={() => { setIsFeaturesDropdownOpen(false); setIsMobileMenuOpen(false); }}
+                    >
+                      Clubs Recruitment
                     </Link>
                     <Link 
                       to="/news" 
