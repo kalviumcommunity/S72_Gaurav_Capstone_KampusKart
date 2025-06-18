@@ -249,6 +249,14 @@ const Navbar: React.FC = () => {
                   <MapIcon sx={{ mr: 1 }} />
                   Campus Map
                 </Link>
+                <Link 
+                  to="/chat" 
+                  className="px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-base w-full text-center transform hover:scale-105"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <ChatIcon sx={{ mr: 1 }} />
+                  Chat
+                </Link>
                 {/* Mobile Features Dropdown (simplified) */}
                 <div className="w-full">
                   <button
