@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './Navbar';
 import { FiPlus, FiCalendar, FiSearch, FiAlertCircle, FiFileText, FiTag, FiMail, FiInfo, FiUser, FiPhone } from 'react-icons/fi';
+import { FaWhatsapp } from 'react-icons/fa';
 import { useAuth } from '../contexts/AuthContext';
 import { API_BASE } from '../config';
 import SkeletonLoader from './SkeletonLoader';
@@ -122,14 +123,25 @@ const ClubDetails: React.FC<ClubDetailsProps> = ({ club, onClose, onEdit, onDele
             </div>
             <div className="mt-6 pt-6 border-t border-gray-200">
               {club.formUrl && (
-                <a
-                  href={club.formUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block w-full text-center px-6 py-3 rounded-lg font-bold text-white bg-[#00C6A7] hover:bg-[#009e87] transition mb-4"
-                >
-                  Apply Now
-                </a>
+                <>
+                  <a
+                    href={club.formUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block w-full text-center px-6 py-3 rounded-lg font-bold text-white bg-[#00C6A7] hover:bg-[#009e87] transition mb-2"
+                  >
+                    Apply Now
+                  </a>
+                  <a
+                    href={`https://wa.me/?text=${encodeURIComponent(`Check out this club recruitment!\n\nTitle: ${club.title}\nDescription: ${club.description}\nSee details and apply here: ${typeof window !== 'undefined' ? window.location.href : ''}`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center w-full text-center px-6 py-3 rounded-lg font-bold text-white bg-[#25D366] hover:bg-[#128C7E] transition mb-4 gap-2"
+                    style={{ textDecoration: 'none' }}
+                  >
+                    <FaWhatsapp className="w-6 h-6" /> Share on WhatsApp
+                  </a>
+                </>
               )}
               {isAdmin && (
                 <div className="flex gap-2">
