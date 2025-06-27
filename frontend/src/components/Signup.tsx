@@ -186,6 +186,11 @@ const Signup: React.FC = () => {
                   placeholder="Email address"
                   value={email}
                   onChange={handleEmailChange}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && emailError) {
+                      e.preventDefault();
+                    }
+                  }}
                 />
                 {emailError && (
                   <p className="mt-1 text-sm text-red-500">{emailError}</p>
