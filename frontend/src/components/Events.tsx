@@ -406,8 +406,17 @@ const Events = () => {
       image: undefined,
       imagePreview: event.image?.url || '',
       operatingHours: event.operatingHours || '',
-      contactInfo: event.contactInfo || { name: undefined, email: undefined, phone: undefined },
-      mapLocation: event.mapLocation || { building: undefined, floor: undefined, room: undefined, coordinates: undefined }
+      contactInfo: {
+        name: event.contactInfo?.name ?? undefined,
+        email: event.contactInfo?.email ?? undefined,
+        phone: event.contactInfo?.phone ?? undefined
+      },
+      mapLocation: {
+        building: event.mapLocation?.building ?? undefined,
+        floor: event.mapLocation?.floor ?? undefined,
+        room: event.mapLocation?.room ?? undefined,
+        coordinates: event.mapLocation?.coordinates ?? undefined
+      }
     });
     setIsModalOpen(true);
   };
@@ -512,7 +521,7 @@ const Events = () => {
       <div className="min-h-screen flex flex-col bg-white font-sans">
         <Navbar />
         <main className="flex-1 container mx-auto px-12 py-8 pt-[100px]">
-          <SkeletonLoader variant="lostfound" />
+          <SkeletonLoader variant="events" />
         </main>
       </div>
     );

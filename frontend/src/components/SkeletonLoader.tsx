@@ -1,12 +1,12 @@
 import React from 'react';
 
 interface SkeletonLoaderProps {
-  variant?: 'lostfound' | 'login' | 'signup' | 'home' | 'profile' | 'chat' | 'complaints' | 'dashboard' | 'features' | 'campusmap' | 'landing' | 'complaint';
+  variant?: 'lostfound' | 'login' | 'signup' | 'home' | 'profile' | 'chat' | 'complaints' | 'dashboard' | 'features' | 'campusmap' | 'landing' | 'complaint' | 'events';
 }
 
 const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({ variant = 'lostfound' }) => {
   const LostFoundSkeleton = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" aria-busy="true">
       {[...Array(6)].map((_, index) => (
         <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100">
           <div className="h-48 bg-gray-200 animate-pulse"></div>
@@ -31,7 +31,7 @@ const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({ variant = 'lostfound' }
   );
 
   const AuthSkeleton = () => (
-    <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md mx-auto">
+    <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md mx-auto" aria-busy="true">
       <div className="space-y-6">
         <div className="flex justify-center mb-6">
           <div className="h-16 w-16 bg-gray-200 rounded-full animate-pulse"></div>
@@ -56,7 +56,7 @@ const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({ variant = 'lostfound' }
   );
 
   const HomeSkeleton = () => (
-    <div className="space-y-8">
+    <div className="space-y-8" aria-busy="true">
       {/* Hero Section */}
       <div className="relative h-[60vh] bg-gray-200 animate-pulse rounded-lg"></div>
       
@@ -87,7 +87,7 @@ const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({ variant = 'lostfound' }
   );
 
   const ProfileSkeleton = () => (
-    <div className="min-h-screen flex flex-col bg-white font-sans">
+    <div className="min-h-screen flex flex-col bg-white font-sans" aria-busy="true">
       <main className="flex-1 container mx-auto px-12 py-8 pt-24">
         <div className="h-8 bg-gray-200 rounded w-48 mb-6 animate-pulse mx-auto"></div> {/* Title Placeholder */}
 
@@ -154,7 +154,7 @@ const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({ variant = 'lostfound' }
   );
 
   const ChatSkeleton = () => (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 min-h-[70vh]">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 min-h-[70vh]" aria-busy="true">
       {/* Sidebar */}
       <div className="bg-white rounded-lg shadow p-4 flex flex-col max-h-[calc(100vh-100px)]">
         <div className="h-8 bg-gray-200 rounded w-3/4 mb-4 animate-pulse"></div>
@@ -198,7 +198,7 @@ const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({ variant = 'lostfound' }
   );
 
   const ComplaintsSkeleton = () => (
-    <div className="space-y-6">
+    <div className="space-y-6" aria-busy="true">
       {[...Array(4)].map((_, i) => (
         <div key={i} className="bg-white rounded-lg shadow-md p-6 flex flex-col gap-3 animate-pulse">
           <div className="h-6 bg-gray-200 rounded w-1/2 mb-2"></div>
@@ -225,7 +225,7 @@ const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({ variant = 'lostfound' }
   );
 
   const DashboardSkeleton = () => (
-    <div className="space-y-8">
+    <div className="space-y-8" aria-busy="true">
       <div className="h-16 bg-gray-200 rounded-lg animate-pulse mb-4"></div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {[...Array(2)].map((_, i) => (
@@ -241,7 +241,7 @@ const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({ variant = 'lostfound' }
   );
 
   const FeaturesSkeleton = () => (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6" aria-busy="true">
       {[...Array(3)].map((_, i) => (
         <div key={i} className="bg-white rounded-lg shadow-md p-6 animate-pulse">
           <div className="h-12 w-12 bg-gray-200 rounded-full mb-4"></div>
@@ -254,11 +254,11 @@ const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({ variant = 'lostfound' }
   );
 
   const CampusMapSkeleton = () => (
-    <div className="w-full h-[60vh] bg-gray-200 rounded-lg animate-pulse"></div>
+    <div className="w-full h-[60vh] bg-gray-200 rounded-lg animate-pulse" aria-busy="true"></div>
   );
 
   const LandingSkeleton = () => (
-    <div className="space-y-8">
+    <div className="space-y-8" aria-busy="true">
       <div className="h-24 bg-gray-200 rounded-lg animate-pulse"></div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[...Array(3)].map((_, i) => (
@@ -274,9 +274,29 @@ const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({ variant = 'lostfound' }
     </div>
   );
 
+  const EventsSkeleton = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" aria-busy="true">
+      {[...Array(6)].map((_, index) => (
+        <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100">
+          <div className="h-40 bg-gray-200 animate-pulse"></div>
+          <div className="p-4">
+            <div className="h-6 bg-gray-200 rounded w-2/3 animate-pulse mb-2"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2 animate-pulse mb-4"></div>
+            <div className="h-4 bg-gray-200 rounded w-full animate-pulse mb-2"></div>
+            <div className="h-4 bg-gray-200 rounded w-5/6 animate-pulse mb-2"></div>
+            <div className="flex gap-2 mt-4">
+              <div className="h-8 w-20 bg-gray-200 rounded-full"></div>
+              <div className="h-8 w-20 bg-gray-200 rounded-full"></div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
   if (variant === 'complaint') {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" aria-busy="true">
         {[...Array(6)].map((_, i) => (
           <div key={i} className="bg-white rounded-lg shadow p-6 flex flex-col gap-2 border animate-pulse">
             {/* Image/Icon Placeholder */}
@@ -339,6 +359,8 @@ const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({ variant = 'lostfound' }
       return <CampusMapSkeleton />;
     case 'landing':
       return <LandingSkeleton />;
+    case 'events':
+      return <EventsSkeleton />;
     default:
       return <LostFoundSkeleton />;
   }

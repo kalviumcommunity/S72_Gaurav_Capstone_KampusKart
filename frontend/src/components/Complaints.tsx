@@ -452,7 +452,7 @@ const Complaints = () => {
               </button>
             </form>
           </div>
-          <SkeletonLoader variant="lostfound" /> {/* Can reuse lostfound skeleton for now */}
+          <SkeletonLoader variant="complaints" />
         </main>
       </div>
     );
