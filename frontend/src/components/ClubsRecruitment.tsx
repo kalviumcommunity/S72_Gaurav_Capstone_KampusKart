@@ -133,7 +133,9 @@ const ClubDetails: React.FC<ClubDetailsProps> = ({ club, onClose, onEdit, onDele
                     Apply Now
                   </a>
                   <a
-                    href={`https://wa.me/?text=${encodeURIComponent(`Check out this club recruitment!\n\nTitle: ${club.title}\nDescription: ${club.description}\nSee details and apply here: ${typeof window !== 'undefined' ? window.location.href : ''}`)}`}
+                    href={`https://wa.me/?text=${encodeURIComponent(
+                      `🚀 *Join the Club Recruitment!* 🚀\n\n*Club:* ${club.clubName}\n*Title:* ${club.title}\n*Description:* ${club.description}\n*Recruitment Period:* ${new Date(club.startDate).toLocaleDateString()} - ${new Date(club.endDate).toLocaleDateString()}\n${club.contactInfo?.name ? `*Contact:* ${club.contactInfo.name}` : ''}${club.contactInfo?.email ? ` | ${club.contactInfo.email}` : ''}${club.contactInfo?.phone ? ` | ${club.contactInfo.phone}` : ''}\n\nApply now and be part of something amazing!\n👉 ${club.formUrl}\n\nSee more details here: ${typeof window !== 'undefined' ? window.location.href : ''}`
+                    )}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center justify-center w-full text-center px-6 py-3 rounded-lg font-bold text-white bg-[#25D366] hover:bg-[#128C7E] transition mb-4 gap-2"

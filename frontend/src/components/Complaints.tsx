@@ -58,6 +58,7 @@ const Complaints = () => {
     category: 'Other' as Complaint['category'],
     priority: 'Medium' as Complaint['priority'],
     department: 'Student Services' as Complaint['department'],
+    status: 'Open' as Complaint['status'],
   });
   const [formError, setFormError] = useState<string | null>(null);
   const [editingComplaint, setEditingComplaint] = useState<Complaint | null>(null);
@@ -143,6 +144,7 @@ const Complaints = () => {
       category: 'Other' as Complaint['category'],
       priority: 'Medium' as Complaint['priority'],
       department: 'Student Services' as Complaint['department'],
+      status: 'Open' as Complaint['status'],
     });
     setFormError(null);
     setIsModalOpen(true);
@@ -156,6 +158,7 @@ const Complaints = () => {
       category: complaint.category,
       priority: complaint.priority,
       department: complaint.department,
+      status: complaint.status,
     });
     setImages(
       (complaint.images || []).map(img => ({
@@ -178,6 +181,7 @@ const Complaints = () => {
       category: 'Other' as Complaint['category'],
       priority: 'Medium' as Complaint['priority'],
       department: 'Student Services' as Complaint['department'],
+      status: 'Open' as Complaint['status'],
     });
     setFormError(null);
   };
@@ -220,6 +224,7 @@ const Complaints = () => {
       formData.append('category', newComplaint.category);
       formData.append('priority', newComplaint.priority);
       formData.append('department', newComplaint.department);
+      formData.append('status', newComplaint.status);
       
       // Append new images
       images.forEach((image) => {
@@ -755,8 +760,8 @@ const Complaints = () => {
                         <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
                         <select
                           name="status"
-                          value={editingComplaint.status}
-                          onChange={(e) => setEditingComplaint({...editingComplaint, status: e.target.value as Complaint['status']})}
+                          value={newComplaint.status || editingComplaint.status}
+                          onChange={(e) => setNewComplaint({ ...newComplaint, status: e.target.value as Complaint['status'] })}
                           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
                         >
                           <option value="Open">Open</option>
