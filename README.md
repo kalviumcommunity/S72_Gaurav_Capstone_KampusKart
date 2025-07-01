@@ -153,8 +153,8 @@ KampusKart is a comprehensive campus portal for MIT ADT University, providing st
    ```
 
 The application will be available at:
-- Frontend: http://localhost:5173
-- Backend API: http://localhost:5000
+- Frontend: https://kampuskart.netlify.app/
+- Backend API: https://s72-gaurav-capstone.onrender.com
 
 ### Production Build
 
