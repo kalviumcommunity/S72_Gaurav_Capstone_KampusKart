@@ -190,13 +190,13 @@ const Facilities = () => {
 
                 {/* Action Buttons */}
                 {user?.email === 'gauravkhandelwal205@gmail.com' && (
-                  <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
+                  <div className="flex flex-col sm:flex-row gap-2 mt-4 pt-4 border-t border-gray-100">
                     <button
                       onClick={(e) => { e.stopPropagation(); setEditingFacility(facility); setIsEditModalOpen(true); }}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors duration-200"
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-3 sm:py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors duration-200 text-sm sm:text-base min-w-0"
                     >
-                      <FiEdit2 className="w-4 h-4" />
-                      Edit
+                      <FiEdit2 className="w-4 h-4 flex-shrink-0" />
+                      <span className="truncate">Edit</span>
                     </button>
                   </div>
                 )}
@@ -763,8 +763,8 @@ const Facilities = () => {
                       setIsEditModalOpen(true);
                       setSelectedFacility(null);
                     }}
-                    className="flex-1 px-3 py-2 rounded-full text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors duration-200"
-                  >Edit</button>
+                    className="flex-1 px-3 py-3 sm:py-2 rounded-full text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors duration-200 min-w-0"
+                  ><span className="truncate">Edit</span></button>
                   <button
                     onClick={async () => {
                       if (!window.confirm('Are you sure you want to delete this facility?')) return;
@@ -780,8 +780,8 @@ const Facilities = () => {
                         setError('Failed to delete facility');
                       }
                     }}
-                    className="flex-1 px-3 py-2 rounded-full text-sm font-semibold text-white bg-[#F05A25] hover:bg-red-600 transition-colors duration-200"
-                  >Delete</button>
+                    className="flex-1 px-3 py-3 sm:py-2 rounded-full text-sm font-semibold text-white bg-[#F05A25] hover:bg-red-600 transition-colors duration-200 min-w-0"
+                  ><span className="truncate">Delete</span></button>
                 </div>
               )}
               {/* Bottom Close Button */}

@@ -417,17 +417,17 @@ const LostFound = () => {
 
                 {/* Action Buttons */}
                 {token && (user?.email === item.user?.email || user?.email === 'gauravkhandelwal205@gmail.com') && (
-                  <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
+                  <div className="flex flex-col sm:flex-row gap-2 mt-4 pt-4 border-t border-gray-100">
                     {!item.resolved && (
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           handleMarkResolved(item._id);
                         }}
-                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors duration-200"
+                        className="flex-1 flex items-center justify-center gap-2 px-4 py-3 sm:py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors duration-200 text-sm sm:text-base min-w-0"
                       >
-                        <FiCheckCircle className="w-4 h-4" />
-                        Mark Resolved
+                        <FiCheckCircle className="w-4 h-4 flex-shrink-0" />
+                        <span className="truncate">Mark Resolved</span>
                       </button>
                     )}
                     <button
@@ -435,20 +435,20 @@ const LostFound = () => {
                         e.stopPropagation();
                         openEditItemModal(item);
                       }}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors duration-200"
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-3 sm:py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors duration-200 text-sm sm:text-base min-w-0"
                     >
-                      <FiEdit2 className="w-4 h-4" />
-                      Edit
+                      <FiEdit2 className="w-4 h-4 flex-shrink-0" />
+                      <span className="truncate">Edit</span>
                     </button>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleDeleteItem(item._id);
                       }}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors duration-200"
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-3 sm:py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors duration-200 text-sm sm:text-base min-w-0"
                     >
-                      <FiTrash2 className="w-4 h-4" />
-                      Delete
+                      <FiTrash2 className="w-4 h-4 flex-shrink-0" />
+                      <span className="truncate">Delete</span>
                     </button>
                   </div>
                 )}

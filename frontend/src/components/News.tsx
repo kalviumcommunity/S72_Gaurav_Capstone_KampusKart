@@ -267,20 +267,20 @@ const News = () => {
 
                 {/* Action Buttons */}
                 {user?.email === "gauravkhandelwal205@gmail.com" && (
-                  <div className="flex gap-2 pt-4 border-t border-gray-100">
+                  <div className="flex flex-col sm:flex-row gap-2 pt-4 border-t border-gray-100">
                     <button
                       onClick={() => handleEditNews(item)}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors duration-200"
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-3 sm:py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors duration-200 text-sm sm:text-base min-w-0"
                     >
-                      <FiEdit2 className="w-4 h-4" />
-                      Edit
+                      <FiEdit2 className="w-4 h-4 flex-shrink-0" />
+                      <span className="truncate">Edit</span>
                     </button>
                     <button
                       onClick={() => handleDeleteNews(item._id)}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors duration-200"
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-3 sm:py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors duration-200 text-sm sm:text-base min-w-0"
                     >
-                      <FiTrash2 className="w-4 h-4" />
-                      Delete
+                      <FiTrash2 className="w-4 h-4 flex-shrink-0" />
+                      <span className="truncate">Delete</span>
                     </button>
                   </div>
                 )}
