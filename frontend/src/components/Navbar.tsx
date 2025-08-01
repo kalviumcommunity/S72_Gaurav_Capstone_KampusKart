@@ -94,15 +94,6 @@ const NavLinks: React.FC<NavLinksProps> = ({
             </div>
           </div>
         </div>
-        {/* Mobile Features Links - Not used in mobile menu anymore, handled in main mobile menu rendering */}
-        {/* <div className="md:hidden flex flex-col w-full space-y-2">
-          <Link to="/lostfound" className="px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base w-full text-center">Lost and Found</Link>
-          <Link to="/complaints" className="px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base w-full text-center">Complaints</Link>
-          <Link to="/events" className="px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base w-full text-center">Events</Link>
-          <Link to="/news" className="px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base w-full text-center">News</Link>
-          <Link to="/facilities" className="px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base w-full text-center">Facilities</Link>
-        </div> */}
-
       </>
     )}
   </>
@@ -155,25 +146,56 @@ const Navbar: React.FC = () => {
   // Close mobile menu when route changes
   useEffect(() => {
     setIsMobileMenuOpen(false);
+    setIsFeaturesDropdownOpen(false);
   }, [location]);
+
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('nav') && isMobileMenuOpen) {
+        setIsMobileMenuOpen(false);
+        setIsFeaturesDropdownOpen(false);
+      }
+    };
+
+    if (isMobileMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isMobileMenuOpen]);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen((prev) => !prev);
+    if (isMobileMenuOpen) {
+      setIsFeaturesDropdownOpen(false);
+    }
   };
 
   const handleFeaturesAreaMouseEnter = () => {
-    // Only open dropdown on hover for non-mobile (handled by CSS md: prefix)
-    setIsFeaturesDropdownOpen(true);
+    // Only open dropdown on hover for desktop
+    if (window.innerWidth >= 768) {
+      setIsFeaturesDropdownOpen(true);
+    }
   };
 
   const handleFeaturesAreaMouseLeave = () => {
-    // Only close dropdown on hover out for non-mobile (handled by CSS md: prefix)
-    setIsFeaturesDropdownOpen(false);
+    // Only close dropdown on hover out for desktop
+    if (window.innerWidth >= 768) {
+      setIsFeaturesDropdownOpen(false);
+    }
   };
 
   const handleFeaturesButtonClick = () => {
-    // Toggle for both desktop (click) and mobile (click in menu)
     setIsFeaturesDropdownOpen((prev) => !prev);
+  };
+
+  const handleMobileNavClick = () => {
+    setIsMobileMenuOpen(false);
+    setIsFeaturesDropdownOpen(false);
   };
 
   return (
@@ -208,7 +230,7 @@ const Navbar: React.FC = () => {
           </div>
           <button
             onClick={toggleMobileMenu}
-            className="p-2 rounded-md hover:bg-gray-100 focus:outline-none transition-all duration-300 ease-in-out transform hover:scale-110"
+            className="p-2 rounded-md bg-white hover:bg-gray-100 focus:outline-none transition-all duration-300 ease-in-out transform hover:scale-110 shadow-none border-none"
             aria-label="Toggle menu"
             aria-expanded={isMobileMenuOpen}
           >
@@ -220,9 +242,17 @@ const Navbar: React.FC = () => {
           </button>
         </div>
 
+        {/* Mobile Menu Overlay */}
+        {isMobileMenuOpen && (
+          <div 
+            className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+        )}
+
         {/* Mobile Menu */}
         <div
-          className={`md:hidden fixed top-[60px] left-0 w-full bg-white shadow-lg z-[100] transition-all duration-300 ease-in-out transform ${
+          className={`md:hidden fixed top-[60px] left-0 w-full bg-white shadow-lg z-50 transition-all duration-300 ease-in-out transform ${
             isMobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
           }`}
           style={{
@@ -233,98 +263,110 @@ const Navbar: React.FC = () => {
           <div className="flex flex-col space-y-4 p-6">
             {user && (
               <>
+                {/* Main Navigation Links */}
                 <Link 
                   to="/home" 
-                  className="px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-base w-full text-center transform hover:scale-105"
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-base w-full text-center transform hover:scale-105 flex items-center justify-center"
+                  onClick={handleMobileNavClick}
                 >
                   <HomeIcon sx={{ mr: 1 }} />
                   Home
                 </Link>
                 <Link 
                   to="/campus-map" 
-                  className="px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-base w-full text-center transform hover:scale-105"
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-base w-full text-center transform hover:scale-105 flex items-center justify-center"
+                  onClick={handleMobileNavClick}
                 >
                   <MapIcon sx={{ mr: 1 }} />
                   Campus Map
                 </Link>
                 <Link 
                   to="/chat" 
-                  className="px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-base w-full text-center transform hover:scale-105"
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-base w-full text-center transform hover:scale-105 flex items-center justify-center"
+                  onClick={handleMobileNavClick}
                 >
                   <ChatIcon sx={{ mr: 1 }} />
                   Chat
                 </Link>
-                {/* Mobile Features Dropdown (simplified) */}
-                <div className="w-full">
-                  <button
-                    onClick={handleFeaturesButtonClick}
-                    className="px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-300 ease-in-out text-base flex items-center justify-center w-full transform hover:scale-105"
-                    aria-expanded={isFeaturesDropdownOpen}
-                    aria-controls="mobile-features-menu"
-                    aria-haspopup="true"
-                    tabIndex={0}
+
+                {/* Mobile Features Section */}
+                <div className="space-y-2">
+                  <div className="text-sm font-semibold text-gray-600 px-2 mb-2">Features</div>
+                  <Link 
+                    to="/lostfound" 
+                    className="block px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-base w-full text-center transform hover:scale-105"
+                    onClick={handleMobileNavClick}
                   >
-                    <StarIcon sx={{ mr: 1 }} />
-                    Features {isFeaturesDropdownOpen ? <IoIosArrowDropup className="ml-1" /> : <IoIosArrowDropdown className="ml-1" />}
-                  </button>
-                  <div
-                    id="mobile-features-menu"
-                    className={`${isFeaturesDropdownOpen ? 'block' : 'hidden'} bg-gray-50 shadow-inner rounded-md w-full mt-2 overflow-hidden transition-all duration-300 ease-in-out`}
-                    style={{ pointerEvents: isFeaturesDropdownOpen ? 'auto' : 'none' }}
+                    Lost and Found
+                  </Link>
+                  <Link 
+                    to="/complaints" 
+                    className="block px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-base w-full text-center transform hover:scale-105"
+                    onClick={handleMobileNavClick}
                   >
-                    <Link 
-                      to="/lostfound" 
-                      className="block px-4 py-3 text-black hover:bg-[#FFD166] text-center transition-colors duration-300"
-                      onClick={() => { setIsFeaturesDropdownOpen(false); setIsMobileMenuOpen(false); }}
-                    >
-                      Lost and Found
-                    </Link>
-                    <Link 
-                      to="/complaints" 
-                      className="block px-4 py-3 text-black hover:bg-[#FFD166] text-center transition-colors duration-300"
-                      onClick={() => { setIsFeaturesDropdownOpen(false); setIsMobileMenuOpen(false); }}
-                    >
-                      Complaints
-                    </Link>
-                    <Link 
-                      to="/events" 
-                      className="block px-4 py-3 text-black hover:bg-[#FFD166] text-center transition-colors duration-300"
-                      onClick={() => { setIsFeaturesDropdownOpen(false); setIsMobileMenuOpen(false); }}
-                    >
-                      Events
-                    </Link>
-                    <Link 
-                      to="/clubs-recruitment" 
-                      className="block px-4 py-3 text-black hover:bg-[#FFD166] text-center transition-colors duration-300"
-                      onClick={() => { setIsFeaturesDropdownOpen(false); setIsMobileMenuOpen(false); }}
-                    >
-                      Clubs Recruitment
-                    </Link>
-                    <Link 
-                      to="/news" 
-                      className="block px-4 py-3 text-black hover:bg-[#FFD166] text-center transition-colors duration-300"
-                      onClick={() => { setIsFeaturesDropdownOpen(false); setIsMobileMenuOpen(false); }}
-                    >
-                      News
-                    </Link>
-                    <Link 
-                      to="/facilities" 
-                      className="block px-4 py-3 text-black hover:bg-[#FFD166] text-center transition-colors duration-300"
-                      onClick={() => { setIsFeaturesDropdownOpen(false); setIsMobileMenuOpen(false); }}
-                    >
-                      Facilities
-                    </Link>
-                  </div>
+                    Complaints
+                  </Link>
+                  <Link 
+                    to="/events" 
+                    className="block px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-base w-full text-center transform hover:scale-105"
+                    onClick={handleMobileNavClick}
+                  >
+                    Events
+                  </Link>
+                  <Link 
+                    to="/clubs-recruitment" 
+                    className="block px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-base w-full text-center transform hover:scale-105"
+                    onClick={handleMobileNavClick}
+                  >
+                    Clubs Recruitment
+                  </Link>
+                  <Link 
+                    to="/news" 
+                    className="block px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-base w-full text-center transform hover:scale-105"
+                    onClick={handleMobileNavClick}
+                  >
+                    News
+                  </Link>
+                  <Link 
+                    to="/facilities" 
+                    className="block px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-base w-full text-center transform hover:scale-105"
+                    onClick={handleMobileNavClick}
+                  >
+                    Facilities
+                  </Link>
                 </div>
-                <AuthButtons user={user} location={location} logout={logout} />
+
+                {/* User Actions */}
+                <div className="space-y-2 pt-4 border-t border-gray-200">
+                  <div className="text-sm font-semibold text-gray-600 px-2 mb-2">Account</div>
+                  <Link 
+                    to="/profile" 
+                    className="block px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-base w-full text-center transform hover:scale-105 flex items-center justify-center"
+                    onClick={handleMobileNavClick}
+                  >
+                    <AccountCircleIcon sx={{ mr: 1 }} />
+                    Profile
+                  </Link>
+                  <button
+                    onClick={() => {
+                      logout();
+                      handleMobileNavClick();
+                    }}
+                    className="w-full px-5 py-3 rounded-full font-bold text-white bg-[#181818] hover:bg-[#00C6A7] hover:text-white transition-all duration-300 ease-in-out text-base transform hover:scale-105 flex items-center justify-center"
+                  >
+                    <LogoutIcon sx={{ mr: 1 }} />
+                    Logout
+                  </button>
+                </div>
               </>
             )}
-            {/* Show AuthButtons for unauthenticated users as well */}
+            
+            {/* Show AuthButtons for unauthenticated users */}
             {!user && (
-              <AuthButtons user={user} location={location} logout={logout} />
+              <div className="space-y-2">
+                <div className="text-sm font-semibold text-gray-600 px-2 mb-2">Authentication</div>
+                <AuthButtons user={user} location={location} logout={logout} />
+              </div>
             )}
           </div>
         </div>
