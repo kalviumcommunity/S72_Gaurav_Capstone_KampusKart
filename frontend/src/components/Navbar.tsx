@@ -37,30 +37,30 @@ const NavLinks: React.FC<NavLinksProps> = ({
   <>
     {user && (
       <>
-        <Link to="/home" className="px-5 py-3 md:py-2 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base w-full md:w-auto text-center">
-          <HomeIcon sx={{ mr: 1 }} />
-          Home
+        <Link to="/home" className="px-1.5 lg:px-2 xl:px-3 py-1 lg:py-1.5 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-xs lg:text-sm xl:text-base whitespace-nowrap flex items-center justify-center min-w-0">
+          <HomeIcon sx={{ mr: 0.5, fontSize: '0.75rem', lg: { fontSize: '0.875rem' } }} />
+          <span className="hidden lg:inline">Home</span>
         </Link>
-        <Link to="/campus-map" className="px-5 py-3 md:py-2 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base w-full md:w-auto text-center">
-          <MapIcon sx={{ mr: 1 }} />
-          Campus Map
+        <Link to="/campus-map" className="px-1.5 lg:px-2 xl:px-3 py-1 lg:py-1.5 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-xs lg:text-sm xl:text-base whitespace-nowrap flex items-center justify-center min-w-0">
+          <MapIcon sx={{ mr: 0.5, fontSize: '0.75rem', lg: { fontSize: '0.875rem' } }} />
+          <span className="hidden lg:inline">Campus Map</span>
         </Link>
-        <Link to="/chat" className="px-5 py-3 md:py-2 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base w-full md:w-auto text-center flex items-center justify-center gap-2">
-          <ChatIcon sx={{ mr: 1 }} />
-          Chat
+        <Link to="/chat" className="px-1.5 lg:px-2 xl:px-3 py-1 lg:py-1.5 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-xs lg:text-sm xl:text-base whitespace-nowrap flex items-center justify-center min-w-0">
+          <ChatIcon sx={{ mr: 0.5, fontSize: '0.75rem', lg: { fontSize: '0.875rem' } }} />
+          <span className="hidden lg:inline">Chat</span>
         </Link>
         {/* Desktop Features Dropdown */}
         <div className="hidden md:block">
           <div
             ref={featuresRef}
-            className="relative group flex items-center w-full md:w-auto"
+            className="relative group flex items-center"
             onMouseEnter={handleFeaturesAreaMouseEnter}
             onMouseLeave={handleFeaturesAreaMouseLeave}
           >
             <button
               id="features-button"
               onClick={handleFeaturesButtonClick}
-              className="px-5 py-3 md:py-2 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base flex items-center justify-center w-full md:w-auto"
+              className="px-1.5 lg:px-2 xl:px-3 py-1 lg:py-1.5 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-xs lg:text-sm xl:text-base whitespace-nowrap flex items-center justify-center min-w-0"
               aria-expanded={isFeaturesDropdownOpen}
               aria-controls="features-menu"
               aria-haspopup="true"
@@ -74,8 +74,8 @@ const NavLinks: React.FC<NavLinksProps> = ({
                 }
               }}
             >
-              <StarIcon sx={{ mr: 1 }} />
-              Features {isFeaturesDropdownOpen ? <IoIosArrowDropup className="ml-1" /> : <IoIosArrowDropdown className="ml-1" />}
+              <StarIcon sx={{ mr: 0.5, fontSize: '0.75rem', lg: { fontSize: '0.875rem' } }} />
+              <span className="hidden lg:inline">Features</span> {isFeaturesDropdownOpen ? <IoIosArrowDropup className="ml-0.5" /> : <IoIosArrowDropdown className="ml-0.5" />}
             </button>
             <div
               id="features-menu"
@@ -107,29 +107,29 @@ interface AuthButtonsProps {
 }
 
 const AuthButtons: React.FC<AuthButtonsProps> = ({ user, location, logout }) => (
-  <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
+  <div className="flex flex-col md:flex-row gap-1 lg:gap-2 w-full md:w-auto">
     {!user && (
       <>
         {location.pathname !== '/login' && (
-          <Link to="/login" className="px-5 py-3 md:py-2 rounded-full font-bold text-black bg-white border border-[#E0E0E0] hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base w-full md:w-auto text-center">Login</Link>
+          <Link to="/login" className="px-1.5 lg:px-2 xl:px-3 py-1 lg:py-1.5 rounded-full font-bold text-black bg-white border border-[#E0E0E0] hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-xs lg:text-sm xl:text-base whitespace-nowrap w-full md:w-auto text-center min-w-0">Login</Link>
         )}
         {location.pathname !== '/signup' && (
-          <Link to="/signup" className="px-5 py-3 md:py-2 rounded-full font-bold text-white bg-[#181818] hover:bg-[#00C6A7] hover:text-white transition-colors duration-200 text-base w-full md:w-auto text-center">Sign up</Link>
+          <Link to="/signup" className="px-1.5 lg:px-2 xl:px-3 py-1 lg:py-1.5 rounded-full font-bold text-white bg-[#181818] hover:bg-[#00C6A7] hover:text-white transition-colors duration-200 text-xs lg:text-sm xl:text-base whitespace-nowrap w-full md:w-auto text-center min-w-0">Sign up</Link>
         )}
       </>
     )}
     {user && (
       <>
-        <Link to="/profile" className="px-5 py-3 md:py-2 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-base w-full md:w-auto text-center">
-          <AccountCircleIcon sx={{ mr: 1 }} />
-          Profile
+        <Link to="/profile" className="px-1.5 lg:px-2 xl:px-3 py-1 lg:py-1.5 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-xs lg:text-sm xl:text-base whitespace-nowrap w-full md:w-auto text-center flex items-center justify-center min-w-0">
+          <AccountCircleIcon sx={{ mr: 0.5, fontSize: '0.75rem', lg: { fontSize: '0.875rem' } }} />
+          <span className="hidden lg:inline">Profile</span>
         </Link>
         <button
           onClick={logout}
-          className="px-5 py-3 md:py-2 rounded-full font-bold text-white bg-[#181818] hover:bg-[#00C6A7] hover:text-white transition-colors duration-200 text-base w-full md:w-auto"
+          className="px-1.5 lg:px-2 xl:px-3 py-1 lg:py-1.5 rounded-full font-bold text-white bg-[#181818] hover:bg-[#00C6A7] hover:text-white transition-colors duration-200 text-xs lg:text-sm xl:text-base whitespace-nowrap w-full md:w-auto flex items-center justify-center min-w-0"
         >
-          <LogoutIcon sx={{ mr: 1 }} />
-          Logout
+          <LogoutIcon sx={{ mr: 0.5, fontSize: '0.75rem', lg: { fontSize: '0.875rem' } }} />
+          <span className="hidden lg:inline">Logout</span>
         </button>
       </>
     )}
@@ -200,10 +200,11 @@ const Navbar: React.FC = () => {
 
   return (
     <nav className="bg-white shadow-md fixed top-0 left-0 w-full z-50">
-      <div className="container mx-auto px-4 py-3">
+      <div className="container mx-auto px-2 sm:px-4 py-1.5 sm:py-2">
         {/* Desktop Navigation */}
-        <div className="hidden md:flex justify-between items-center">
-          <div className="flex items-center space-x-6">
+        <div className="hidden md:flex justify-between items-center relative min-h-[50px] max-w-full">
+          {/* Left Section - Navigation Links */}
+          <div className="flex items-center space-x-1 lg:space-x-2 xl:space-x-4 flex-shrink-0 min-w-0 max-w-[40%]">
             <NavLinks
               user={user}
               location={location}
@@ -215,11 +216,17 @@ const Navbar: React.FC = () => {
               featuresRef={featuresRef}
             />
           </div>
-          <div className="flex items-center gap-3 absolute left-1/2 transform -translate-x-1/2">
-            <img src='/Logo.png' alt='KampusKart Logo' className='h-10 w-10 object-contain transition-transform duration-300 hover:scale-110' style={{ background: 'none', border: 'none', borderRadius: 0, boxShadow: 'none' }} />
-            <span className='text-xl font-extrabold text-black font-sans' style={{ fontFamily: 'Work Sans, sans-serif' }}>Kampuskart</span>
+          
+          {/* Center Section - Branding */}
+          <div className="flex items-center gap-1 lg:gap-2 absolute left-1/2 transform -translate-x-1/2 flex-shrink-0 z-10">
+            <img src='/Logo.png' alt='KampusKart Logo' className='h-6 w-6 lg:h-8 lg:w-8 object-contain transition-transform duration-300 hover:scale-110' style={{ background: 'none', border: 'none', borderRadius: 0, boxShadow: 'none' }} />
+            <span className='text-sm lg:text-lg font-extrabold text-black font-sans whitespace-nowrap' style={{ fontFamily: 'Work Sans, sans-serif' }}>Kampuskart</span>
           </div>
-          <AuthButtons user={user} location={location} logout={logout} />
+          
+          {/* Right Section - Auth Buttons */}
+          <div className="flex items-center gap-1 lg:gap-2 flex-shrink-0 min-w-0 max-w-[40%]">
+            <AuthButtons user={user} location={location} logout={logout} />
+          </div>
         </div>
 
         {/* Mobile Navigation */}

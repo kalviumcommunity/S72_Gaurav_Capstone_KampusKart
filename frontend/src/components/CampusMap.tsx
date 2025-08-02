@@ -53,7 +53,6 @@ const CampusMap: React.FC<CampusMapProps> = () => {
   const [infoWindowPosition, setInfoWindowPosition] = useState<google.maps.LatLng | null>(null);
   const [hasRequestedLocation, setHasRequestedLocation] = useState(false);
   const animationInProgress = useRef(false);
-  const [isPanelOpen, setIsPanelOpen] = useState(window.innerWidth >= 768); // Panel open by default on desktop
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   const { isLoaded, loadError } = useGoogleMaps();
@@ -351,10 +350,8 @@ const CampusMap: React.FC<CampusMapProps> = () => {
     }
   }, [hasRequestedLocation, mapRef, userLocation]);
 
-  // Toggle panel visibility on mobile
-  const togglePanel = useCallback(() => {
-    setIsPanelOpen(prev => !prev);
-  }, []);
+  // Panel is always open on desktop, hidden on mobile
+  const isPanelOpen = window.innerWidth >= 768;
 
 
   // Cleanup debounced function on unmount
@@ -376,67 +373,72 @@ const CampusMap: React.FC<CampusMapProps> = () => {
   }
 
   return (
-    <div className="w-full h-full flex flex-col bg-gray-100 relative overflow-hidden">
-      <div className="p-4">
-         <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Campus Map</h1>
+    <div className="w-full h-screen flex flex-col bg-gray-100 relative overflow-hidden">
+      {/* Mobile Header - Only visible on mobile */}
+      <div className="md:hidden p-3 bg-white shadow-sm border-b border-gray-200">
+        <h1 className="text-xl font-bold text-gray-800 text-center">Campus Map</h1>
       </div>
+      
+      {/* Desktop Header - Only visible on desktop */}
+      <div className="hidden md:block p-4">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Campus Map</h1>
+      </div>
+      
       {/* Main flex container for map and panel */}
-      <div className="flex flex-col md:flex-row flex-grow h-0">
+      <div className="flex flex-col md:flex-row flex-1 min-h-0">
         {/* Map Container - Full width on mobile, 2/3 on desktop */}
-        {/* Adjusted height logic based on panel state on mobile */}
-        <div className={`w-full md:w-2/3 ${isPanelOpen ? 'h-[60vh]' : 'h-[100vh]'} md:h-full relative transition-all duration-300 ease-in-out`}>
+        <div className="w-full md:w-2/3 h-full relative">
           <div className="bg-white shadow-lg overflow-hidden h-full relative">
             {/* Mobile Search Bar and Dropdown - Visible on mobile only, positioned over map */}
-            <div className="md:hidden absolute top-4 left-1/2 transform -translate-x-1/2 z-10 w-[90%] max-w-md">
+            <div className="md:hidden absolute top-2 left-1/2 transform -translate-x-1/2 z-10 w-[95%] max-w-sm">
               <form
-                className="relative w-full flex border border-gray-300 overflow-hidden shadow-sm focus-within:ring-1 focus-within:ring-black focus-within:border-black transition-all duration-300 rounded-full bg-white"
+                className="relative w-full flex border border-gray-300 overflow-hidden shadow-lg focus-within:ring-2 focus-within:ring-[#00C6A7] focus-within:border-[#00C6A7] transition-all duration-300 rounded-full bg-white"
                 onSubmit={e => { e.preventDefault(); setSearchQuery(searchInput); }}
               >
                 <div className="relative flex items-center flex-1">
                   <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                   <input
                     type="text"
-                    placeholder="Search locations..."
-                    className="block w-full pl-10 pr-4 py-2 bg-white text-black outline-none text-lg border-none rounded-l-full"
+                    placeholder="Search campus locations..."
+                    className="block w-full pl-10 pr-4 py-2.5 bg-white text-black outline-none text-base border-none rounded-l-full"
                     value={searchInput}
                     onChange={handleSearchInputChange}
                     onFocus={handleSearchFocus}
                     onBlur={handleSearchBlur}
                     aria-label="Search locations"
-                    onClick={() => setIsSearchFocused(true)} // Ensure focus on click
+                    onClick={() => setIsSearchFocused(true)}
                   />
                 </div>
                 <button
                   type="submit"
                   aria-label="Search"
-                  className="px-6 py-2 bg-[#00C6A7] text-white font-semibold hover:bg-[#009e87] transition-all duration-300 ease-in-out rounded-r-full transform hover:scale-105 flex items-center justify-center"
+                  className="px-4 py-2.5 bg-[#00C6A7] text-white font-semibold hover:bg-[#009e87] transition-all duration-300 ease-in-out rounded-r-full flex items-center justify-center"
                 >
-                  <FiSearch className="md:hidden" />
-                  <span className="hidden md:inline">Search</span>
+                  <FiSearch className="h-4 w-4" />
                 </button>
               </form>
 
               {/* Mobile Locations Dropdown */}
               {isSearchFocused && filteredLocations.length > 0 && (
-                <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 shadow-lg rounded-md mt-1 max-h-60 overflow-y-auto z-20">
-                  <ul className="space-y-2 p-2">
+                <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 shadow-xl rounded-lg mt-1 max-h-48 overflow-y-auto z-20">
+                  <ul className="space-y-1 p-2">
                     {filteredLocations.map((location) => (
                       <li
                         key={location.id}
-                        className={`pb-2 border-b border-gray-200 text-gray-800 cursor-pointer hover:bg-gray-100 p-2 rounded transition-all duration-300 ease-in-out transform hover:scale-105 ${
-                          selectedLocation?.id === location.id ? 'bg-blue-100' : ''
+                        className={`border-b border-gray-100 text-gray-800 cursor-pointer hover:bg-gray-50 p-2 rounded transition-all duration-200 ${
+                          selectedLocation?.id === location.id ? 'bg-blue-50 border-blue-200' : ''
                         }`}
                         onClick={() => {
                           handleLocationClick(location);
-                          setIsSearchFocused(false); // Close dropdown after selection
+                          setIsSearchFocused(false);
                         }}
                       >
-                        <div className="flex flex-wrap items-start gap-2">
+                        <div className="flex items-start gap-2">
                           <div className="flex-1 min-w-0">
-                            <span className="font-semibold text-sm md:text-base block truncate">{location.id}. {location.name}</span>
-                            <p className="text-xs md:text-sm text-gray-600 mt-1 line-clamp-2">{location.description}</p>
+                            <span className="font-semibold text-sm block truncate">{location.id}. {location.name}</span>
+                            <p className="text-xs text-gray-600 mt-1 line-clamp-1">{location.description}</p>
                           </div>
-                          <span className="text-xs bg-gray-200 px-2 py-1 rounded-full flex-shrink-0 whitespace-nowrap">
+                          <span className="text-xs bg-gray-100 px-2 py-1 rounded-full flex-shrink-0 whitespace-nowrap">
                             {location.category}
                           </span>
                         </div>
@@ -491,29 +493,29 @@ const CampusMap: React.FC<CampusMapProps> = () => {
                   }}
                   options={{
                     pixelOffset: new window.google.maps.Size(0, -30),
-                    maxWidth: 380,
+                    maxWidth: window.innerWidth < 768 ? 280 : 380,
                     disableAutoPan: false
                   }}
                 >
-                  <div className="p-3 max-w-sm bg-white rounded-lg shadow-lg">
+                  <div className="p-2 max-w-xs">
                     {/* Header Section */}
-                    <div className="flex items-start justify-between mb-4 border-b border-gray-100 pb-3">
-                      <div>
-                        <h3 className="font-bold text-xl text-gray-800 mb-1">{selectedLocation.name}</h3>
-                        <span className="text-xs bg-blue-100 text-blue-800 px-2.5 py-1 rounded-full font-medium">
+                    <div className="flex items-start justify-between mb-3 border-b border-gray-100 pb-2">
+                      <div className="flex-1">
+                        <h3 className="font-bold text-lg text-gray-800 mb-1 line-clamp-2">{selectedLocation.name}</h3>
+                        <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-medium">
                           {selectedLocation.category}
                         </span>
                       </div>
                     </div>
 
                     {/* Description Section */}
-                    <div className="bg-gray-50 p-4 rounded-lg mb-4">
-                      <h4 className="text-sm font-semibold text-gray-700 mb-2">About this location</h4>
-                      <p className="text-sm text-gray-600 leading-relaxed">{selectedLocation.description}</p>
+                    <div className="bg-gray-50 p-3 rounded-lg mb-3">
+                      <h4 className="text-sm font-semibold text-gray-700 mb-1">About this location</h4>
+                      <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">{selectedLocation.description}</p>
                     </div>
 
                     {/* Location Details Section */}
-                    <div className="space-y-2 mb-4">
+                    <div className="space-y-1 mb-3">
                       <div className="flex items-center text-sm text-gray-600">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -526,13 +528,13 @@ const CampusMap: React.FC<CampusMapProps> = () => {
                     {/* Action Buttons */}
                     <div className="flex gap-2">
                       <button
-                        className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center gap-2 font-medium"
+                        className="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center gap-2 font-medium text-sm"
                         onClick={() => {
                           const url = `https://www.google.com/maps/dir/?api=1&destination=${selectedLocation.lat},${selectedLocation.lng}`;
                           window.open(url, '_blank');
                         }}
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                           <path fillRule="evenodd" d="M12 1.586l-4 4v12.828l4-4V1.586zM3.707 3.293A1 1 0 002 4v10a1 1 0 00.293.707L6 18.414V5.586L3.707 3.293zM17.707 5.293L14 1.586v12.828l2.293 2.293A1 1 0 0018 16V6a1 1 0 00-.293-.707z" clipRule="evenodd" />
                         </svg>
                         Get Directions
@@ -542,14 +544,14 @@ const CampusMap: React.FC<CampusMapProps> = () => {
                 </InfoWindow>
               )}
             </GoogleMap>
-            {/* Recenter Button - Adjusted for mobile */}
+            {/* Recenter Button - Optimized for mobile */}
             <button
               onClick={handleRecenter}
-              className="absolute bottom-4 md:bottom-6 left-4 md:left-6 z-10 bg-white border border-gray-300 shadow-lg rounded-full p-2 md:p-3 flex items-center justify-center hover:bg-blue-100 transition-all duration-300 ease-in-out transform hover:scale-110"
+              className="absolute bottom-3 left-3 z-10 bg-white border border-gray-300 shadow-lg rounded-full p-2.5 flex items-center justify-center hover:bg-blue-50 transition-all duration-200"
               title="Re-center map on your location"
-              style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.10)' }}
+              style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 md:h-6 md:w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth={2} fill="none" />
                 <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth={2} fill="none" />
                 <line x1="12" y1="2" x2="12" y2="6" stroke="currentColor" strokeWidth={2} />
