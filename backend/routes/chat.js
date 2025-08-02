@@ -140,11 +140,21 @@ router.patch('/messages/:messageId', auth, async (req, res) => {
     const { message } = req.body;
     const chatMessage = await Chat.findById(req.params.messageId);
     
+    // Debug logging
+    console.log('Edit message debug:', {
+      messageId: req.params.messageId,
+      currentUser: req.user._id,
+      messageSender: chatMessage ? chatMessage.sender : null,
+      messageSenderString: chatMessage ? chatMessage.sender.toString() : null,
+      userString: req.user._id.toString(),
+      comparison: chatMessage ? chatMessage.sender.toString() === req.user._id.toString() : false
+    });
+    
     if (!chatMessage) {
       return res.status(404).json({ message: 'Message not found' });
     }
 
-    if (chatMessage.sender.toString() !== req.user._id) {
+    if (chatMessage.sender.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: 'Not authorized to edit this message' });
     }
 

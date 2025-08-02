@@ -48,9 +48,11 @@ const ChatWindow = () => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [searchResults, setSearchResults] = useState([]);
-  const [showSearch, setShowSearch] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState(null);
+  const [editingMessage, setEditingMessage] = useState(null);
+  const [editText, setEditText] = useState('');
   const [anchorEl, setAnchorEl] = useState(null);
+  const [contextMenu, setContextMenu] = useState(null);
   const [replyTo, setReplyTo] = useState(null);
   const [attachments, setAttachments] = useState([]);
   const fileInputRef = useRef(null);
@@ -251,9 +253,21 @@ const ChatWindow = () => {
     }, 1000);
   };
 
-  const handleMessageMenu = (event, message) => {
-    setAnchorEl(event.currentTarget);
-    setSelectedMessage(message);
+  const handleContextMenu = (event, message) => {
+    event.preventDefault();
+    const isOwnMessage = message.sender._id === user._id;
+    if (isOwnMessage) {
+      setContextMenu({
+        mouseX: event.clientX || event.touches?.[0]?.clientX || 0,
+        mouseY: event.clientY || event.touches?.[0]?.clientY || 0,
+      });
+      setSelectedMessage(message);
+    }
+  };
+
+  const handleCloseContextMenu = () => {
+    setContextMenu(null);
+    setSelectedMessage(null);
   };
 
   const handleDeleteMessage = async () => {
@@ -273,6 +287,53 @@ const ChatWindow = () => {
     }
     setAnchorEl(null);
     setSelectedMessage(null);
+  };
+
+  const handleEditMessage = async () => {
+    if (!selectedMessage || !editText.trim()) return;
+    
+    console.log('Editing message:', {
+      messageId: selectedMessage._id,
+      currentUser: user._id,
+      messageSender: selectedMessage.sender._id,
+      isOwnMessage: selectedMessage.sender._id === user._id
+    });
+    
+    try {
+      const response = await fetch(`${API_BASE}/api/chat/messages/${selectedMessage._id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({ message: editText.trim() }),
+      });
+      
+      if (response.ok) {
+        const updatedMessage = await response.json();
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg._id === selectedMessage._id ? { ...msg, ...updatedMessage } : msg
+          )
+        );
+        console.log('Message edited successfully');
+      } else {
+        const errorData = await response.text();
+        console.error('Failed to edit message:', response.status, response.statusText, errorData);
+      }
+    } catch (error) {
+      console.error('Error editing message:', error);
+    }
+    setEditingMessage(null);
+    setEditText('');
+    setAnchorEl(null);
+    setSelectedMessage(null);
+  };
+
+  const startEditing = (message) => {
+    setEditingMessage(message);
+    setEditText(message.message);
+    setAnchorEl(null);
   };
 
   const markMessageAsRead = async (messageId) => {
@@ -304,7 +365,7 @@ const ChatWindow = () => {
       elevation={1}
       sx={{
         p: 2,
-        mb: 1,
+        mb: 0,
         bgcolor: '#fff',
         borderRadius: '0 0 16px 16px',
         display: 'flex',
@@ -327,11 +388,6 @@ const ChatWindow = () => {
             {onlineUsers.length} online
           </Typography>
         </Box>
-      </Box>
-      <Box>
-        <IconButton onClick={() => setShowSearch(!showSearch)}>
-          <SearchIcon />
-        </IconButton>
       </Box>
     </Paper>
   );
@@ -365,26 +421,103 @@ const ChatWindow = () => {
             sx={{ border: isOwnMessage ? '2px solid #1976d2' : '2px solid #e0e0e0' }}
           />
         </ListItemAvatar>
-        <Box sx={{
-          bgcolor: isOwnMessage ? '#e3f2fd' : '#fff',
-          border: isOwnMessage ? '1px solid #90caf9' : '1px solid #e0e0e0',
-          borderRadius: isOwnMessage ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-          p: 1.5,
-          minWidth: 120,
-          maxWidth: 420,
-          boxShadow: 1,
-          ml: isOwnMessage ? 0 : 1,
-          mr: isOwnMessage ? 1 : 0,
-          position: 'relative',
-        }}>
-          <Typography variant="body2" color="text.primary" sx={{ wordBreak: 'break-word' }}>
-            {message.message}
-            {message.edited && (
-              <Typography component="span" variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-                (edited)
-              </Typography>
-            )}
-          </Typography>
+        <Box 
+          onContextMenu={(e) => handleContextMenu(e, message)}
+          onTouchStart={(e) => {
+            // For mobile long press
+            const timer = setTimeout(() => {
+              try {
+                if (e.cancelable) {
+                  e.preventDefault();
+                }
+                handleContextMenu(e, message);
+              } catch {
+                // Fallback if preventDefault fails
+                handleContextMenu(e, message);
+              }
+            }, 500);
+            e.currentTarget.touchTimer = timer;
+          }}
+          onTouchEnd={(e) => {
+            if (e.currentTarget.touchTimer) {
+              clearTimeout(e.currentTarget.touchTimer);
+              e.currentTarget.touchTimer = null;
+            }
+          }}
+          onTouchMove={(e) => {
+            // Cancel long press if user moves finger
+            if (e.currentTarget.touchTimer) {
+              clearTimeout(e.currentTarget.touchTimer);
+              e.currentTarget.touchTimer = null;
+            }
+          }}
+          sx={{
+            bgcolor: isOwnMessage ? '#e3f2fd' : '#fff',
+            border: isOwnMessage ? '1px solid #90caf9' : '1px solid #e0e0e0',
+            borderRadius: isOwnMessage ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+            p: 1.5,
+            minWidth: 120,
+            maxWidth: 420,
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+            ml: isOwnMessage ? 0 : 1,
+            mr: isOwnMessage ? 1 : 0,
+            position: 'relative',
+            transition: 'all 0.2s ease-in-out',
+            cursor: isOwnMessage ? 'context-menu' : 'default',
+            '&:hover': {
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.12)',
+              transform: 'translateY(-1px)'
+            }
+          }}
+        >
+          {editingMessage?._id === message._id ? (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              <TextField
+                value={editText}
+                onChange={(e) => setEditText(e.target.value)}
+                variant="outlined"
+                size="small"
+                multiline
+                maxRows={3}
+                sx={{ 
+                  '& .MuiOutlinedInput-root': {
+                    fontSize: '0.875rem',
+                    padding: '4px 8px',
+                  }
+                }}
+              />
+              <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+                <Button
+                  size="small"
+                  onClick={() => {
+                    setEditingMessage(null);
+                    setEditText('');
+                  }}
+                  sx={{ fontSize: '0.75rem', px: 1, py: 0.5 }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  size="small"
+                  variant="contained"
+                  onClick={handleEditMessage}
+                  disabled={!editText.trim() || editText.trim() === message.message}
+                  sx={{ fontSize: '0.75rem', px: 1, py: 0.5 }}
+                >
+                  Save
+                </Button>
+              </Box>
+            </Box>
+          ) : (
+            <Typography variant="body2" color="text.primary" sx={{ wordBreak: 'break-word' }}>
+              {message.message}
+              {message.edited && (
+                <Typography component="span" variant="caption" color="text.secondary" sx={{ ml: 1 }}>
+                  (edited)
+                </Typography>
+              )}
+            </Typography>
+          )}
           {message.attachments && message.attachments.length > 0 && (
             <Box sx={{ mt: 1 }}>
               {message.attachments.map((attachment, index) => (
@@ -435,13 +568,7 @@ const ChatWindow = () => {
             )}
           </Box>
         </Box>
-        <IconButton
-          size="small"
-          onClick={(e) => handleMessageMenu(e, message)}
-          sx={{ position: 'absolute', top: 0, right: isOwnMessage ? 'auto' : 0, left: isOwnMessage ? 0 : 'auto' }}
-        >
-          <MoreVertIcon fontSize="small" />
-        </IconButton>
+
       </ListItem>
     );
   };
@@ -464,7 +591,7 @@ const ChatWindow = () => {
   return (
     <Box sx={{
       position: 'fixed',
-      top: '58px',
+      top: 0,
       left: 0,
       right: 0,
       bottom: 0,
@@ -473,8 +600,9 @@ const ChatWindow = () => {
       flexDirection: 'column',
       bgcolor: '#f7f7fa',
       overflow: 'hidden',
-      height: 'calc(100vh - 58px)',
+      height: '100vh',
       minHeight: 0,
+      pt: '64px', // Use padding-top instead of top positioning
     }}>
       <ChatHeader />
       {/* Messages */}
@@ -587,17 +715,62 @@ const ChatWindow = () => {
         </Paper>
       </Box>
 
-      {/* Message Menu */}
+      {/* Context Menu */}
       <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={() => setAnchorEl(null)}
+        open={contextMenu !== null}
+        onClose={handleCloseContextMenu}
+        anchorReference="anchorPosition"
+        anchorPosition={
+          contextMenu !== null && contextMenu.mouseX && contextMenu.mouseY
+            ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+            : { top: 0, left: 0 }
+        }
+        PaperProps={{
+          sx: {
+            borderRadius: '12px',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
+            border: '1px solid rgba(0, 0, 0, 0.08)',
+            minWidth: 120
+          }
+        }}
       >
         {selectedMessage?.sender._id === user._id && (
-          <MenuItem onClick={handleDeleteMessage}>
-            <DeleteIcon fontSize="small" sx={{ mr: 1 }} />
-            Delete
-          </MenuItem>
+          <>
+            <MenuItem 
+              onClick={() => {
+                startEditing(selectedMessage);
+                handleCloseContextMenu();
+              }}
+              sx={{
+                borderRadius: '8px',
+                mx: 0.5,
+                my: 0.25,
+                '&:hover': {
+                  backgroundColor: '#e3f2fd'
+                }
+              }}
+            >
+              <EditIcon fontSize="small" sx={{ mr: 1.5, color: '#1976d2' }} />
+              <Typography variant="body2" sx={{ fontWeight: 500 }}>Edit</Typography>
+            </MenuItem>
+            <MenuItem 
+              onClick={() => {
+                handleDeleteMessage();
+                handleCloseContextMenu();
+              }}
+              sx={{
+                borderRadius: '8px',
+                mx: 0.5,
+                my: 0.25,
+                '&:hover': {
+                  backgroundColor: '#ffebee'
+                }
+              }}
+            >
+              <DeleteIcon fontSize="small" sx={{ mr: 1.5, color: '#d32f2f' }} />
+              <Typography variant="body2" sx={{ fontWeight: 500, color: '#d32f2f' }}>Delete</Typography>
+            </MenuItem>
+          </>
         )}
       </Menu>
 

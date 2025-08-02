@@ -111,24 +111,26 @@ const AuthButtons: React.FC<AuthButtonsProps> = ({ user, location, logout }) => 
     {!user && (
       <>
         {location.pathname !== '/login' && (
-          <Link to="/login" className="px-1.5 lg:px-2 xl:px-3 py-1 lg:py-1.5 rounded-full font-bold text-black bg-white border border-[#E0E0E0] hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-xs lg:text-sm xl:text-base whitespace-nowrap w-full md:w-auto text-center min-w-0">Login</Link>
+          <Link to="/login" className="px-4 py-4 md:px-1.5 md:py-1 lg:px-2 xl:px-3 lg:py-1.5 rounded-full font-bold text-black bg-white border border-[#E0E0E0] hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-lg md:text-xs lg:text-sm xl:text-base whitespace-nowrap w-full md:w-auto text-center min-w-0">Login</Link>
         )}
         {location.pathname !== '/signup' && (
-          <Link to="/signup" className="px-1.5 lg:px-2 xl:px-3 py-1 lg:py-1.5 rounded-full font-bold text-white bg-[#181818] hover:bg-[#00C6A7] hover:text-white transition-colors duration-200 text-xs lg:text-sm xl:text-base whitespace-nowrap w-full md:w-auto text-center min-w-0">Sign up</Link>
+          <Link to="/signup" className="px-4 py-4 md:px-1.5 md:py-1 lg:px-2 xl:px-3 lg:py-1.5 rounded-full font-bold text-white bg-[#181818] hover:bg-[#00C6A7] hover:text-white transition-colors duration-200 text-lg md:text-xs lg:text-sm xl:text-base whitespace-nowrap w-full md:w-auto text-center min-w-0">Sign up</Link>
         )}
       </>
     )}
     {user && (
       <>
-        <Link to="/profile" className="px-1.5 lg:px-2 xl:px-3 py-1 lg:py-1.5 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-xs lg:text-sm xl:text-base whitespace-nowrap w-full md:w-auto text-center flex items-center justify-center min-w-0">
-          <AccountCircleIcon sx={{ mr: 0.5, fontSize: '0.75rem', lg: { fontSize: '0.875rem' } }} />
+        <Link to="/profile" className="px-4 py-4 md:px-1.5 md:py-1 lg:px-2 xl:px-3 lg:py-1.5 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-colors duration-200 text-lg md:text-xs lg:text-sm xl:text-base whitespace-nowrap w-full md:w-auto text-center flex items-center justify-center min-w-0">
+          <AccountCircleIcon sx={{ mr: 2, fontSize: '1.25rem', '@media (min-width: 768px)': { mr: 0.5, fontSize: '0.75rem' }, '@media (min-width: 1024px)': { fontSize: '0.875rem' } }} />
+          <span className="md:hidden">Profile</span>
           <span className="hidden lg:inline">Profile</span>
         </Link>
         <button
           onClick={logout}
-          className="px-1.5 lg:px-2 xl:px-3 py-1 lg:py-1.5 rounded-full font-bold text-white bg-[#181818] hover:bg-[#00C6A7] hover:text-white transition-colors duration-200 text-xs lg:text-sm xl:text-base whitespace-nowrap w-full md:w-auto flex items-center justify-center min-w-0"
+          className="px-4 py-4 md:px-1.5 md:py-1 lg:px-2 xl:px-3 lg:py-1.5 rounded-full font-bold text-white bg-[#181818] hover:bg-[#00C6A7] hover:text-white transition-colors duration-200 text-lg md:text-xs lg:text-sm xl:text-base whitespace-nowrap w-full md:w-auto flex items-center justify-center min-w-0"
         >
-          <LogoutIcon sx={{ mr: 0.5, fontSize: '0.75rem', lg: { fontSize: '0.875rem' } }} />
+          <LogoutIcon sx={{ mr: 2, fontSize: '1.25rem', '@media (min-width: 768px)': { mr: 0.5, fontSize: '0.75rem' }, '@media (min-width: 1024px)': { fontSize: '0.875rem' } }} />
+          <span className="md:hidden">Logout</span>
           <span className="hidden lg:inline">Logout</span>
         </button>
       </>
@@ -267,76 +269,76 @@ const Navbar: React.FC = () => {
             overflow: 'auto'
           }}
         >
-          <div className="flex flex-col space-y-4 p-6">
+          <div className="flex flex-col space-y-3 p-4">
             {user && (
               <>
                 {/* Main Navigation Links */}
                 <Link 
                   to="/home" 
-                  className="px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-base w-full text-center transform hover:scale-105 flex items-center justify-center"
+                  className="px-4 py-4 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-lg w-full text-center transform hover:scale-105 flex items-center justify-center"
                   onClick={handleMobileNavClick}
                 >
-                  <HomeIcon sx={{ mr: 1 }} />
+                  <HomeIcon sx={{ mr: 2, fontSize: '1.25rem' }} />
                   Home
                 </Link>
                 <Link 
                   to="/campus-map" 
-                  className="px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-base w-full text-center transform hover:scale-105 flex items-center justify-center"
+                  className="px-4 py-4 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-lg w-full text-center transform hover:scale-105 flex items-center justify-center"
                   onClick={handleMobileNavClick}
                 >
-                  <MapIcon sx={{ mr: 1 }} />
+                  <MapIcon sx={{ mr: 2, fontSize: '1.25rem' }} />
                   Campus Map
                 </Link>
                 <Link 
                   to="/chat" 
-                  className="px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-base w-full text-center transform hover:scale-105 flex items-center justify-center"
+                  className="px-4 py-4 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-lg w-full text-center transform hover:scale-105 flex items-center justify-center"
                   onClick={handleMobileNavClick}
                 >
-                  <ChatIcon sx={{ mr: 1 }} />
+                  <ChatIcon sx={{ mr: 2, fontSize: '1.25rem' }} />
                   Chat
                 </Link>
 
                 {/* Mobile Features Section */}
                 <div className="space-y-2">
-                  <div className="text-sm font-semibold text-gray-600 px-2 mb-2">Features</div>
+                  <div className="text-base font-semibold text-gray-600 px-3 mb-3">Features</div>
                   <Link 
                     to="/lostfound" 
-                    className="block px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-base w-full text-center transform hover:scale-105"
+                    className="block px-4 py-4 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-lg w-full text-center transform hover:scale-105"
                     onClick={handleMobileNavClick}
                   >
                     Lost and Found
                   </Link>
                   <Link 
                     to="/complaints" 
-                    className="block px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-base w-full text-center transform hover:scale-105"
+                    className="block px-4 py-4 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-lg w-full text-center transform hover:scale-105"
                     onClick={handleMobileNavClick}
                   >
                     Complaints
                   </Link>
                   <Link 
                     to="/events" 
-                    className="block px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-base w-full text-center transform hover:scale-105"
+                    className="block px-4 py-4 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-lg w-full text-center transform hover:scale-105"
                     onClick={handleMobileNavClick}
                   >
                     Events
                   </Link>
                   <Link 
                     to="/clubs-recruitment" 
-                    className="block px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-base w-full text-center transform hover:scale-105"
+                    className="block px-4 py-4 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-lg w-full text-center transform hover:scale-105"
                     onClick={handleMobileNavClick}
                   >
                     Clubs Recruitment
                   </Link>
                   <Link 
                     to="/news" 
-                    className="block px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-base w-full text-center transform hover:scale-105"
+                    className="block px-4 py-4 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-lg w-full text-center transform hover:scale-105"
                     onClick={handleMobileNavClick}
                   >
                     News
                   </Link>
                   <Link 
                     to="/facilities" 
-                    className="block px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-base w-full text-center transform hover:scale-105"
+                    className="block px-4 py-4 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-lg w-full text-center transform hover:scale-105"
                     onClick={handleMobileNavClick}
                   >
                     Facilities
@@ -345,13 +347,13 @@ const Navbar: React.FC = () => {
 
                 {/* User Actions */}
                 <div className="space-y-2 pt-4 border-t border-gray-200">
-                  <div className="text-sm font-semibold text-gray-600 px-2 mb-2">Account</div>
+                  <div className="text-base font-semibold text-gray-600 px-3 mb-3">Account</div>
                   <Link 
                     to="/profile" 
-                    className="block px-5 py-3 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-base w-full text-center transform hover:scale-105 flex items-center justify-center"
+                    className="block px-4 py-4 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-lg w-full text-center transform hover:scale-105 flex items-center justify-center"
                     onClick={handleMobileNavClick}
                   >
-                    <AccountCircleIcon sx={{ mr: 1 }} />
+                    <AccountCircleIcon sx={{ mr: 2, fontSize: '1.25rem' }} />
                     Profile
                   </Link>
                   <button
@@ -359,9 +361,9 @@ const Navbar: React.FC = () => {
                       logout();
                       handleMobileNavClick();
                     }}
-                    className="w-full px-5 py-3 rounded-full font-bold text-white bg-[#181818] hover:bg-[#00C6A7] hover:text-white transition-all duration-300 ease-in-out text-base transform hover:scale-105 flex items-center justify-center"
+                    className="w-full px-4 py-4 rounded-full font-bold text-white bg-[#181818] hover:bg-[#00C6A7] hover:text-white transition-all duration-300 ease-in-out text-lg transform hover:scale-105 flex items-center justify-center"
                   >
-                    <LogoutIcon sx={{ mr: 1 }} />
+                    <LogoutIcon sx={{ mr: 2, fontSize: '1.25rem' }} />
                     Logout
                   </button>
                 </div>
@@ -371,7 +373,7 @@ const Navbar: React.FC = () => {
             {/* Show AuthButtons for unauthenticated users */}
             {!user && (
               <div className="space-y-2">
-                <div className="text-sm font-semibold text-gray-600 px-2 mb-2">Authentication</div>
+                <div className="text-base font-semibold text-gray-600 px-3 mb-3">Authentication</div>
                 <AuthButtons user={user} location={location} logout={logout} />
               </div>
             )}
