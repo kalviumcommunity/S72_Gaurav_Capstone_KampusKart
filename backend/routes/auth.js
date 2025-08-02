@@ -20,13 +20,13 @@ const transporter = nodemailer.createTransport({
 // Rate limiting configuration
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // limit each IP to 5 requests per windowMs
+  max: 150, // limit each IP to 50 requests per windowMs (very generous)
   message: { message: 'Too many login attempts, please try again after 15 minutes' }
 });
 
 const signupLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 3, // limit each IP to 3 requests per windowMs
+  max: 125, // limit each IP to 25 requests per windowMs (very generous)
   message: { message: 'Too many signup attempts, please try again after an hour' }
 });
 

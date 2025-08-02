@@ -52,7 +52,6 @@ const ChatWindow = () => {
   const [editingMessage, setEditingMessage] = useState(null);
   const [editText, setEditText] = useState('');
   const [anchorEl, setAnchorEl] = useState(null);
-  const [contextMenu, setContextMenu] = useState(null);
   const [replyTo, setReplyTo] = useState(null);
   const [attachments, setAttachments] = useState([]);
   const fileInputRef = useRef(null);
@@ -253,21 +252,9 @@ const ChatWindow = () => {
     }, 1000);
   };
 
-  const handleContextMenu = (event, message) => {
-    event.preventDefault();
-    const isOwnMessage = message.sender._id === user._id;
-    if (isOwnMessage) {
-      setContextMenu({
-        mouseX: event.clientX || event.touches?.[0]?.clientX || 0,
-        mouseY: event.clientY || event.touches?.[0]?.clientY || 0,
-      });
-      setSelectedMessage(message);
-    }
-  };
-
-  const handleCloseContextMenu = () => {
-    setContextMenu(null);
-    setSelectedMessage(null);
+  const handleMessageActions = (message, event) => {
+    setSelectedMessage(message);
+    setAnchorEl(event.currentTarget); // Use the button as anchor
   };
 
   const handleDeleteMessage = async () => {
@@ -422,35 +409,6 @@ const ChatWindow = () => {
           />
         </ListItemAvatar>
         <Box 
-          onContextMenu={(e) => handleContextMenu(e, message)}
-          onTouchStart={(e) => {
-            // For mobile long press
-            const timer = setTimeout(() => {
-              try {
-                if (e.cancelable) {
-                  e.preventDefault();
-                }
-                handleContextMenu(e, message);
-              } catch {
-                // Fallback if preventDefault fails
-                handleContextMenu(e, message);
-              }
-            }, 500);
-            e.currentTarget.touchTimer = timer;
-          }}
-          onTouchEnd={(e) => {
-            if (e.currentTarget.touchTimer) {
-              clearTimeout(e.currentTarget.touchTimer);
-              e.currentTarget.touchTimer = null;
-            }
-          }}
-          onTouchMove={(e) => {
-            // Cancel long press if user moves finger
-            if (e.currentTarget.touchTimer) {
-              clearTimeout(e.currentTarget.touchTimer);
-              e.currentTarget.touchTimer = null;
-            }
-          }}
           sx={{
             bgcolor: isOwnMessage ? '#e3f2fd' : '#fff',
             border: isOwnMessage ? '1px solid #90caf9' : '1px solid #e0e0e0',
@@ -463,7 +421,6 @@ const ChatWindow = () => {
             mr: isOwnMessage ? 1 : 0,
             position: 'relative',
             transition: 'all 0.2s ease-in-out',
-            cursor: isOwnMessage ? 'context-menu' : 'default',
             '&:hover': {
               boxShadow: '0 4px 12px rgba(0, 0, 0, 0.12)',
               transform: 'translateY(-1px)'
@@ -568,6 +525,35 @@ const ChatWindow = () => {
             )}
           </Box>
         </Box>
+
+        {/* Action Button for Own Messages */}
+        {isOwnMessage && (
+          <IconButton
+            size="small"
+            onClick={(e) => handleMessageActions(message, e)}
+            sx={{ 
+              position: 'absolute', 
+              top: 4, 
+              left: 4,
+              backgroundColor: 'rgba(255, 255, 255, 0.9)',
+              border: '1px solid rgba(0, 0, 0, 0.1)',
+              borderRadius: '50%',
+              width: 28,
+              height: 28,
+              opacity: 0.8,
+              transition: 'all 0.2s ease-in-out',
+              zIndex: 10,
+              '&:hover': { 
+                backgroundColor: 'rgba(255, 255, 255, 1)',
+                opacity: 1,
+                transform: 'scale(1.05)',
+                boxShadow: '0 2px 6px rgba(0, 0, 0, 0.12)'
+              }
+            }}
+          >
+            <MoreVertIcon fontSize="small" sx={{ color: '#555' }} />
+          </IconButton>
+        )}
 
       </ListItem>
     );
@@ -715,16 +701,11 @@ const ChatWindow = () => {
         </Paper>
       </Box>
 
-      {/* Context Menu */}
+      {/* Message Menu */}
       <Menu
-        open={contextMenu !== null}
-        onClose={handleCloseContextMenu}
-        anchorReference="anchorPosition"
-        anchorPosition={
-          contextMenu !== null && contextMenu.mouseX && contextMenu.mouseY
-            ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
-            : { top: 0, left: 0 }
-        }
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={() => setAnchorEl(null)}
         PaperProps={{
           sx: {
             borderRadius: '12px',
@@ -739,7 +720,7 @@ const ChatWindow = () => {
             <MenuItem 
               onClick={() => {
                 startEditing(selectedMessage);
-                handleCloseContextMenu();
+                setAnchorEl(null);
               }}
               sx={{
                 borderRadius: '8px',
@@ -756,7 +737,7 @@ const ChatWindow = () => {
             <MenuItem 
               onClick={() => {
                 handleDeleteMessage();
-                handleCloseContextMenu();
+                setAnchorEl(null);
               }}
               sx={{
                 borderRadius: '8px',
