@@ -7,6 +7,7 @@ const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const rateLimit = require('express-rate-limit');
 const bcrypt = require('bcryptjs');
+const { validateSignup, validateLogin, sanitizeInput } = require('../middleware/validation');
 
 // Create Nodemailer transporter
 const transporter = nodemailer.createTransport({
@@ -52,10 +53,16 @@ router.get('/google/callback',
   (req, res) => {
     try {
       console.log('Processing Google OAuth callback');
+      // Validate JWT_SECRET is configured
+      if (!process.env.JWT_SECRET) {
+        console.error('JWT_SECRET not configured');
+        return res.redirect('/login?error=server_configuration');
+      }
+
       // Generate JWT token
       const token = jwt.sign(
         { userId: req.user._id },
-        process.env.JWT_SECRET || 'your-secret-key',
+        process.env.JWT_SECRET,
         { expiresIn: '24h' }
       );
 
@@ -75,65 +82,9 @@ router.get('/google/callback',
 );
 
 // Signup route
-router.post('/signup', signupLimiter, async (req, res) => {
+router.post('/signup', signupLimiter, sanitizeInput, validateSignup, async (req, res) => {
   try {
     const { email, password, name } = req.body;
-
-    // Enhanced input validation
-    if (!email || !password || !name) {
-      return res.status(400).json({ 
-        message: 'All fields are required',
-        details: {
-          email: !email ? 'Email is required' : null,
-          password: !password ? 'Password is required' : null,
-          name: !name ? 'Name is required' : null
-        }
-      });
-    }
-
-    // Email format validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ message: 'Invalid email format' });
-    }
-
-    // Password strength validation
-    if (password.length < 8) {
-      return res.status(400).json({ 
-        message: 'Password must be at least 8 characters long' 
-      });
-    }
-
-    if (!/[A-Z]/.test(password)) {
-      return res.status(400).json({ 
-        message: 'Password must contain at least one uppercase letter' 
-      });
-    }
-
-    if (!/[a-z]/.test(password)) {
-      return res.status(400).json({ 
-        message: 'Password must contain at least one lowercase letter' 
-      });
-    }
-
-    if (!/[0-9]/.test(password)) {
-      return res.status(400).json({ 
-        message: 'Password must contain at least one number' 
-      });
-    }
-
-    if (!/[!@#$%^&*]/.test(password)) {
-      return res.status(400).json({ 
-        message: 'Password must contain at least one special character (!@#$%^&*)' 
-      });
-    }
-
-    // Name validation
-    if (name.trim().length < 2) {
-      return res.status(400).json({ 
-        message: 'Name must be at least 2 characters long' 
-      });
-    }
 
     // Check if user already exists
     const existingUser = await User.findOne({ email: email.toLowerCase() });
@@ -150,10 +101,16 @@ router.post('/signup', signupLimiter, async (req, res) => {
 
     await user.save();
 
+    // Validate JWT_SECRET is configured
+    if (!process.env.JWT_SECRET) {
+      console.error('JWT_SECRET not configured');
+      return res.status(500).json({ message: 'Server configuration error' });
+    }
+
     // Generate JWT token
     const token = jwt.sign(
       { userId: user._id },
-      process.env.JWT_SECRET || 'your-secret-key',
+      process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
 
@@ -175,26 +132,9 @@ router.post('/signup', signupLimiter, async (req, res) => {
 });
 
 // Login route
-router.post('/login', loginLimiter, async (req, res) => {
+router.post('/login', loginLimiter, sanitizeInput, validateLogin, async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    // Enhanced input validation
-    if (!email || !password) {
-      return res.status(400).json({ 
-        message: 'Email and password are required',
-        details: {
-          email: !email ? 'Email is required' : null,
-          password: !password ? 'Password is required' : null
-        }
-      });
-    }
-
-    // Email format validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ message: 'Invalid email format' });
-    }
 
     // Find user with normalized email
     const user = await User.findOne({ email: email.toLowerCase() });
@@ -208,10 +148,16 @@ router.post('/login', loginLimiter, async (req, res) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
+    // Validate JWT_SECRET is configured
+    if (!process.env.JWT_SECRET) {
+      console.error('JWT_SECRET not configured');
+      return res.status(500).json({ message: 'Server configuration error' });
+    }
+
     // Generate JWT token
     const token = jwt.sign(
       { userId: user._id },
-      process.env.JWT_SECRET || 'your-secret-key',
+      process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
 
@@ -314,13 +260,19 @@ router.post('/refresh', async (req, res) => {
       return res.status(401).json({ message: 'No token provided' });
     }
 
+    // Validate JWT_SECRET is configured
+    if (!process.env.JWT_SECRET) {
+      console.error('JWT_SECRET not configured');
+      return res.status(500).json({ message: 'Server configuration error' });
+    }
+
     // Verify the current token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
     // Generate new token
     const newToken = jwt.sign(
       { userId: decoded.userId },
-      process.env.JWT_SECRET || 'your-secret-key',
+      process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
 

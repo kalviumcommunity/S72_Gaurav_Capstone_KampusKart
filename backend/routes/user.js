@@ -6,12 +6,18 @@ const jwt = require('jsonwebtoken');
 // Middleware to verify JWT token
 const auth = async (req, res, next) => {
   try {
+    // Validate JWT_SECRET is configured
+    if (!process.env.JWT_SECRET) {
+      console.error('JWT_SECRET not configured');
+      return res.status(500).json({ message: 'Server configuration error' });
+    }
+
     const token = req.header('Authorization')?.replace('Bearer ', '');
     if (!token) {
       throw new Error();
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.userId);
     
     if (!user) {
