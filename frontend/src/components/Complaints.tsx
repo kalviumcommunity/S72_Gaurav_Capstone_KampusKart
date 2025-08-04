@@ -579,14 +579,27 @@ const Complaints = () => {
 
                 {/* Action Buttons */}
                 {(() => {
-                  console.log('Debug button condition:', {
-                    user: user ? { _id: user._id, id: user.id, isAdmin: user.isAdmin } : null,
+                  // Check if user can edit/delete this complaint
+                  const canEdit = user && complaint.user && (
+                    // User owns the complaint OR user is admin
+                    complaint.user._id === user._id || 
+                    complaint.user._id === user.id || 
+                    user.isAdmin
+                  ) && !['Resolved', 'Closed'].includes(complaint.status);
+                  
+                  // Debug logging for admin functionality
+                  console.log('Complaint authorization check:', {
+                    user: user ? { _id: user._id, id: user.id, isAdmin: user.isAdmin, email: user.email } : null,
                     complaintUser: complaint.user ? { _id: complaint.user._id } : null,
                     status: complaint.status,
-                    shouldShow: user && complaint.user && (complaint.user._id === user._id || complaint.user._id === user.id || user.isAdmin) && !['Resolved', 'Closed'].includes(complaint.status)
+                    canEdit,
+                    userOwns: complaint.user._id === user._id,
+                    userOwnsAlt: user.id && complaint.user._id === user.id,
+                    isAdmin: user.isAdmin,
+                    statusOk: !['Resolved', 'Closed'].includes(complaint.status)
                   });
-                  // Temporary: Always show buttons for testing
-                  return user && complaint.user && !['Resolved', 'Closed'].includes(complaint.status);
+                  
+                  return canEdit;
                 })() && (
                   <div className="flex flex-col sm:flex-row gap-2 mt-4 pt-4 border-t border-gray-100">
                     <button
@@ -917,7 +930,13 @@ const Complaints = () => {
                         </div>
                     </div>
 
-                     {user && selectedComplaintForDetails.user && ( !['Resolved', 'Closed'].includes(selectedComplaintForDetails.status)) && (
+                     {user && selectedComplaintForDetails.user && (
+                        // Check if user can edit/delete this complaint
+                        (selectedComplaintForDetails.user._id === user._id || 
+                         selectedComplaintForDetails.user._id === user.id || 
+                         user.isAdmin) && 
+                        !['Resolved', 'Closed'].includes(selectedComplaintForDetails.status)
+                     ) && (
                         <div className="flex gap-3 mt-6">
                             <button
                                 onClick={() => { setSelectedComplaintForDetails(null); openEditComplaintModal(selectedComplaintForDetails); }}

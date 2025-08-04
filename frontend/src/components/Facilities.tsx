@@ -4,6 +4,7 @@ import { FiMapPin, FiSearch, FiHome, FiWifi, FiBookOpen, FiCoffee, FiPlus, FiEdi
 import { useAuth } from '../contexts/AuthContext';
 import UniversalLoader from './UniversalLoader';
 import { useDataLoading } from '../hooks/useLoading';
+import { API_BASE } from '../config';
 
 const Facilities = () => {
   const { token, user } = useAuth();
@@ -51,7 +52,7 @@ const Facilities = () => {
     const fetchFacilities = async () => {
       startLoading();
       try {
-        const res = await fetch('http://localhost:5000/api/facilities');
+        const res = await fetch(`${API_BASE}/api/facilities`);
         const data = await res.json();
         setFacilities(data);
       } catch (err) {
@@ -266,7 +267,7 @@ const Facilities = () => {
                 formData.append('icon', newFacility.icon);
                 facilityImages.forEach(img => { if (img.file) formData.append('images', img.file); });
                 try {
-                  const res = await fetch('http://localhost:5000/api/facilities', {
+                  const res = await fetch(`${API_BASE}/api/facilities`, {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${token}` },
                     body: formData,
@@ -509,7 +510,7 @@ const Facilities = () => {
                 // New images
                 editFacilityImages.forEach(img => { if (img.file) formData.append('images', img.file); });
                 try {
-                  const res = await fetch(`http://localhost:5000/api/facilities/${editFacility._id}`, {
+                  const res = await fetch(`${API_BASE}/api/facilities/${editFacility._id}`, {
                     method: 'PUT',
                     headers: { 'Authorization': `Bearer ${token}` },
                     body: formData,
@@ -786,7 +787,7 @@ const Facilities = () => {
                     onClick={async () => {
                       if (!window.confirm('Are you sure you want to delete this facility?')) return;
                       try {
-                        const res = await fetch(`http://localhost:5000/api/facilities/${selectedFacility._id}`, {
+                        const res = await fetch(`${API_BASE}/api/facilities/${selectedFacility._id}`, {
                           method: 'DELETE',
                           headers: { 'Authorization': `Bearer ${token}` },
                         });

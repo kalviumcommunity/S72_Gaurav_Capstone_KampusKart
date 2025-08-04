@@ -156,20 +156,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       console.log('Attempting login with email:', email);
-      const response = await axios.post(`${API_BASE}/api/auth/login`, {
-        email: email.toLowerCase(),
-        password
-      });
-      console.log('Login response:', response.data);
-      const { token, user } = response.data;
-      setToken(token);
-      setUser(user);
-      // Always save token to localStorage with expiry for persistent login
-      const expiry = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
-      localStorage.setItem('token', token);
-      localStorage.setItem('token_expiry', expiry.toString());
-      sessionStorage.removeItem('token');
-      console.log('AuthContext: Saved token to localStorage (Remember Me)');
+      
+      // Add retry logic for server wakeup scenarios
+      let lastError;
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          const response = await axios.post(`${API_BASE}/api/auth/login`, {
+            email: email.toLowerCase(),
+            password
+          });
+          console.log('Login response:', response.data);
+          const { token, user } = response.data;
+          setToken(token);
+          setUser(user);
+          // Always save token to localStorage with expiry for persistent login
+          const expiry = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
+          localStorage.setItem('token', token);
+          localStorage.setItem('token_expiry', expiry.toString());
+          sessionStorage.removeItem('token');
+          console.log('AuthContext: Saved token to localStorage (Remember Me)');
+          return; // Success, exit the retry loop
+        } catch (error) {
+          lastError = error;
+          if (attempt < 3) {
+            console.log(`Login attempt ${attempt} failed, retrying in ${attempt * 1000}ms...`);
+            await new Promise(resolve => setTimeout(resolve, attempt * 1000));
+          }
+        }
+      }
+      
+      // If all retries failed, throw the last error
+      throw lastError;
     } catch (error) {
       console.error('Login error details:', error.response?.data);
       if (axios.isAxiosError(error)) {
@@ -183,6 +200,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             .map(([key, value]) => `${key}: ${value}`)
             .join(', ');
           throw new Error(errorMessages);
+        }
+        if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
+          throw new Error('Server is starting up. Please try again in a few seconds.');
         }
       }
       throw error;
@@ -239,23 +259,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       console.log('AuthContext: Making signup request to', `${API_BASE}/api/auth/signup`);
-      const response = await axios.post(`${API_BASE}/api/auth/signup`, {
-        email: email.toLowerCase(),
-        password,
-        name: name.trim()
-      });
-
-      console.log('AuthContext: Signup response received', response.data);
-      const { token, user } = response.data;
-      setToken(token);
-      setUser(user);
       
-      // Always save token to localStorage with expiry for persistent login
-      const expiry = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
-      localStorage.setItem('token', token);
-      localStorage.setItem('token_expiry', expiry.toString());
-      sessionStorage.removeItem('token');
-      console.log('AuthContext: Token saved to localStorage');
+      // Add retry logic for server wakeup scenarios
+      let lastError;
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          const response = await axios.post(`${API_BASE}/api/auth/signup`, {
+            email: email.toLowerCase(),
+            password,
+            name: name.trim()
+          });
+
+          console.log('AuthContext: Signup response received', response.data);
+          const { token, user } = response.data;
+          setToken(token);
+          setUser(user);
+          
+          // Always save token to localStorage with expiry for persistent login
+          const expiry = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
+          localStorage.setItem('token', token);
+          localStorage.setItem('token_expiry', expiry.toString());
+          sessionStorage.removeItem('token');
+          console.log('AuthContext: Token saved to localStorage');
+          return; // Success, exit the retry loop
+        } catch (error) {
+          lastError = error;
+          if (attempt < 3) {
+            console.log(`Signup attempt ${attempt} failed, retrying in ${attempt * 1000}ms...`);
+            await new Promise(resolve => setTimeout(resolve, attempt * 1000));
+          }
+        }
+      }
+      
+      // If all retries failed, throw the last error
+      throw lastError;
     } catch (error) {
       console.error('AuthContext: Signup error:', error);
       if (axios.isAxiosError(error)) {
@@ -277,6 +314,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
         if (error.code === 'ECONNREFUSED') {
           throw new Error('Cannot connect to the server. Please make sure the backend server is running.');
+        }
+        if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
+          throw new Error('Server is starting up. Please try again in a few seconds.');
         }
       }
       throw error;
@@ -331,7 +371,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const backendUrl = isProduction 
       ? 'https://s72-gaurav-capstone.onrender.com'
       : 'http://localhost:5000';
-    window.location.href = `${backendUrl}/api/auth/google`;
+    
+    // Add a small delay to ensure the server wakeup loader has time to show
+    setTimeout(() => {
+      window.location.href = `${backendUrl}/api/auth/google`;
+    }, 100);
   };
 
   const handleGoogleCallback = async (token: string) => {

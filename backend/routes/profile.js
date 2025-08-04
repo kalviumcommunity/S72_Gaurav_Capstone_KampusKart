@@ -28,7 +28,17 @@ router.get('/', authMiddleware, async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    res.json(user);
+
+    // Convert to plain object and add isAdmin field
+    const userObject = user.toObject();
+    
+    // Check if user is admin based on environment configuration
+    const adminEmails = process.env.ADMIN_EMAILS ? 
+      process.env.ADMIN_EMAILS.split(',').map(email => email.trim()) : 
+      [];
+    userObject.isAdmin = adminEmails.includes(user.email);
+
+    res.json(userObject);
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ message: 'Server Error', error: err.message }); // Send JSON error response
@@ -97,7 +107,15 @@ router.put('/', authMiddleware, upload.single('profilePicture'), async (req, res
 
           // Respond with the updated user data after handling the picture
           const updatedUser = await User.findById(req.user.id).select('-password -resetPasswordOTP -resetPasswordExpires');
-          res.json(updatedUser);
+          
+          // Convert to plain object and add isAdmin field
+          const userObject = updatedUser.toObject();
+          const adminEmails = process.env.ADMIN_EMAILS ? 
+            process.env.ADMIN_EMAILS.split(',').map(email => email.trim()) : 
+            [];
+          userObject.isAdmin = adminEmails.includes(updatedUser.email);
+          
+          res.json(userObject);
         }
       );
 
@@ -113,7 +131,14 @@ router.put('/', authMiddleware, upload.single('profilePicture'), async (req, res
         { new: true, runValidators: true }
       ).select('-password -resetPasswordOTP -resetPasswordExpires');
 
-      res.json(user);
+      // Convert to plain object and add isAdmin field
+      const userObject = user.toObject();
+      const adminEmails = process.env.ADMIN_EMAILS ? 
+        process.env.ADMIN_EMAILS.split(',').map(email => email.trim()) : 
+        [];
+      userObject.isAdmin = adminEmails.includes(user.email);
+
+      res.json(userObject);
     }
 
   } catch (err) {

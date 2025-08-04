@@ -953,7 +953,7 @@ const Events = () => {
             onClose={closeEventDetailsModal}
             onEdit={handleEditEvent}
             onDelete={handleDeleteEvent}
-            isAdmin={user?.email === "gauravkhandelwal205@gmail.com"}
+            isAdmin={user?.isAdmin}
           />
         )}
       </main>

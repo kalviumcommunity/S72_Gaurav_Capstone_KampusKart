@@ -287,7 +287,7 @@ const News = () => {
                 <p className="text-gray-600 text-sm mb-4 line-clamp-3">{item.description}</p>
 
                 {/* Action Buttons */}
-                {user?.email === "gauravkhandelwal205@gmail.com" && (
+                {user && user.isAdmin && (
                   <div className="flex flex-col sm:flex-row gap-2 pt-4 border-t border-gray-100">
                     <button
                       onClick={() => handleEditNews(item)}

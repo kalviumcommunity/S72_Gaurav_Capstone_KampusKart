@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { EyeIcon, EyeSlashIcon, EnvelopeIcon, LockClosedIcon } from '@heroicons/react/24/outline';
 import SkeletonLoader from './SkeletonLoader';
+import ServerWakeupLoader from './ServerWakeupLoader';
 
 // Use an image from the public folder
 const imageUrl = '/login-side.jpg'; // Place your image in the public folder as login-side.jpg
@@ -26,6 +27,7 @@ const Login: React.FC = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [emailError, setEmailError] = useState('');
+  const [showServerWakeup, setShowServerWakeup] = useState(false);
   const navigate = useNavigate();
   const { login, loginWithGoogle } = useAuth();
 
@@ -64,11 +66,34 @@ const Login: React.FC = () => {
     }
   };
 
+  const handleGoogleLogin = () => {
+    setShowServerWakeup(true);
+  };
+
+  const handleServerReady = () => {
+    setShowServerWakeup(false);
+    loginWithGoogle();
+  };
+
+  const handleServerError = (error: string) => {
+    setShowServerWakeup(false);
+    setError('Server connection failed. Please try again.');
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white font-sans px-4">
         <SkeletonLoader variant="login" />
       </div>
+    );
+  }
+
+  if (showServerWakeup) {
+    return (
+      <ServerWakeupLoader
+        onServerReady={handleServerReady}
+        onError={handleServerError}
+      />
     );
   }
 
@@ -173,7 +198,7 @@ const Login: React.FC = () => {
 
             <button
               type="button"
-              onClick={loginWithGoogle}
+              onClick={handleGoogleLogin}
               className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-full text-lg font-semibold text-black bg-white border border-[#E0E0E0] hover:bg-[#FFD166] hover:text-black transition mobile-touch-friendly mobile-no-hover mobile-active-feedback"
             >
               <img src="/google-icon.svg" alt="Google" className="w-5 h-5" />

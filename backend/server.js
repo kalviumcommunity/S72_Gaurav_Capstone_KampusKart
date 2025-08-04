@@ -104,7 +104,22 @@ app.use('/api/clubs', clubsRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.status(200).json({ status: 'ok', message: 'Server is running' });
+  res.status(200).json({ 
+    status: 'ok', 
+    message: 'Server is running',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
+
+// Server startup status endpoint
+app.get('/api/server-status', (req, res) => {
+  res.status(200).json({ 
+    status: 'ready', 
+    message: 'Server is ready to handle requests',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
 });
 
 // Global error handling middleware

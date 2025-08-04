@@ -9,14 +9,27 @@ const rateLimit = require('express-rate-limit');
 const bcrypt = require('bcryptjs');
 const { validateSignup, validateLogin, sanitizeInput } = require('../middleware/validation');
 
-// Create Nodemailer transporter
-const transporter = nodemailer.createTransport({
-  service: process.env.EMAIL_SERVICE, // e.g., 'gmail'
-  auth: {
-    user: process.env.EMAIL_USER, // Your email address
-    pass: process.env.EMAIL_PASS // Your email password or app-specific password
+// Create Nodemailer transporter with better error handling
+let transporter;
+try {
+  // Check if email configuration is available
+  if (process.env.EMAIL_SERVICE && process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+    transporter = nodemailer.createTransport({
+      service: process.env.EMAIL_SERVICE, // e.g., 'gmail'
+      auth: {
+        user: process.env.EMAIL_USER, // Your email address
+        pass: process.env.EMAIL_PASS // Your email password or app-specific password
+      }
+    });
+    console.log('Email transporter configured successfully');
+  } else {
+    console.warn('Email configuration missing. Forgot password functionality will be limited.');
+    transporter = null;
   }
-});
+} catch (error) {
+  console.error('Error configuring email transporter:', error);
+  transporter = null;
+}
 
 // Rate limiting configuration
 const loginLimiter = rateLimit({
@@ -218,14 +231,28 @@ router.post('/forgot-password', async (req, res) => {
       text: `Your OTP for password reset is: ${otp}. This OTP is valid for 15 minutes.`
     };
 
-    // Send email
-    await transporter.sendMail(mailOptions);
-
-    res.status(200).json({ message: 'OTP sent to your email' });
+    // Send email if transporter is configured
+    if (transporter) {
+      try {
+        await transporter.sendMail(mailOptions);
+        res.status(200).json({ message: 'OTP sent to your email' });
+      } catch (emailError) {
+        console.error('Email sending error:', emailError);
+        res.status(500).json({ message: 'Error sending email. Please try again later.' });
+      }
+    } else {
+      // For development/testing, return the OTP in the response
+      console.log(`[DEV] OTP for ${email}: ${otp}`);
+      res.status(200).json({ 
+        message: 'OTP generated successfully (email service not configured)',
+        otp: process.env.NODE_ENV === 'development' ? otp : undefined,
+        note: 'In production, this OTP would be sent via email'
+      });
+    }
 
   } catch (error) {
     console.error('Forgot password error:', error);
-    res.status(500).json({ message: 'Error sending OTP', error: error.message });
+    res.status(500).json({ message: 'Error processing request', error: error.message });
   }
 });
 

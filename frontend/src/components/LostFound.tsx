@@ -440,42 +440,67 @@ const LostFound = () => {
                 </div>
 
                 {/* Action Buttons */}
-                {token && (user?.email === item.user?.email || user?.email === 'gauravkhandelwal205@gmail.com') && (
-                  <div className="flex flex-col sm:flex-row gap-2 mt-4 pt-4 border-t border-gray-100">
-                    {!item.resolved && (
+                {token && user && item.user && (
+                  // Check if user can edit/delete this item
+                  (user._id === item.user._id || 
+                   user.id === item.user._id || 
+                   user.isAdmin) && (
+                    <div className="flex flex-col sm:flex-row gap-2 mt-4 pt-4 border-t border-gray-100">
+                      {!item.resolved && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleMarkResolved(item._id);
+                          }}
+                          className="flex-1 flex items-center justify-center gap-2 px-4 py-3 sm:py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors duration-200 text-sm sm:text-base min-w-0"
+                        >
+                          <FiCheckCircle className="w-4 h-4 flex-shrink-0" />
+                          <span className="truncate">Mark Resolved</span>
+                        </button>
+                      )}
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleMarkResolved(item._id);
+                          openEditItemModal(item);
                         }}
-                        className="flex-1 flex items-center justify-center gap-2 px-4 py-3 sm:py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors duration-200 text-sm sm:text-base min-w-0"
+                        className="flex-1 flex items-center justify-center gap-2 px-4 py-3 sm:py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors duration-200 text-sm sm:text-base min-w-0"
                       >
-                        <FiCheckCircle className="w-4 h-4 flex-shrink-0" />
-                        <span className="truncate">Mark Resolved</span>
+                        <FiEdit2 className="w-4 h-4 flex-shrink-0" />
+                        <span className="truncate">Edit</span>
                       </button>
-                    )}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openEditItemModal(item);
-                      }}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-3 sm:py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors duration-200 text-sm sm:text-base min-w-0"
-                    >
-                      <FiEdit2 className="w-4 h-4 flex-shrink-0" />
-                      <span className="truncate">Edit</span>
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteItem(item._id);
-                      }}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-3 sm:py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors duration-200 text-sm sm:text-base min-w-0"
-                    >
-                      <FiTrash2 className="w-4 h-4 flex-shrink-0" />
-                      <span className="truncate">Delete</span>
-                    </button>
-                  </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteItem(item._id);
+                        }}
+                        className="flex-1 flex items-center justify-center gap-2 px-4 py-3 sm:py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors duration-200 text-sm sm:text-base min-w-0"
+                      >
+                        <FiTrash2 className="w-4 h-4 flex-shrink-0" />
+                        <span className="truncate">Delete</span>
+                      </button>
+                    </div>
+                  )
                 )}
+                
+                {/* Debug logging for admin functionality */}
+                {(() => {
+                  const canEdit = token && user && item.user && (
+                    user._id === item.user._id || 
+                    user.id === item.user._id || 
+                    user.isAdmin
+                  );
+                  
+                  console.log('LostFound authorization check:', {
+                    user: user ? { _id: user._id, id: user.id, isAdmin: user.isAdmin, email: user.email } : null,
+                    itemUser: item.user ? { _id: item.user._id } : null,
+                    canEdit,
+                    userOwns: user && item.user ? user._id === item.user._id : false,
+                    userOwnsAlt: user && item.user && user.id ? user.id === item.user._id : false,
+                    isAdmin: user ? user.isAdmin : false
+                  });
+                  
+                  return null;
+                })()}
               </div>
             </div>
           ))}

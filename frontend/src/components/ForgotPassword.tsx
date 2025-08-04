@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE } from '../config';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -27,7 +28,7 @@ const ForgotPassword = () => {
     }
 
     try {
-      const response = await fetch('/api/auth/forgot-password', {
+      const response = await fetch(`${API_BASE}/api/auth/forgot-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -39,6 +40,10 @@ const ForgotPassword = () => {
 
       if (response.ok) {
         setMessage(data.message);
+        // In development, show the OTP if it's provided
+        if (data.otp) {
+          setMessage(`${data.message}\n\nOTP for testing: ${data.otp}`);
+        }
         setStep('reset_password'); // Move to the next step
       } else {
         setError(data.message || 'Failed to send OTP.');
@@ -116,7 +121,7 @@ const ForgotPassword = () => {
             }
 
             try {
-              const response = await fetch('/api/auth/reset-password', {
+              const response = await fetch(`${API_BASE}/api/auth/reset-password`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',

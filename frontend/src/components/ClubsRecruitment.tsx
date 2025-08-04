@@ -713,7 +713,7 @@ const ClubsRecruitment = () => {
             onClose={closeClubDetailsModal}
             onEdit={handleEditClub}
             onDelete={handleDeleteClub}
-            isAdmin={user?.email === "gauravkhandelwal205@gmail.com"}
+            isAdmin={user?.isAdmin}
           />
         )}
       </main>
