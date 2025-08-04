@@ -220,10 +220,10 @@ const Navbar: React.FC = () => {
           </div>
           
           {/* Center Section - Branding */}
-          <div className="flex items-center gap-1 lg:gap-2 absolute left-1/2 transform -translate-x-1/2 flex-shrink-0 z-10">
+          <Link to="/home" className="flex items-center gap-1 lg:gap-2 absolute left-1/2 transform -translate-x-1/2 flex-shrink-0 z-10 cursor-pointer hover:opacity-80 transition-opacity duration-200">
             <img src='/Logo.png' alt='KampusKart Logo' className='h-6 w-6 lg:h-8 lg:w-8 object-contain transition-transform duration-300 hover:scale-110' style={{ background: 'none', border: 'none', borderRadius: 0, boxShadow: 'none' }} />
             <span className='text-sm lg:text-lg font-extrabold text-black font-sans whitespace-nowrap' style={{ fontFamily: 'Work Sans, sans-serif' }}>Kampuskart</span>
-          </div>
+          </Link>
           
           {/* Right Section - Auth Buttons */}
           <div className="flex items-center gap-1 lg:gap-2 flex-shrink-0 min-w-0 max-w-[40%]">
@@ -233,13 +233,13 @@ const Navbar: React.FC = () => {
 
         {/* Mobile Navigation */}
         <div className="md:hidden flex justify-between items-center">
-          <div className="flex items-center gap-3">
+          <Link to="/home" className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity duration-200">
             <img src='/Logo.png' alt='KampusKart Logo' className='h-8 w-8 object-contain transition-transform duration-300 hover:scale-110' style={{ background: 'none', border: 'none', borderRadius: 0, boxShadow: 'none' }} />
             <span className='text-lg font-extrabold text-black font-sans' style={{ fontFamily: 'Work Sans, sans-serif' }}>Kampuskart</span>
-          </div>
+          </Link>
           <button
             onClick={toggleMobileMenu}
-            className="p-2 rounded-md bg-white hover:bg-gray-100 focus:outline-none transition-all duration-300 ease-in-out transform hover:scale-110 shadow-none border-none"
+            className="p-2 rounded-md bg-white hover:bg-gray-100 focus:outline-none transition-all duration-300 ease-in-out transform hover:scale-110 shadow-none border-none mobile-touch-friendly mobile-no-hover mobile-active-feedback"
             aria-label="Toggle menu"
             aria-expanded={isMobileMenuOpen}
           >
@@ -275,7 +275,7 @@ const Navbar: React.FC = () => {
                 {/* Main Navigation Links */}
                 <Link 
                   to="/home" 
-                  className="px-4 py-4 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-lg w-full text-center transform hover:scale-105 flex items-center justify-center"
+                  className="px-4 py-4 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-lg w-full text-center transform hover:scale-105 flex items-center justify-center mobile-touch-friendly mobile-no-hover mobile-active-feedback"
                   onClick={handleMobileNavClick}
                 >
                   <HomeIcon sx={{ mr: 2, fontSize: '1.25rem' }} />
@@ -283,7 +283,7 @@ const Navbar: React.FC = () => {
                 </Link>
                 <Link 
                   to="/campus-map" 
-                  className="px-4 py-4 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-lg w-full text-center transform hover:scale-105 flex items-center justify-center"
+                  className="px-4 py-4 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-lg w-full text-center transform hover:scale-105 flex items-center justify-center mobile-touch-friendly mobile-no-hover mobile-active-feedback"
                   onClick={handleMobileNavClick}
                 >
                   <MapIcon sx={{ mr: 2, fontSize: '1.25rem' }} />
@@ -291,7 +291,7 @@ const Navbar: React.FC = () => {
                 </Link>
                 <Link 
                   to="/chat" 
-                  className="px-4 py-4 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-lg w-full text-center transform hover:scale-105 flex items-center justify-center"
+                  className="px-4 py-4 rounded-full font-bold text-black bg-white hover:bg-[#FFD166] hover:text-black transition-all duration-300 ease-in-out text-lg w-full text-center transform hover:scale-105 flex items-center justify-center mobile-touch-friendly mobile-no-hover mobile-active-feedback"
                   onClick={handleMobileNavClick}
                 >
                   <ChatIcon sx={{ mr: 2, fontSize: '1.25rem' }} />

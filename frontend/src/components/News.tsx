@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import Navbar from './Navbar';
 import { FiPlus, FiCalendar, FiFileText, FiSearch, FiAlertCircle, FiInfo, FiTag, FiEdit2, FiTrash2 } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
+import UniversalLoader from './UniversalLoader';
+import { useDataLoading } from '../hooks/useLoading';
 import { API_BASE } from '../config';
 
 interface NewsItem {
@@ -15,6 +17,7 @@ interface NewsItem {
 
 const News = () => {
   const { user, token } = useAuth();
+  const { isLoading, error: loadingError, steps, startLoading, stopLoading, setError: setLoadingError } = useDataLoading();
   const [filterCategory, setFilterCategory] = useState('All');
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -39,6 +42,7 @@ const News = () => {
 
   const fetchNews = async () => {
     try {
+      startLoading();
       const response = await fetch(`${API_BASE}/api/news`);
       if (!response.ok) throw new Error('Failed to fetch news');
       const data = await response.json();
@@ -46,6 +50,8 @@ const News = () => {
     } catch (error) {
       console.error('Error fetching news:', error);
       setError('Failed to load news');
+    } finally {
+      stopLoading();
     }
   };
 
@@ -157,6 +163,21 @@ const News = () => {
     (item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
      item.description.toLowerCase().includes(searchQuery.toLowerCase()))
   );
+
+  if (isLoading) {
+    return (
+      <UniversalLoader
+        variant="page"
+        title="Loading News"
+        subtitle="Fetching latest campus news..."
+        showSteps={true}
+        steps={steps}
+        error={loadingError}
+        onRetry={() => window.location.reload()}
+        size="large"
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white font-sans">

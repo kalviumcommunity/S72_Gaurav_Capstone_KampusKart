@@ -56,6 +56,9 @@ router.get('/', protect, async (req, res) => {
       ];
     }
 
+    // Exclude deleted complaints
+    query.isDeleted = { $ne: true };
+
     const parsedPage = parseInt(page, 10);
     const parsedLimit = parseInt(limit, 10);
     const skip = (parsedPage - 1) * parsedLimit;
@@ -118,8 +121,8 @@ router.put('/:id', protect, upload.array('images', 5), async (req, res) => {
       return res.status(404).json({ message: 'Complaint not found.' });
     }
 
-    // Ensure the logged-in user is the creator of the complaint
-    if (complaint.user.toString() !== req.user._id.toString()) {
+    // Ensure the logged-in user is the creator of the complaint or an admin
+    if (complaint.user.toString() !== req.user._id.toString() && !req.user.isAdmin) {
       return res.status(403).json({ message: 'Not authorized to update this complaint.' });
     }
 
@@ -186,8 +189,8 @@ router.delete('/:id', protect, async (req, res) => {
       return res.status(404).json({ message: 'Complaint not found.' });
     }
 
-    // Ensure the logged-in user is the creator of the complaint
-    if (complaint.user.toString() !== req.user._id.toString()) {
+    // Ensure the logged-in user is the creator of the complaint or an admin
+    if (complaint.user.toString() !== req.user._id.toString() && !req.user.isAdmin) {
       return res.status(403).json({ message: 'Not authorized to delete this complaint.' });
     }
 
@@ -202,10 +205,172 @@ router.delete('/:id', protect, async (req, res) => {
       }
     }
 
-    await complaint.deleteOne();
+    complaint.isDeleted = true;
+    complaint.deletedAt = new Date();
+    await complaint.save();
     res.json({ message: 'Complaint removed.' });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+});
+
+// Admin-only route to get all complaints (including deleted ones)
+router.get('/admin/all', protect, async (req, res) => {
+  try {
+    // Only admins can access this route
+    if (!req.user.isAdmin) {
+      return res.status(403).json({ message: 'Admin access required' });
+    }
+
+    const { status, search, page = 1, limit = 50, includeDeleted = false } = req.query;
+    const query = {};
+
+    if (status && status !== 'All') {
+      query.status = status;
+    }
+
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    // Include deleted complaints if requested
+    if (includeDeleted !== 'true') {
+      query.isDeleted = { $ne: true };
+    }
+
+    const parsedPage = parseInt(page, 10);
+    const parsedLimit = parseInt(limit, 10);
+    const skip = (parsedPage - 1) * parsedLimit;
+
+    const totalItems = await Complaint.countDocuments(query);
+    const totalPages = Math.ceil(totalItems / parsedLimit);
+
+    const complaints = await Complaint.find(query)
+      .populate('user', 'name email')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(parsedLimit);
+
+    res.json({ complaints, totalItems, totalPages });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Admin-only route to permanently delete a complaint
+router.delete('/admin/:id/permanent', protect, async (req, res) => {
+  try {
+    // Only admins can access this route
+    if (!req.user.isAdmin) {
+      return res.status(403).json({ message: 'Admin access required' });
+    }
+
+    const complaint = await Complaint.findById(req.params.id);
+
+    if (!complaint) {
+      return res.status(404).json({ message: 'Complaint not found.' });
+    }
+
+    // Delete all images from Cloudinary
+    if (Array.isArray(complaint.images)) {
+      for (const img of complaint.images) {
+        try {
+          await cloudinary.uploader.destroy(img.public_id);
+        } catch (err) {
+          console.error(`Error deleting image ${img.public_id}:`, err);
+        }
+      }
+    }
+
+    await complaint.deleteOne();
+    res.json({ message: 'Complaint permanently deleted.' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Admin-only route to restore a deleted complaint
+router.patch('/admin/:id/restore', protect, async (req, res) => {
+  try {
+    // Only admins can access this route
+    if (!req.user.isAdmin) {
+      return res.status(403).json({ message: 'Admin access required' });
+    }
+
+    const complaint = await Complaint.findById(req.params.id);
+
+    if (!complaint) {
+      return res.status(404).json({ message: 'Complaint not found.' });
+    }
+
+    complaint.isDeleted = false;
+    complaint.deletedAt = undefined;
+    await complaint.save();
+
+    await complaint.populate('user', 'name email');
+    res.json({ message: 'Complaint restored successfully.', complaint });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Admin-only route to manually trigger cleanup of expired complaints
+router.post('/admin/cleanup-expired', protect, async (req, res) => {
+  try {
+    // Only admins can access this route
+    if (!req.user.isAdmin) {
+      return res.status(403).json({ message: 'Admin access required' });
+    }
+
+    const now = new Date();
+    const fourteenDaysAgo = new Date(now);
+    fourteenDaysAgo.setDate(now.getDate() - 14);
+
+    // Find resolved/closed complaints older than 14 days
+    const expiredComplaints = await Complaint.find({
+      status: { $in: ['Resolved', 'Closed'] },
+      lastUpdated: { $lt: fourteenDaysAgo },
+      isDeleted: { $ne: true }
+    });
+
+    let deletedCount = 0;
+    let errorCount = 0;
+
+    for (const complaint of expiredComplaints) {
+      try {
+        // Delete images from Cloudinary
+        if (Array.isArray(complaint.images)) {
+          for (const img of complaint.images) {
+            try {
+              await cloudinary.uploader.destroy(img.public_id);
+            } catch (err) {
+              console.error(`Error deleting complaint image ${img.public_id}:`, err);
+            }
+          }
+        }
+        
+        complaint.isDeleted = true;
+        complaint.deletedAt = new Date();
+        await complaint.save();
+        deletedCount++;
+        console.log(`Manually deleted expired complaint: ${complaint._id}`);
+      } catch (error) {
+        errorCount++;
+        console.error(`Error deleting expired complaint ${complaint._id}:`, error);
+      }
+    }
+
+    res.json({ 
+      message: 'Manual cleanup completed', 
+      deletedCount, 
+      errorCount,
+      totalFound: expiredComplaints.length 
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error during manual cleanup', error: error.message });
   }
 });
 

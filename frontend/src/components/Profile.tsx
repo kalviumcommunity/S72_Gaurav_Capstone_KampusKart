@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import SkeletonLoader from './SkeletonLoader';
+import UniversalLoader from './UniversalLoader';
+import { useDataLoading } from '../hooks/useLoading';
 import { FiUser, FiMail, FiPhone, FiMapPin, FiEdit2, FiSave, FiXCircle, FiUpload, FiAlertCircle, FiCheckCircle, FiCalendar, FiTag, FiBriefcase } from 'react-icons/fi'; // Importing icons including new ones
 import { API_BASE } from '../config';
 
@@ -28,7 +29,8 @@ const calculateCompletion = (profileData: any) => {
 };
 
 const Profile = () => {
-  const { user, token, loading } = useAuth();
+  const { user, token } = useAuth();
+  const { isLoading, error: loadingError, steps, startLoading, stopLoading, setError: setLoadingError } = useDataLoading();
   const [profileData, setProfileData] = useState({
     name: user?.name || '',
     email: user?.email || '',
@@ -88,6 +90,7 @@ const Profile = () => {
          return;
       }
       if (!pageLoading) setPageLoading(true);
+      startLoading();
 
       try {
         const response = await fetch(`${API_BASE}/api/profile`, {
@@ -118,6 +121,7 @@ const Profile = () => {
         setError('An error occurred while fetching profile data.');
       } finally {
         setPageLoading(false);
+        stopLoading();
       }
     };
     
@@ -223,13 +227,18 @@ const Profile = () => {
         setIsEditing(false);
     };
 
-  if (loading || pageLoading || !user) {
+  if (isLoading || pageLoading || !user) {
     return (
-      <div className="min-h-screen flex flex-col bg-white font-sans">
-        <main className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-[100px]">
-          <SkeletonLoader variant="profile" />
-        </main>
-      </div>
+      <UniversalLoader
+        variant="page"
+        title="Loading Profile"
+        subtitle="Fetching your profile data..."
+        showSteps={true}
+        steps={steps}
+        error={loadingError}
+        onRetry={() => window.location.reload()}
+        size="large"
+      />
     );
   }
 

@@ -207,7 +207,7 @@ io.on('connection', (socket) => {
     socket.emit('previous-messages', messages.reverse());
   });
 
-  // Handle new messages
+  // Handle new messages (this is a fallback, main message handling is via HTTP API)
   socket.on('send-message', async (messageData) => {
     try {
       const chatMessage = new Chat({
@@ -221,7 +221,8 @@ io.on('connection', (socket) => {
         .populate('sender', 'name profilePicture')
         .lean();
       
-      io.to('global-chat').emit('new-message', populatedMessage);
+      // Emit to all clients except sender to prevent duplicates
+      socket.to('global-chat').emit('new-message', populatedMessage);
     } catch (error) {
       console.error('Error saving message:', error);
       socket.emit('error', 'Failed to send message');

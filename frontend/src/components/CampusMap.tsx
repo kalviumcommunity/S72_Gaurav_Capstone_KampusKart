@@ -3,6 +3,8 @@ import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react'
 import { GoogleMap, useLoadScript, InfoWindow, Marker, Libraries } from '@react-google-maps/api';
 import { FiSearch } from 'react-icons/fi';
 import debounce from 'lodash/debounce';
+import UniversalLoader from './UniversalLoader';
+import { useDataLoading } from '../hooks/useLoading';
 
 // Define libraries as a proper static constant with correct type
 const GOOGLE_MAPS_LIBRARIES: Libraries = ["places"];
@@ -45,6 +47,7 @@ interface Location {
 }
 
 const CampusMap: React.FC<CampusMapProps> = () => {
+  const { isLoading, error: loadingError, steps, startLoading, stopLoading, setError: setLoadingError } = useDataLoading();
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
@@ -365,11 +368,31 @@ const CampusMap: React.FC<CampusMapProps> = () => {
   }, [debouncedSetSearchQuery]);
 
   if (loadError) {
-    return <div>Error loading maps</div>;
+    return (
+      <UniversalLoader
+        variant="page"
+        title="Map Loading Error"
+        subtitle="Failed to load Google Maps"
+        error="Unable to load the campus map. Please check your internet connection and try again."
+        onRetry={() => window.location.reload()}
+        size="large"
+      />
+    );
   }
 
-  if (!isLoaded) {
-    return <div>Loading...</div>;
+  if (!isLoaded || isLoading) {
+    return (
+      <UniversalLoader
+        variant="page"
+        title="Loading Campus Map"
+        subtitle="Initializing map components..."
+        showSteps={true}
+        steps={steps}
+        error={loadingError}
+        onRetry={() => window.location.reload()}
+        size="large"
+      />
+    );
   }
 
   return (

@@ -3,6 +3,8 @@ import Navbar from './Navbar';
 import { useAuth } from '../contexts/AuthContext';
 import { FiSearch, FiX, FiClock, FiMapPin, FiUser, FiCalendar, FiMessageSquare, FiEdit2, FiTrash2, FiCheckCircle, FiInfo, FiTag, FiFileText, FiMail, FiAlertCircle } from 'react-icons/fi';
 import SkeletonLoader from './SkeletonLoader';
+import UniversalLoader from './UniversalLoader';
+import { useDataLoading } from '../hooks/useLoading';
 import { API_BASE } from '../config';
 
 interface LostFoundItem {
@@ -38,6 +40,7 @@ interface ModalImage {
 
 const LostFound = () => {
   const [items, setItems] = useState<LostFoundItem[]>([]);
+  const { isLoading, error: loadingError, steps, startLoading, stopLoading, setError: setLoadingError } = useDataLoading();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { token, user } = useAuth();
@@ -132,6 +135,9 @@ const LostFound = () => {
 
   const fetchItems = async () => {
     try {
+      if (currentPage === 1) {
+        startLoading();
+      }
       setLoading(currentPage === 1);
       setError(null);
       const url = new URL(`${API_BASE}/api/lostfound`);
@@ -166,6 +172,9 @@ const LostFound = () => {
       console.error('Error fetching lost and found items:', err);
       setError(err.message || 'Failed to fetch lost and found items.');
     } finally {
+      if (currentPage === 1) {
+        stopLoading();
+      }
       setLoading(false);
       setIsFetchingMore(false);
     }
@@ -245,6 +254,21 @@ const LostFound = () => {
       </div>
     );
   };
+
+  if (isLoading) {
+    return (
+      <UniversalLoader
+        variant="page"
+        title="Loading Lost & Found"
+        subtitle="Fetching lost and found items..."
+        showSteps={true}
+        steps={steps}
+        error={loadingError}
+        onRetry={() => window.location.reload()}
+        size="large"
+      />
+    );
+  }
 
   if (loading) {
     return (
@@ -854,7 +878,7 @@ const LostFound = () => {
             </div>
 
             {/* Owner/Admin Actions */}
-            {(user && (user._id === selectedItemForDetails.user._id || user.email === 'gauravkhandelwal205@gmail.com')) && (
+            {(user && (user._id === selectedItemForDetails.user._id || user.isAdmin)) && (
               <div className="flex gap-3 mt-6">
                 {!selectedItemForDetails.resolved && (
                   <button

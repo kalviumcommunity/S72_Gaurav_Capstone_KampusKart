@@ -24,6 +24,12 @@ const authMiddleware = async (req, res, next) => {
         return res.status(401).json({ message: 'User not found' });
     }
 
+    // Check if user is admin based on environment configuration
+    const adminEmails = process.env.ADMIN_EMAILS ? 
+      process.env.ADMIN_EMAILS.split(',').map(email => email.trim()) : 
+      [];
+    req.user.isAdmin = adminEmails.includes(req.user.email);
+
     next();
 
   } catch (error) {

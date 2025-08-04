@@ -37,6 +37,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { API_BASE } from '../../config';
+import { themeConfig } from '../../theme/themeConfig';
 
 const ChatWindow = () => {
   const [messages, setMessages] = useState([]);
@@ -45,6 +46,8 @@ const ChatWindow = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [connectionStatus, setConnectionStatus] = useState('connecting');
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [searchResults, setSearchResults] = useState([]);
@@ -54,6 +57,7 @@ const ChatWindow = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [replyTo, setReplyTo] = useState(null);
   const [attachments, setAttachments] = useState([]);
+  const [sendingMessage, setSendingMessage] = useState(false);
   const fileInputRef = useRef(null);
   const { user } = useAuth();
   const socketRef = useRef();
@@ -89,12 +93,42 @@ const ChatWindow = () => {
         }
       }
       setLoading(false);
+      setConnectionStatus('connected');
+      setError(null);
+    });
+
+    // Handle connection errors
+    socketRef.current.on('connect_error', (error) => {
+      console.error('Socket connection error:', error);
+      setError('Failed to connect to chat server');
+      setConnectionStatus('error');
+      setLoading(false);
+    });
+
+    socketRef.current.on('disconnect', (reason) => {
+      console.log('Socket disconnected:', reason);
+      setConnectionStatus('disconnected');
+      if (reason === 'io server disconnect') {
+        setError('Connection lost. Please refresh the page.');
+      }
+    });
+
+    socketRef.current.on('connect', () => {
+      setConnectionStatus('connected');
+      setError(null);
     });
 
     // Listen for new messages
     socketRef.current.on('new-message', (message) => {
       if (message) {
-        setMessages((prev) => [...prev, message]);
+        setMessages((prev) => {
+          // Check if message already exists to prevent duplicates
+          const messageExists = prev.some(msg => msg._id === message._id);
+          if (messageExists) {
+            return prev;
+          }
+          return [...prev, message];
+        });
         markMessageAsRead(message._id);
       }
     });
@@ -194,14 +228,25 @@ const ChatWindow = () => {
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (!newMessage.trim() && attachments.length === 0) return;
+    if (newMessage.trim() === '' && attachments.length === 0) return;
+    if (sendingMessage) return; // Prevent multiple submissions
+
+    setSendingMessage(true);
+    const messageText = newMessage.trim();
+    const currentAttachments = [...attachments];
+    
+    // Clear form immediately
+    setNewMessage('');
+    setAttachments([]);
+    setReplyTo(null);
+    setShowEmojiPicker(false);
 
     const formData = new FormData();
-    formData.append('message', newMessage);
+    formData.append('message', messageText);
     if (replyTo) {
       formData.append('replyTo', replyTo._id);
     }
-    attachments.forEach((file) => {
+    currentAttachments.forEach((file) => {
       formData.append('attachments', file);
     });
 
@@ -214,14 +259,19 @@ const ChatWindow = () => {
         body: formData,
       });
 
-      if (!response.ok) throw new Error('Failed to send message');
-
-      setNewMessage('');
-      setAttachments([]);
-      setReplyTo(null);
-      setShowEmojiPicker(false);
+      if (!response.ok) {
+        // Restore the message if sending failed
+        setNewMessage(messageText);
+        setAttachments(currentAttachments);
+        throw new Error('Failed to send message');
+      }
     } catch (error) {
       console.error('Error sending message:', error);
+      // Restore the message if sending failed
+      setNewMessage(messageText);
+      setAttachments(currentAttachments);
+    } finally {
+      setSendingMessage(false);
     }
   };
 
@@ -342,6 +392,34 @@ const ChatWindow = () => {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages]);
+
+  // Scroll to bottom when component mounts or when new messages arrive
+  useEffect(() => {
+    const scrollToBottom = () => {
+      if (messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
+    };
+
+    // Scroll immediately when component mounts
+    scrollToBottom();
+
+    // Also scroll when new messages are added
+    if (messages.length > 0) {
+      scrollToBottom();
+    }
+  }, [messages.length]);
+
+  // Force scroll to bottom when chat is first loaded
+  useEffect(() => {
+    if (!loading && messages.length > 0) {
+      setTimeout(() => {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    }
+  }, [loading, messages.length]);
 
   // Fix logo import for Avatar
   const logoUrl = '/Logo.png';
@@ -566,10 +644,312 @@ const ChatWindow = () => {
     }
   }, [anchorEl, messages]);
 
+  // Error state
+  if (error && (!messages || messages.length === 0)) {
+    return (
+      <Box 
+        sx={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 10,
+          display: 'flex',
+          flexDirection: 'column',
+          bgcolor: '#f7f7fa',
+          overflow: 'hidden',
+          height: '100vh',
+          minHeight: 0,
+          pt: '64px',
+        }}
+      >
+        {/* Chat Header during error */}
+        <Paper
+          elevation={1}
+          sx={{
+            p: 2,
+            mb: 0,
+            bgcolor: '#fff',
+            borderRadius: '0 0 16px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            borderBottom: '1px solid #e0e0e0',
+            boxShadow: 'none',
+          }}
+        >
+          <Box display="flex" alignItems="center" gap={2}>
+            <Avatar
+              src={logoUrl}
+              sx={{ bgcolor: 'error.main', width: 40, height: 40 }}
+            />
+            <Box>
+              <Typography variant="h6" fontWeight={700} color="error.main">
+                KampusKart Chat
+              </Typography>
+              <Typography variant="caption" color="error.main">
+                Connection Error
+              </Typography>
+            </Box>
+          </Box>
+        </Paper>
+
+        {/* Error Content */}
+        <Box 
+          sx={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            p: 3,
+            gap: 3,
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 2,
+            }}
+          >
+            <Box
+              sx={{
+                width: 80,
+                height: 80,
+                borderRadius: '50%',
+                bgcolor: 'error.main',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <img 
+                src={logoUrl} 
+                alt="KampusKart" 
+                style={{ 
+                  width: '50px', 
+                  height: '50px',
+                  filter: 'brightness(0) invert(1)',
+                }} 
+              />
+            </Box>
+            
+            <Typography variant="h6" fontWeight={600} color="error.main">
+              Connection Failed
+            </Typography>
+            
+            <Typography variant="body2" color="text.secondary" textAlign="center">
+              {error}
+            </Typography>
+          </Box>
+
+          <Button 
+            variant="contained" 
+            color="primary"
+            onClick={() => window.location.reload()}
+            sx={{ mt: 2 }}
+          >
+            Retry Connection
+          </Button>
+        </Box>
+      </Box>
+    );
+  }
+
   if (loading && (!messages || messages.length === 0)) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
-        <CircularProgress />
+      <Box 
+        sx={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 10,
+          display: 'flex',
+          flexDirection: 'column',
+          bgcolor: '#212B36',
+          overflow: 'hidden',
+          height: '100vh',
+          minHeight: 0,
+          pt: '64px',
+        }}
+      >
+        {/* Chat Header during loading */}
+        <Paper
+          elevation={1}
+          sx={{
+            p: 2,
+            mb: 0,
+            bgcolor: '#fff',
+            borderRadius: '0 0 16px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            borderBottom: '1px solid #e0e0e0',
+            boxShadow: 'none',
+          }}
+        >
+          <Box display="flex" alignItems="center" gap={2}>
+            <Avatar
+              src={logoUrl}
+              sx={{ bgcolor: 'primary.main', width: 40, height: 40 }}
+            />
+            <Box>
+              <Typography variant="h6" fontWeight={700} color="primary.main">
+                KampusKart Chat
+              </Typography>
+                          <Typography variant="caption" color="text.secondary">
+              {connectionStatus === 'connecting' ? 'Connecting...' : 
+               connectionStatus === 'connected' ? 'Connected' : 
+               connectionStatus === 'disconnected' ? 'Disconnected' : 'Connecting...'}
+            </Typography>
+            </Box>
+          </Box>
+        </Paper>
+
+        {/* Loading Content */}
+        <Box 
+          sx={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            p: 3,
+            gap: 3,
+          }}
+        >
+          {/* Animated Logo */}
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 2,
+            }}
+          >
+            <Box
+              sx={{
+                width: 80,
+                height: 80,
+                borderRadius: '50%',
+                bgcolor: themeConfig.colors.primary,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                animation: 'pulse 2s infinite',
+                '@keyframes pulse': {
+                  '0%': {
+                    transform: 'scale(1)',
+                    opacity: 1,
+                  },
+                  '50%': {
+                    transform: 'scale(1.1)',
+                    opacity: 0.7,
+                  },
+                  '100%': {
+                    transform: 'scale(1)',
+                    opacity: 1,
+                  },
+                },
+              }}
+            >
+              <img 
+                src={logoUrl} 
+                alt="KampusKart" 
+                style={{ 
+                  width: '50px', 
+                  height: '50px',
+                  filter: 'brightness(0) invert(1)',
+                }} 
+              />
+            </Box>
+            
+            <Typography variant="h6" fontWeight={600} sx={{ color: themeConfig.colors.primary }}>
+              Loading Chat
+            </Typography>
+            
+            <Typography variant="body2" sx={{ color: themeConfig.colors.text.secondary }} textAlign="center">
+              Connecting to chat server...
+            </Typography>
+          </Box>
+
+          {/* Progress Indicator */}
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+            <CircularProgress 
+              size={40} 
+              thickness={4}
+              sx={{ 
+                color: themeConfig.colors.primary,
+                '& .MuiCircularProgress-circle': {
+                  strokeLinecap: 'round',
+                },
+              }}
+            />
+            <Typography variant="caption" sx={{ color: themeConfig.colors.text.secondary }}>
+              Establishing connection
+            </Typography>
+          </Box>
+
+          {/* Loading Steps */}
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, maxWidth: 300 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <CircularProgress 
+                size={16} 
+                sx={{ 
+                  color: connectionStatus === 'connected' ? themeConfig.colors.success : 
+                         connectionStatus === 'error' ? themeConfig.colors.error : themeConfig.colors.primary 
+                }} 
+              />
+              <Typography 
+                variant="caption" 
+                sx={{ 
+                  color: connectionStatus === 'connected' ? themeConfig.colors.success : 
+                         connectionStatus === 'error' ? themeConfig.colors.error : themeConfig.colors.text.secondary
+                }}
+              >
+                {connectionStatus === 'connected' ? 'Connected to server' :
+                 connectionStatus === 'error' ? 'Connection failed' : 'Connecting to server'}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <CircularProgress 
+                size={16} 
+                sx={{ 
+                  color: connectionStatus === 'connected' ? themeConfig.colors.success : themeConfig.colors.primary 
+                }} 
+              />
+              <Typography 
+                variant="caption" 
+                sx={{ 
+                  color: connectionStatus === 'connected' ? themeConfig.colors.success : themeConfig.colors.text.secondary
+                }}
+              >
+                {connectionStatus === 'connected' ? 'Messages loaded' : 'Loading messages'}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <CircularProgress 
+                size={16} 
+                sx={{ 
+                  color: connectionStatus === 'connected' ? themeConfig.colors.success : themeConfig.colors.text.light 
+                }} 
+              />
+              <Typography 
+                variant="caption" 
+                sx={{ 
+                  color: connectionStatus === 'connected' ? themeConfig.colors.success : themeConfig.colors.text.light
+                }}
+              >
+                {connectionStatus === 'connected' ? 'Real-time features ready' : 'Setting up real-time features'}
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
       </Box>
     );
   }
@@ -602,7 +982,16 @@ const ChatWindow = () => {
         border: 'none',
         boxShadow: 'none',
       }}>
-        {loading && <CircularProgress size={20} sx={{ display: 'block', mx: 'auto', my: 1 }} />}
+        {loading && messages.length > 0 && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <CircularProgress size={20} sx={{ color: 'primary.main' }} />
+              <Typography variant="caption" color="text.secondary">
+                Loading more messages...
+              </Typography>
+            </Box>
+          </Box>
+        )}
         <List sx={{ p: 0 }}>
           {messages.map((message, index) => (
             <React.Fragment key={message._id}>
@@ -665,10 +1054,14 @@ const ChatWindow = () => {
           </IconButton>
           {showEmojiPicker && (
             <Box sx={{ position: 'absolute', bottom: '100%', left: 0 }}>
-              <Picker data={data} onEmojiSelect={(emoji) => {
-                setNewMessage((prev) => prev + emoji.native);
-                setShowEmojiPicker(false);
-              }} />
+              <Picker 
+                data={data} 
+                theme="light"
+                onEmojiSelect={(emoji) => {
+                  setNewMessage((prev) => prev + emoji.native);
+                  setShowEmojiPicker(false);
+                }} 
+              />
             </Box>
           )}
           {/* Show selected attachments as chips */}
@@ -695,8 +1088,12 @@ const ChatWindow = () => {
             }}
             size="small"
           />
-          <IconButton type="submit" color="primary" disabled={!newMessage.trim() && attachments.length === 0}>
-            <SendIcon />
+          <IconButton 
+            type="submit" 
+            color="primary" 
+            disabled={(newMessage.trim() === '' && attachments.length === 0) || sendingMessage}
+          >
+            {sendingMessage ? <CircularProgress size={20} /> : <SendIcon />}
           </IconButton>
         </Paper>
       </Box>

@@ -32,7 +32,10 @@ const chatSchema = new mongoose.Schema({
     },
     message: {
         type: String,
-        required: true,
+        required: function() {
+            // Message is required only if there are no attachments
+            return !this.attachments || this.attachments.length === 0;
+        },
         trim: true
     },
     attachments: [{

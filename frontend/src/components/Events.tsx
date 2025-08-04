@@ -3,8 +3,9 @@ import Navbar from './Navbar';
 import { FiPlus, FiCalendar, FiMapPin, FiSearch, FiAlertCircle, FiFileText, FiTag, FiMail, FiInfo, FiClock, FiUser, FiPhone } from 'react-icons/fi';
 import { FaSearch } from 'react-icons/fa';
 import { useAuth } from '../contexts/AuthContext';
+import UniversalLoader from './UniversalLoader';
+import { useDataLoading } from '../hooks/useLoading';
 import { API_BASE } from '../config';
-import SkeletonLoader from './SkeletonLoader';
 
 interface Event {
   _id: string;
@@ -292,8 +293,8 @@ const Events = () => {
       coordinates: undefined as { lat: number; lng: number } | undefined
     }
   });
+  const { isLoading, error: loadingError, steps, startLoading, stopLoading, setError: setLoadingError } = useDataLoading();
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
   const [selectedEventForDetails, setSelectedEventForDetails] = useState<Event | null>(null);
 
   const renderStatus = (status: Event['status']) => {
@@ -333,6 +334,7 @@ const Events = () => {
 
   const fetchEvents = async () => {
     try {
+      startLoading();
       const response = await fetch(`${API_BASE}/api/events`);
       if (!response.ok) throw new Error('Failed to fetch events');
       const data = await response.json();
@@ -341,7 +343,7 @@ const Events = () => {
       console.error('Error fetching events:', error);
       setError('Failed to load events');
     } finally {
-      setLoading(false);
+      stopLoading();
     }
   };
 
@@ -516,14 +518,18 @@ const Events = () => {
      event.description.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col bg-white font-sans">
-        <Navbar />
-        <main className="flex-1 container mx-auto px-12 py-8 pt-[100px]">
-          <SkeletonLoader variant="events" />
-        </main>
-      </div>
+      <UniversalLoader
+        variant="page"
+        title="Loading Events"
+        subtitle="Fetching campus events..."
+        showSteps={true}
+        steps={steps}
+        error={loadingError}
+        onRetry={() => window.location.reload()}
+        size="large"
+      />
     );
   }
 

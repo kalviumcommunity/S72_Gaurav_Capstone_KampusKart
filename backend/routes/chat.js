@@ -39,6 +39,39 @@ const uploadToCloudinary = (file) => {
   });
 };
 
+// Helper function to delete a file from Cloudinary
+const deleteFromCloudinary = (publicId) => {
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader.destroy(publicId, (error, result) => {
+      if (error) return reject(error);
+      resolve(result);
+    });
+  });
+};
+
+// Helper function to extract public ID from Cloudinary URL
+const extractPublicIdFromUrl = (url) => {
+  try {
+    // Extract the public ID from the Cloudinary URL
+    // URL format: https://res.cloudinary.com/cloud_name/image/upload/v1234567890/folder/filename.jpg
+    const urlParts = url.split('/');
+    const uploadIndex = urlParts.findIndex(part => part === 'upload');
+    if (uploadIndex !== -1 && uploadIndex + 2 < urlParts.length) {
+      // Get everything after 'upload' and before the file extension
+      const pathAfterUpload = urlParts.slice(uploadIndex + 2).join('/');
+      // Remove the version number if present (v1234567890)
+      const withoutVersion = pathAfterUpload.replace(/^v\d+\//, '');
+      // Remove the file extension
+      const publicId = withoutVersion.replace(/\.[^/.]+$/, '');
+      return publicId;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error extracting public ID from URL:', error);
+    return null;
+  }
+};
+
 // Get recent chat messages with pagination
 router.get('/messages', auth, async (req, res) => {
   try {
@@ -110,7 +143,7 @@ router.post('/messages', auth, upload.array('attachments', 5), async (req, res) 
 
     const chatMessage = new Chat({
       sender: req.user._id,
-      message,
+      message: message || (attachments.length > 0 ? '📎 Attachment' : ''),
       attachments,
       replyTo
     });
@@ -125,6 +158,7 @@ router.post('/messages', auth, upload.array('attachments', 5), async (req, res) 
     // Emit to all clients in real time
     const io = req.app.get('io');
     if (io) {
+      // Emit to all clients except the sender to prevent duplicates
       io.to('global-chat').emit('new-message', populatedMessage);
     }
 
@@ -192,6 +226,22 @@ router.delete('/messages/:messageId', auth, async (req, res) => {
       return res.status(403).json({ message: 'Not authorized to delete this message' });
     }
 
+    // Delete attachments from Cloudinary if they exist
+    if (message.attachments && message.attachments.length > 0) {
+      try {
+        for (const attachment of message.attachments) {
+          const publicId = extractPublicIdFromUrl(attachment.url);
+          if (publicId) {
+            await deleteFromCloudinary(publicId);
+            console.log(`Deleted attachment from Cloudinary: ${publicId}`);
+          }
+        }
+      } catch (cloudinaryError) {
+        console.error('Error deleting attachments from Cloudinary:', cloudinaryError);
+        // Continue with message deletion even if Cloudinary deletion fails
+      }
+    }
+
     message.isDeleted = true;
     await message.save();
 
@@ -204,6 +254,51 @@ router.delete('/messages/:messageId', auth, async (req, res) => {
     res.json({ message: 'Message deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Error deleting message', error: error.message });
+  }
+});
+
+// Hard delete message (permanent deletion - admin only)
+router.delete('/messages/:messageId/permanent', auth, async (req, res) => {
+  try {
+    const message = await Chat.findById(req.params.messageId);
+
+    if (!message) {
+      return res.status(404).json({ message: 'Message not found' });
+    }
+
+    // Only admins can permanently delete messages
+    if (!req.user.isAdmin) {
+      return res.status(403).json({ message: 'Only admins can permanently delete messages' });
+    }
+
+    // Delete attachments from Cloudinary if they exist
+    if (message.attachments && message.attachments.length > 0) {
+      try {
+        for (const attachment of message.attachments) {
+          const publicId = extractPublicIdFromUrl(attachment.url);
+          if (publicId) {
+            await deleteFromCloudinary(publicId);
+            console.log(`Deleted attachment from Cloudinary: ${publicId}`);
+          }
+        }
+      } catch (cloudinaryError) {
+        console.error('Error deleting attachments from Cloudinary:', cloudinaryError);
+        // Continue with message deletion even if Cloudinary deletion fails
+      }
+    }
+
+    // Permanently delete the message
+    await Chat.findByIdAndDelete(req.params.messageId);
+
+    // Emit message-deleted event
+    const io = req.app.get('io');
+    if (io) {
+      io.to('global-chat').emit('message-deleted', { _id: message._id });
+    }
+
+    res.json({ message: 'Message permanently deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error permanently deleting message', error: error.message });
   }
 });
 
@@ -249,6 +344,52 @@ router.post('/messages/:messageId/read', auth, async (req, res) => {
     res.json(updatedMessage);
   } catch (error) {
     res.status(500).json({ message: 'Error marking message as read', error: error.message });
+  }
+});
+
+// Cleanup orphaned attachments (admin only)
+router.post('/cleanup-orphaned-attachments', auth, async (req, res) => {
+  try {
+    // Only admins can run cleanup
+    if (!req.user.isAdmin) {
+      return res.status(403).json({ message: 'Only admins can run cleanup operations' });
+    }
+
+    // Find all deleted messages with attachments
+    const deletedMessages = await Chat.find({ 
+      isDeleted: true, 
+      attachments: { $exists: true, $ne: [] } 
+    });
+
+    let deletedCount = 0;
+    let errorCount = 0;
+
+    for (const message of deletedMessages) {
+      if (message.attachments && message.attachments.length > 0) {
+        for (const attachment of message.attachments) {
+          try {
+            const publicId = extractPublicIdFromUrl(attachment.url);
+            if (publicId) {
+              await deleteFromCloudinary(publicId);
+              deletedCount++;
+              console.log(`Cleaned up orphaned attachment: ${publicId}`);
+            }
+          } catch (error) {
+            errorCount++;
+            console.error(`Error cleaning up attachment: ${attachment.url}`, error);
+          }
+        }
+      }
+    }
+
+    res.json({ 
+      message: 'Cleanup completed', 
+      deletedCount, 
+      errorCount,
+      totalProcessed: deletedMessages.length 
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error during cleanup', error: error.message });
   }
 });
 

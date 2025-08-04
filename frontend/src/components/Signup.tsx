@@ -243,7 +243,7 @@ const Signup: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full flex justify-center py-3 px-4 rounded-full text-lg font-semibold text-white bg-[#181818] shadow-lg hover:bg-[#00C6A7] hover:text-white transition ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`w-full flex justify-center py-3 px-4 rounded-full text-lg font-semibold text-white bg-[#181818] shadow-lg hover:bg-[#00C6A7] hover:text-white transition mobile-touch-friendly mobile-no-hover mobile-active-feedback ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
               style={{ boxShadow: '0 4px 24px 0 rgba(0,0,0,0.10)' }}
             >
               {loading ? 'Creating account...' : 'Sign up'}

@@ -114,12 +114,19 @@ router.post('/signup', signupLimiter, sanitizeInput, validateSignup, async (req,
       { expiresIn: '24h' }
     );
 
+    // Check if user is admin based on environment configuration
+    const adminEmails = process.env.ADMIN_EMAILS ? 
+      process.env.ADMIN_EMAILS.split(',').map(email => email.trim()) : 
+      [];
+    const isAdmin = adminEmails.includes(user.email);
+
     res.status(201).json({
       token,
       user: {
         id: user._id,
         email: user.email,
-        name: user.name
+        name: user.name,
+        isAdmin
       }
     });
   } catch (error) {
@@ -161,12 +168,19 @@ router.post('/login', loginLimiter, sanitizeInput, validateLogin, async (req, re
       { expiresIn: '24h' }
     );
 
+    // Check if user is admin based on environment configuration
+    const adminEmails = process.env.ADMIN_EMAILS ? 
+      process.env.ADMIN_EMAILS.split(',').map(email => email.trim()) : 
+      [];
+    const isAdmin = adminEmails.includes(user.email);
+
     res.json({
       token,
       user: {
         id: user._id,
         email: user.email,
-        name: user.name
+        name: user.name,
+        isAdmin
       }
     });
   } catch (error) {

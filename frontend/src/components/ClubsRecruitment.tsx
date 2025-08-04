@@ -3,8 +3,9 @@ import Navbar from './Navbar';
 import { FiPlus, FiCalendar, FiSearch, FiAlertCircle, FiFileText, FiTag, FiMail, FiInfo, FiUser, FiPhone } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import { useAuth } from '../contexts/AuthContext';
+import UniversalLoader from './UniversalLoader';
+import { useDataLoading } from '../hooks/useLoading';
 import { API_BASE } from '../config';
-import SkeletonLoader from './SkeletonLoader';
 
 interface ClubRecruitment {
   _id: string;
@@ -177,6 +178,7 @@ const ClubDetails: React.FC<ClubDetailsProps> = ({ club, onClose, onEdit, onDele
 
 const ClubsRecruitment = () => {
   const { user, token } = useAuth();
+  const { isLoading, error: loadingError, steps, startLoading, stopLoading, setError: setLoadingError } = useDataLoading();
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [clubs, setClubs] = useState<ClubRecruitment[]>([]);
@@ -195,7 +197,6 @@ const ClubsRecruitment = () => {
     status: 'Open' as 'Open' | 'Closed',
   });
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
   const [selectedClubForDetails, setSelectedClubForDetails] = useState<ClubRecruitment | null>(null);
 
   useEffect(() => {
@@ -204,6 +205,7 @@ const ClubsRecruitment = () => {
 
   const fetchClubs = async () => {
     try {
+      startLoading();
       const response = await fetch(`${API_BASE}/api/clubs`);
       if (!response.ok) throw new Error('Failed to fetch club recruitments');
       const data = await response.json();
@@ -211,7 +213,7 @@ const ClubsRecruitment = () => {
     } catch (error) {
       setError('Failed to load club recruitments');
     } finally {
-      setLoading(false);
+      stopLoading();
     }
   };
 
@@ -366,14 +368,18 @@ const ClubsRecruitment = () => {
     club.clubName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col bg-white font-sans">
-        <Navbar />
-        <main className="flex-1 container mx-auto px-12 py-8 pt-[100px]">
-          <SkeletonLoader variant="lostfound" />
-        </main>
-      </div>
+      <UniversalLoader
+        variant="page"
+        title="Loading Club Recruitment"
+        subtitle="Fetching club recruitment data..."
+        showSteps={true}
+        steps={steps}
+        error={loadingError}
+        onRetry={() => window.location.reload()}
+        size="large"
+      />
     );
   }
 

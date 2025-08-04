@@ -1,4 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import './theme/globalTheme.css';
 
 @tailwind base;
 @tailwind components;
@@ -74,6 +76,122 @@ button:focus-visible {
   }
   button {
     background-color: #f9f9f9;
+  }
+}
+
+/* Mobile-specific styles to fix hover issues */
+@media (hover: none) and (pointer: coarse) {
+  /* Disable hover effects on touch devices */
+  *:hover {
+    transform: none !important;
+    scale: none !important;
+  }
+  
+  /* Improve button touch targets */
+  button, 
+  [role="button"],
+  .btn,
+  .button,
+  a[role="button"],
+  .cursor-pointer {
+    min-height: 44px;
+    min-width: 44px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Remove all hover states on touch devices */
+  .hover\:bg-\[#FFD166\]:hover,
+  .hover\:bg-\[#00C6A7\]:hover,
+  .hover\:bg-gray-100:hover,
+  .hover\:bg-gray-50:hover,
+  .hover\:bg-blue-50:hover,
+  .hover\:bg-blue-100:hover,
+  .hover\:bg-red-50:hover,
+  .hover\:bg-red-100:hover,
+  .hover\:bg-green-50:hover,
+  .hover\:bg-green-100:hover,
+  .hover\:bg-\[#009e87\]:hover,
+  .hover\:bg-\[#00C7A7\]:hover,
+  .hover\:bg-red-600:hover,
+  .hover\:scale-105:hover,
+  .hover\:scale-110:hover,
+  .hover\:shadow-lg:hover,
+  .hover\:opacity-90:hover,
+  .hover\:opacity-100:hover,
+  .hover\:text-black:hover,
+  .hover\:text-white:hover,
+  .hover\:text-blue-500:hover,
+  .hover\:underline:hover,
+  .group:hover .group-hover\:scale-105,
+  .group:hover .group-hover\:opacity-100 {
+    background-color: inherit !important;
+    transform: none !important;
+    scale: none !important;
+    opacity: inherit !important;
+    color: inherit !important;
+    text-decoration: inherit !important;
+    box-shadow: inherit !important;
+  }
+  
+  /* Active states for better touch feedback */
+  button:active,
+  [role="button"]:active,
+  .btn:active,
+  .button:active,
+  a[role="button"]:active,
+  .cursor-pointer:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+  
+  /* Focus states for accessibility */
+  button:focus,
+  [role="button"]:focus,
+  .btn:focus,
+  .button:focus,
+  a[role="button"]:focus,
+  .cursor-pointer:focus {
+    outline: 2px solid #00C6A7;
+    outline-offset: 2px;
+  }
+  
+  /* Remove transition delays on mobile for immediate feedback */
+  * {
+    transition-delay: 0s !important;
+  }
+}
+
+/* Desktop hover effects (only on devices that support hover) */
+@media (hover: hover) and (pointer: fine) {
+  /* Keep existing hover effects for desktop */
+}
+
+/* Utility classes for better mobile handling */
+@layer utilities {
+  .mobile-touch-friendly {
+    @apply min-h-[44px] min-w-[44px] touch-manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .mobile-no-hover {
+    @media (hover: none) and (pointer: coarse) {
+      &:hover {
+        transform: none !important;
+        scale: none !important;
+        background-color: inherit !important;
+        color: inherit !important;
+      }
+    }
+  }
+  
+  .mobile-active-feedback {
+    @media (hover: none) and (pointer: coarse) {
+      &:active {
+        transform: scale(0.98);
+        transition: transform 0.1s ease;
+      }
+    }
   }
 }
 

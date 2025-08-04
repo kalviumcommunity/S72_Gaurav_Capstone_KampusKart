@@ -273,8 +273,8 @@ router.put('/:id', authMiddleware, itemRateLimiter, upload.array('images', 5), a
       return res.status(409).json({ message: 'Resolved items cannot be updated' });
     }
 
-    // Check if the logged-in user is the owner of the item
-    if (item.user.toString() !== userId) {
+    // Check if the logged-in user is the owner of the item or an admin
+    if (item.user.toString() !== userId && !req.user.isAdmin) {
       return res.status(403).json({ message: 'You are not authorized to update this item' });
     }
 
@@ -351,8 +351,6 @@ router.delete('/:id', authMiddleware, itemRateLimiter, async (req, res) => {
   try {
     const itemId = req.params.id;
     const userId = req.user.id;
-    const userEmail = req.user.email;
-    const isAdmin = userEmail === 'gauravkhandelwal205@gmail.com';
 
     const item = await LostFoundItem.findById(itemId);
 
@@ -361,12 +359,12 @@ router.delete('/:id', authMiddleware, itemRateLimiter, async (req, res) => {
     }
 
     // Check if the item is resolved - only for non-admin users
-    if (item.resolved && !isAdmin) {
+    if (item.resolved && !req.user.isAdmin) {
       return res.status(409).json({ message: 'Resolved items cannot be deleted' });
     }
 
     // Allow owner or admin
-    if (item.user.toString() !== userId && !isAdmin) {
+    if (item.user.toString() !== userId && !req.user.isAdmin) {
       return res.status(403).json({ message: 'You are not authorized to delete this item' });
     }
 
@@ -389,7 +387,6 @@ router.patch('/:id/resolve', authMiddleware, async (req, res) => {
   try {
     const itemId = req.params.id;
     const userId = req.user.id;
-    const userEmail = req.user.email;
 
     const item = await LostFoundItem.findById(itemId);
 
@@ -398,7 +395,7 @@ router.patch('/:id/resolve', authMiddleware, async (req, res) => {
     }
 
     // Allow owner or admin
-    if (item.user.toString() !== userId && userEmail !== 'gauravkhandelwal205@gmail.com') {
+    if (item.user.toString() !== userId && !req.user.isAdmin) {
       return res.status(403).json({ message: 'You are not authorized to mark this item as resolved' });
     }
 
@@ -410,6 +407,159 @@ router.patch('/:id/resolve', authMiddleware, async (req, res) => {
   } catch (error) {
     console.error('Mark item as resolved error:', error);
     res.status(500).json({ message: 'Error marking item as resolved' });
+  }
+});
+
+// Admin-only route to get all lost/found items (including deleted ones)
+router.get('/admin/all', authMiddleware, async (req, res) => {
+  try {
+    // Only admins can access this route
+    if (!req.user.isAdmin) {
+      return res.status(403).json({ message: 'Admin access required' });
+    }
+
+    const { type, resolved, search, page = 1, limit = 50, includeDeleted = false } = req.query;
+    const query = {};
+
+    if (type && type !== 'All') {
+      query.type = type;
+    }
+
+    if (resolved !== undefined) {
+      query.resolved = resolved === 'true';
+    }
+
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+        { location: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    // Include deleted items if requested
+    if (includeDeleted !== 'true') {
+      query.isDeleted = { $ne: true };
+    }
+
+    const parsedPage = parseInt(page, 10);
+    const parsedLimit = parseInt(limit, 10);
+    const skip = (parsedPage - 1) * parsedLimit;
+
+    const totalItems = await LostFoundItem.countDocuments(query);
+    const totalPages = Math.ceil(totalItems / parsedLimit);
+
+    const items = await LostFoundItem.find(query)
+      .populate('user', 'name email')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(parsedLimit);
+
+    res.json({ items, totalItems, totalPages });
+  } catch (error) {
+    console.error('Admin get all items error:', error);
+    res.status(500).json({ message: 'Error fetching items' });
+  }
+});
+
+// Admin-only route to permanently delete a lost/found item
+router.delete('/admin/:id/permanent', authMiddleware, async (req, res) => {
+  try {
+    // Only admins can access this route
+    if (!req.user.isAdmin) {
+      return res.status(403).json({ message: 'Admin access required' });
+    }
+
+    const item = await LostFoundItem.findById(req.params.id);
+
+    if (!item) {
+      return res.status(404).json({ message: 'Item not found' });
+    }
+
+    // Remove images from Cloudinary
+    await deleteImages(item.images);
+
+    await item.deleteOne();
+    res.status(200).json({ message: 'Item permanently deleted successfully' });
+  } catch (error) {
+    console.error('Admin permanent delete error:', error);
+    res.status(500).json({ message: 'Error permanently deleting item' });
+  }
+});
+
+// Admin-only route to restore a deleted lost/found item
+router.patch('/admin/:id/restore', authMiddleware, async (req, res) => {
+  try {
+    // Only admins can access this route
+    if (!req.user.isAdmin) {
+      return res.status(403).json({ message: 'Admin access required' });
+    }
+
+    const item = await LostFoundItem.findById(req.params.id);
+
+    if (!item) {
+      return res.status(404).json({ message: 'Item not found' });
+    }
+
+    item.isDeleted = false;
+    item.deletedAt = undefined;
+    await item.save();
+
+    await item.populate('user', 'name email');
+    res.json({ message: 'Item restored successfully.', item });
+  } catch (error) {
+    console.error('Admin restore error:', error);
+    res.status(500).json({ message: 'Error restoring item' });
+  }
+});
+
+// Admin-only route to manually trigger cleanup of expired lost & found items
+router.post('/admin/cleanup-expired', authMiddleware, async (req, res) => {
+  try {
+    // Only admins can access this route
+    if (!req.user.isAdmin) {
+      return res.status(403).json({ message: 'Admin access required' });
+    }
+
+    const now = new Date();
+    const fourteenDaysAgo = new Date(now);
+    fourteenDaysAgo.setDate(now.getDate() - 14);
+
+    // Find resolved items older than 14 days
+    const expiredItems = await LostFoundItem.find({
+      resolved: true,
+      resolvedAt: { $lt: fourteenDaysAgo },
+      isDeleted: { $ne: true }
+    });
+
+    let deletedCount = 0;
+    let errorCount = 0;
+
+    for (const item of expiredItems) {
+      try {
+        // Delete images from Cloudinary
+        await deleteImages(item.images);
+        
+        item.isDeleted = true;
+        item.deletedAt = new Date();
+        await item.save();
+        deletedCount++;
+        console.log(`Manually deleted expired lost & found item: ${item._id}`);
+      } catch (error) {
+        errorCount++;
+        console.error(`Error deleting expired lost & found item ${item._id}:`, error);
+      }
+    }
+
+    res.json({ 
+      message: 'Manual cleanup completed', 
+      deletedCount, 
+      errorCount,
+      totalFound: expiredItems.length 
+    });
+  } catch (error) {
+    console.error('Manual cleanup error:', error);
+    res.status(500).json({ message: 'Error during manual cleanup', error: error.message });
   }
 });
 

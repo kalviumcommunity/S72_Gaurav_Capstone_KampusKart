@@ -14,6 +14,7 @@ interface User {
   gender?: string;
   dateOfBirth?: string;
   program?: string;
+  isAdmin?: boolean;
 }
 
 export interface AuthContextType {

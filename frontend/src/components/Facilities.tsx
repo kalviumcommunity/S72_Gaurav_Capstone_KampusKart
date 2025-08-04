@@ -2,9 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import Navbar from './Navbar';
 import { FiMapPin, FiSearch, FiHome, FiWifi, FiBookOpen, FiCoffee, FiPlus, FiEdit2, FiTag, FiCalendar, FiUser } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
+import UniversalLoader from './UniversalLoader';
+import { useDataLoading } from '../hooks/useLoading';
 
 const Facilities = () => {
   const { token, user } = useAuth();
+  const { isLoading, error: loadingError, steps, startLoading, stopLoading, setError: setLoadingError } = useDataLoading();
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState('All');
@@ -17,7 +20,6 @@ const Facilities = () => {
     icon: 'FiBookOpen',
   });
   const [facilities, setFacilities] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [facilityImages, setFacilityImages] = useState<{ file?: File; previewUrl: string }[]>([]);
   const dragImage = useRef<number | null>(null);
@@ -47,7 +49,7 @@ const Facilities = () => {
 
   useEffect(() => {
     const fetchFacilities = async () => {
-      setLoading(true);
+      startLoading();
       try {
         const res = await fetch('http://localhost:5000/api/facilities');
         const data = await res.json();
@@ -55,11 +57,26 @@ const Facilities = () => {
       } catch (err) {
         setError('Failed to load facilities');
       } finally {
-        setLoading(false);
+        stopLoading();
       }
     };
     fetchFacilities();
-  }, []);
+  }, [startLoading, stopLoading]);
+
+  if (isLoading) {
+    return (
+      <UniversalLoader
+        variant="page"
+        title="Loading Facilities"
+        subtitle="Fetching campus facilities..."
+        showSteps={true}
+        steps={steps}
+        error={loadingError}
+        onRetry={() => window.location.reload()}
+        size="large"
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white font-sans">

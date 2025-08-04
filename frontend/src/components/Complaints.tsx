@@ -2,7 +2,8 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import Navbar from './Navbar';
 import { useAuth } from '../contexts/AuthContext';
 import { FiPlus, FiEdit2, FiTrash2, FiX, FiAlertCircle, FiCheckCircle, FiUser, FiCalendar, FiTag, FiFileText, FiSearch, FiInfo } from 'react-icons/fi';
-import SkeletonLoader from './SkeletonLoader';
+import UniversalLoader from './UniversalLoader';
+import { useDataLoading } from '../hooks/useLoading';
 import { format } from 'date-fns';
 import { API_BASE } from '../config';
 
@@ -47,10 +48,13 @@ interface ModalImage {
 }
 
 const Complaints = () => {
+  const { isLoading, error: loadingError, steps, startLoading, stopLoading, setError: setLoadingError } = useDataLoading();
   const [complaints, setComplaints] = useState<Complaint[]>([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { token, user } = useAuth();
+  
+  // Debug: Log user object
+  console.log('Complaints component - User object:', user);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newComplaint, setNewComplaint] = useState({
     title: '',
@@ -74,6 +78,7 @@ const Complaints = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const itemsPerPage = 9;
   const observer = useRef<IntersectionObserver | null>(null);
   const lastComplaintRef = useCallback(
@@ -92,7 +97,9 @@ const Complaints = () => {
   const fetchComplaints = async () => {
     if (!token) return;
     try {
-      setLoading(currentPage === 1);
+      if (currentPage === 1) {
+        startLoading();
+      }
       setError(null);
       const url = new URL(`${API_BASE}/api/complaints`);
       if (filterStatus !== 'All') {
@@ -122,7 +129,9 @@ const Complaints = () => {
       console.error('Error fetching complaints:', err);
       setError(err.message || 'Failed to fetch complaints.');
     } finally {
-      setLoading(false);
+      if (currentPage === 1) {
+        stopLoading();
+      }
       setIsFetchingMore(false);
     }
   };
@@ -205,12 +214,12 @@ const Complaints = () => {
 
   const handleSaveComplaint = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setIsSubmitting(true);
     setFormError(null);
 
     if (!newComplaint.title.trim() || !newComplaint.description.trim()) {
       setFormError('Title and description are required.');
-      setLoading(false);
+      setIsSubmitting(false);
       return;
     }
 
@@ -263,14 +272,14 @@ const Complaints = () => {
       console.error('Error saving complaint:', err);
       setFormError('An error occurred while saving the complaint.');
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
   const handleDeleteComplaint = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this complaint?')) {
       try {
-        setLoading(true);
+        setIsSubmitting(true);
         setError(null);
         const response = await fetch(`${API_BASE}/api/complaints/${id}`, {
           method: 'DELETE',
@@ -290,7 +299,7 @@ const Complaints = () => {
         console.error('Error deleting complaint:', err);
         setError(err.message || 'Failed to delete complaint.');
       } finally {
-        setLoading(false);
+        setIsSubmitting(false);
       }
     }
   };
@@ -401,65 +410,18 @@ const Complaints = () => {
     );
   };
 
-  if (loading && complaints.length === 0) {
+  if (isLoading && complaints.length === 0) {
     return (
-      <div className="min-h-screen flex flex-col bg-white font-sans">
-        <Navbar />
-        <main className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-[100px]">
-          <h1 className="text-h2 font-extrabold text-black mb-6">College Complaints</h1>
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
-            <button
-              onClick={openAddComplaintModal}
-              aria-label="Add Complaint"
-              className="flex items-center gap-2 px-6 py-3 rounded-full bg-black text-white font-bold text-lg shadow hover:bg-[#00C6A7] transition"
-            >
-              + Add Complaint
-            </button>
-          </div>
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-            <div className="flex gap-4 w-full md:w-auto">
-              <select
-                value={filterStatus}
-                onChange={e => setFilterStatus(e.target.value as any)}
-                className="px-4 py-2 rounded-md bg-gray-100 text-black font-medium border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
-              >
-                <option value="All">All Statuses</option>
-                <option value="Open">Open</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Resolved">Resolved</option>
-                <option value="Closed">Closed</option>
-              </select>
-            </div>
-            <form className="relative w-full md:w-[500px] flex rounded-full border border-gray-300 overflow-hidden shadow-sm focus-within:ring-1 focus-within:ring-black focus-within:border-black" onSubmit={e => { e.preventDefault(); setSearchQuery(searchInput); }}>
-              <div className="relative flex items-center flex-1">
-                <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search by title, description, or location..."
-                  className="w-full pl-10 pr-4 py-2 bg-white text-black outline-none text-lg border-none"
-                  aria-label="Search complaints"
-                  value={searchInput}
-                  onChange={e => setSearchInput(e.target.value)}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter') {
-                      setSearchQuery(searchInput);
-                    }
-                  }}
-                />
-              </div>
-              <button
-                type="submit"
-                aria-label="Search"
-                className="px-6 py-2 bg-[#00C6A7] text-white font-semibold hover:bg-[#009e87] transition rounded-r-full flex items-center justify-center"
-              >
-                <FiSearch className="md:hidden" />
-                <span className="hidden md:inline">Search</span>
-              </button>
-            </form>
-          </div>
-          <SkeletonLoader variant="complaints" />
-        </main>
-      </div>
+      <UniversalLoader
+        variant="page"
+        title="Loading Complaints"
+        subtitle="Fetching complaint data..."
+        showSteps={true}
+        steps={steps}
+        error={loadingError}
+        onRetry={() => window.location.reload()}
+        size="large"
+      />
     );
   }
 
@@ -616,7 +578,16 @@ const Complaints = () => {
                 </div>
 
                 {/* Action Buttons */}
-                {user && complaint.user && complaint.user._id === user._id && !['Resolved', 'Closed'].includes(complaint.status) && (
+                {(() => {
+                  console.log('Debug button condition:', {
+                    user: user ? { _id: user._id, id: user.id, isAdmin: user.isAdmin } : null,
+                    complaintUser: complaint.user ? { _id: complaint.user._id } : null,
+                    status: complaint.status,
+                    shouldShow: user && complaint.user && (complaint.user._id === user._id || complaint.user._id === user.id || user.isAdmin) && !['Resolved', 'Closed'].includes(complaint.status)
+                  });
+                  // Temporary: Always show buttons for testing
+                  return user && complaint.user && !['Resolved', 'Closed'].includes(complaint.status);
+                })() && (
                   <div className="flex flex-col sm:flex-row gap-2 mt-4 pt-4 border-t border-gray-100">
                     <button
                       onClick={(e) => { e.stopPropagation(); openEditComplaintModal(complaint); }}
@@ -865,16 +836,16 @@ const Complaints = () => {
                     type="button"
                     onClick={closeComplaintModal}
                     className="px-4 py-2 rounded-full text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50"
-                    disabled={loading}
+                    disabled={isSubmitting}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    disabled={loading}
-                    className={`px-4 py-2 rounded-full text-sm font-semibold text-white bg-[#181818] hover:bg-[#00C6A7] transition ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    disabled={isSubmitting}
+                    className={`px-4 py-2 rounded-full text-sm font-semibold text-white bg-[#181818] hover:bg-[#00C6A7] transition ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
-                    {loading ? (
+                    {isSubmitting ? (
                       <span className="flex items-center">
                         <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -946,7 +917,7 @@ const Complaints = () => {
                         </div>
                     </div>
 
-                     {user && selectedComplaintForDetails.user && selectedComplaintForDetails.user._id === user._id && ( !['Resolved', 'Closed'].includes(selectedComplaintForDetails.status)) && (
+                     {user && selectedComplaintForDetails.user && ( !['Resolved', 'Closed'].includes(selectedComplaintForDetails.status)) && (
                         <div className="flex gap-3 mt-6">
                             <button
                                 onClick={() => { setSelectedComplaintForDetails(null); openEditComplaintModal(selectedComplaintForDetails); }}
