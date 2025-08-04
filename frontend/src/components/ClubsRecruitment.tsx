@@ -45,18 +45,18 @@ const ClubDetails: React.FC<ClubDetailsProps> = ({ club, onClose, onEdit, onDele
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-xl p-8 max-w-3xl w-full mx-auto max-h-[90vh] overflow-y-auto relative">
+            <div className="bg-white rounded-xl shadow-xl p-8 max-w-3xl w-full mx-auto max-h-[90vh] overflow-y-auto relative">
         {/* Close Button */}
         <button
           onClick={onClose}
           aria-label="Close"
-          className="w-12 h-12 flex items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-200 text-black absolute top-4 right-4 z-50 transition-all duration-150 focus:outline-none"
+          className="absolute top-4 right-4 text-red-500 hover:text-red-700 transition-colors duration-200"
         >
-          <svg className="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
+
         <h2 className="text-2xl font-bold text-gray-900 mb-4 pr-8">{club.title}</h2>
         <div className="flex flex-col md:flex-row gap-8">
           {club.image?.url ? (
@@ -490,21 +490,20 @@ const ClubsRecruitment = () => {
         {isModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-lg p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto relative">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">
-                  {editingClub ? 'Edit Recruitment' : 'Add New Recruitment'}
-                </h2>
-                <button
-                  onClick={() => { setIsModalOpen(false); setEditingClub(null); setNewClub({ title: '', description: '', clubName: '', startDate: '', endDate: '', formUrl: '', image: undefined, imagePreview: '', contactInfo: { name: '', email: '', phone: '' }, status: 'Open' }); }}
-                  aria-label="Close"
-                  className="w-12 h-12 flex items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-200 text-black absolute top-4 right-4 z-50 transition-all duration-150 focus:outline-none"
-                >
-                  <svg className="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18" />
-                    <line x1="6" y1="6" x2="18" y2="18" />
-                  </svg>
-                </button>
-              </div>
+                              <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900">
+                    {editingClub ? 'Edit Recruitment' : 'Add New Recruitment'}
+                  </h2>
+                  <button
+                    onClick={() => { setIsModalOpen(false); setEditingClub(null); setNewClub({ title: '', description: '', clubName: '', startDate: '', endDate: '', formUrl: '', image: undefined, imagePreview: '', contactInfo: { name: '', email: '', phone: '' }, status: 'Open' }); }}
+                    aria-label="Close"
+                    className="text-red-500 hover:text-red-700 transition-colors duration-200"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
               {error && (
                 <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
                   <div className="flex items-center text-red-700">
