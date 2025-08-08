@@ -3,7 +3,7 @@ const { body, validationResult } = require('express-validator');
 // Sanitize and validate user input
 const sanitizeInput = (req, res, next) => {
   // Remove potentially dangerous characters
-  if (req.body) {
+  if (req.body && typeof req.body === 'object') {
     Object.keys(req.body).forEach(key => {
       if (typeof req.body[key] === 'string') {
         req.body[key] = req.body[key].trim();
