@@ -1058,8 +1058,8 @@ const ChatWindow = () => {
                 data={data} 
                 theme="light"
                 onEmojiSelect={(emoji) => {
-                  setNewMessage((prev) => prev + emoji.native);
-                  setShowEmojiPicker(false);
+                setNewMessage((prev) => prev + emoji.native);
+                setShowEmojiPicker(false);
                 }} 
               />
             </Box>
