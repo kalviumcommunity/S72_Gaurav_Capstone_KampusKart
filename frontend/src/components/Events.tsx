@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Navbar from './Navbar';
 import { FiPlus, FiCalendar, FiMapPin, FiSearch, FiAlertCircle, FiFileText, FiTag, FiMail, FiInfo, FiClock, FiUser, FiPhone } from 'react-icons/fi';
 import { FaSearch } from 'react-icons/fa';
@@ -6,6 +6,8 @@ import { useAuth } from '../contexts/AuthContext';
 import UniversalLoader from './UniversalLoader';
 import { useDataLoading } from '../hooks/useLoading';
 import { API_BASE } from '../config';
+import AIAutocomplete from './AIAutocomplete';
+import { useAIAutocomplete } from '../hooks/useAIAutocomplete';
 
 interface Event {
   _id: string;
@@ -296,6 +298,30 @@ const Events = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedEventForDetails, setSelectedEventForDetails] = useState<Event | null>(null);
 
+  // AI Autocomplete hook
+  const preExistingStrings = useMemo(() => {
+    const pool: string[] = [];
+    events.forEach(e => {
+      if (e.title) pool.push(e.title);
+      if (e.description) pool.push(e.description);
+      if (e.location) pool.push(e.location);
+    });
+    return Array.from(new Set(pool.map(s => s.trim()).filter(Boolean)));
+  }, [events]);
+
+  const {
+    suggestions,
+    isLoading: aiLoading,
+    error: aiError,
+    handleInputChange: handleAISearchInput,
+    handleSuggestionSelect,
+    clearSuggestions
+  } = useAIAutocomplete({
+    context: { section: 'events' },
+    debounceMs: 300,
+    preExistingStrings
+  });
+
   const renderStatus = (status: Event['status']) => {
     let bgColorClass;
     let textColorClass;
@@ -562,32 +588,29 @@ const Events = () => {
               <option value="cancelled">Cancelled</option>
             </select>
           </div>
-          <form className="relative w-full md:w-[500px] flex rounded-full border border-gray-300 overflow-hidden shadow-sm focus-within:ring-1 focus-within:ring-black focus-within:border-black" onSubmit={e => { e.preventDefault(); setSearchQuery(searchInput); }}>
-            <div className="relative flex items-center flex-1">
-              <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search by event title or description..."
-                className="bg-white w-full pl-10 pr-4 py-2 text-black outline-none text-lg border-none"
-                aria-label="Search events"
-                value={searchInput}
-                onChange={e => setSearchInput(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') {
-                    setSearchQuery(searchInput);
-                  }
-                }}
-              />
-            </div>
-            <button
-              type="submit"
-              aria-label="Search"
-              className="px-6 py-2 bg-[#00C6A7] text-white font-semibold hover:bg-[#009e87] transition rounded-r-full flex items-center justify-center"
-            >
-              <FiSearch className="md:hidden" />
-              <span className="hidden md:inline">Search</span>
-            </button>
-          </form>
+          {/* AI-Powered Search Bar */}
+          <div className="relative w-full md:w-[500px]">
+            <AIAutocomplete
+              value={searchInput}
+              onChange={(value) => {
+                setSearchInput(value);
+                handleAISearchInput(value);
+              }}
+              onSelect={(suggestion) => {
+                setSearchInput(suggestion.text);
+                setSearchQuery(suggestion.text);
+                handleSuggestionSelect(suggestion);
+              }}
+              placeholder="Search events"
+              className="w-full md:w-[500px]"
+              suggestions={suggestions}
+              isLoading={aiLoading}
+              disabled={false}
+              showSubmitButton
+              submitLabel="Search"
+              onSubmit={() => setSearchQuery(searchInput)}
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -429,7 +429,8 @@ const ChatWindow = () => {
     <Paper
       elevation={1}
       sx={{
-        p: 2,
+        px: { xs: 1.5, sm: 2 },
+        py: { xs: 1, sm: 2 },
         mb: 0,
         bgcolor: '#fff',
         borderRadius: '0 0 16px 16px',
@@ -440,13 +441,16 @@ const ChatWindow = () => {
         boxShadow: 'none',
       }}
     >
-      <Box display="flex" alignItems="center" gap={2}>
+      <Box display="flex" alignItems="center" gap={{ xs: 1.25, sm: 2 }}>
         <Avatar
           src={logoUrl}
-          sx={{ bgcolor: 'primary.main', width: 40, height: 40 }}
+          sx={{ bgcolor: 'primary.main', width: { xs: 36, sm: 40 }, height: { xs: 36, sm: 40 } }}
         />
         <Box>
-          <Typography variant="h6" fontWeight={700} color="primary.main">
+          <Typography variant="subtitle1" fontWeight={700} color="primary.main" sx={{ display: { xs: 'block', sm: 'none' } }}>
+            Chat
+          </Typography>
+          <Typography variant="h6" fontWeight={700} color="primary.main" sx={{ display: { xs: 'none', sm: 'block' } }}>
             KampusKart Chat
           </Typography>
           <Typography variant="caption" color="text.secondary">
@@ -491,12 +495,12 @@ const ChatWindow = () => {
             bgcolor: isOwnMessage ? '#e3f2fd' : '#fff',
             border: isOwnMessage ? '1px solid #90caf9' : '1px solid #e0e0e0',
             borderRadius: isOwnMessage ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-            p: 1.5,
+            p: { xs: 1.25, sm: 1.5 },
             minWidth: 120,
-            maxWidth: 420,
+            maxWidth: { xs: '80%', sm: 420 },
             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
-            ml: isOwnMessage ? 0 : 1,
-            mr: isOwnMessage ? 1 : 0,
+            ml: isOwnMessage ? 0 : { xs: 0.5, sm: 1 },
+            mr: isOwnMessage ? { xs: 0.5, sm: 1 } : 0,
             position: 'relative',
             transition: 'all 0.2s ease-in-out',
             '&:hover': {
@@ -1004,7 +1008,7 @@ const ChatWindow = () => {
       </Box>
 
       {/* Sticky Input and Reply Preview */}
-      <Box sx={{ position: 'sticky', bottom: 0, left: 0, right: 0, bgcolor: '#f7f7fa', zIndex: 20, pt: 1 }}>
+      <Box sx={{ position: 'sticky', bottom: 0, left: 0, right: 0, bgcolor: '#f7f7fa', zIndex: 20, pt: 1, pb: 'env(safe-area-inset-bottom)' }}>
         {/* Reply Preview */}
         {replyTo && (
           <Paper sx={{ p: 1, mb: 1, bgcolor: 'grey.100' }}>
@@ -1032,10 +1036,11 @@ const ChatWindow = () => {
           component="form"
           onSubmit={handleSendMessage}
           sx={{
-            p: 2,
+            px: { xs: 1, sm: 2 },
+            py: { xs: 1, sm: 2 },
             display: 'flex',
             alignItems: 'center',
-            gap: 1,
+            gap: { xs: 0.5, sm: 1 },
             boxShadow: '0 -2px 8px #eee',
           }}
         >
@@ -1046,14 +1051,14 @@ const ChatWindow = () => {
             style={{ display: 'none' }}
             onChange={handleFileSelect}
           />
-          <IconButton onClick={() => fileInputRef.current?.click()}>
+          <IconButton onClick={() => fileInputRef.current?.click()} size="small">
             <AttachFileIcon />
           </IconButton>
-          <IconButton onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
+          <IconButton onClick={() => setShowEmojiPicker(!showEmojiPicker)} size="small">
             <EmojiEmotionsIcon />
           </IconButton>
           {showEmojiPicker && (
-            <Box sx={{ position: 'absolute', bottom: '100%', left: 0 }}>
+            <Box sx={{ position: 'absolute', bottom: '100%', left: 0, zIndex: 30 }}>
               <Picker 
                 data={data} 
                 theme="light"
@@ -1087,11 +1092,13 @@ const ChatWindow = () => {
               handleTyping();
             }}
             size="small"
+            inputProps={{ style: { fontSize: 14 } }}
           />
           <IconButton 
             type="submit" 
             color="primary" 
             disabled={(newMessage.trim() === '' && attachments.length === 0) || sendingMessage}
+            size="small"
           >
             {sendingMessage ? <CircularProgress size={20} /> : <SendIcon />}
           </IconButton>

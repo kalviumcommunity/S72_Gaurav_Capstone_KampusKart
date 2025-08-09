@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import Navbar from './Navbar';
 import { FiPlus, FiCalendar, FiFileText, FiSearch, FiAlertCircle, FiInfo, FiTag, FiEdit2, FiTrash2 } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 import UniversalLoader from './UniversalLoader';
 import { useDataLoading } from '../hooks/useLoading';
 import { API_BASE } from '../config';
+import AIAutocomplete from './AIAutocomplete';
+import { useAIAutocomplete } from '../hooks/useAIAutocomplete';
 
 interface NewsItem {
   _id: string;
@@ -35,6 +37,30 @@ const News = () => {
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
   const dragImage = useRef<number | null>(null);
   const dragOverImage = useRef<number | null>(null);
+
+  // AI Autocomplete hook
+  const preExistingStrings = useMemo(() => {
+    const pool: string[] = [];
+    news.forEach(n => {
+      if (n.title) pool.push(n.title);
+      if (n.description) pool.push(n.description);
+      if (n.category) pool.push(n.category);
+    });
+    return Array.from(new Set(pool.map(s => s.trim()).filter(Boolean)));
+  }, [news]);
+
+  const {
+    suggestions,
+    isLoading: aiLoading,
+    error: aiError,
+    handleInputChange: handleAISearchInput,
+    handleSuggestionSelect,
+    clearSuggestions
+  } = useAIAutocomplete({
+    context: { section: 'news' },
+    debounceMs: 300,
+    preExistingStrings
+  });
 
   useEffect(() => {
     fetchNews();
@@ -208,33 +234,29 @@ const News = () => {
               <option value="Academics">Academics</option>
             </select>
           </div>
-          {/* Search Bar */}
-          <form className="relative w-full md:w-[500px] flex rounded-full border border-gray-300 overflow-hidden shadow-sm focus-within:ring-1 focus-within:ring-black focus-within:border-black" onSubmit={e => { e.preventDefault(); setSearchQuery(searchInput); }}>
-            <div className="relative flex items-center flex-1">
-              <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search news articles..."
-                className="w-full pl-10 pr-4 py-2 bg-white text-black outline-none text-lg border-none"
-                aria-label="Search news articles"
-                value={searchInput}
-                onChange={e => setSearchInput(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') {
-                    setSearchQuery(searchInput);
-                  }
-                }}
-              />
-            </div>
-            <button
-              type="submit"
-              aria-label="Search"
-              className="px-6 py-2 bg-[#00C6A7] text-white font-semibold hover:bg-[#009e87] transition rounded-r-full flex items-center justify-center"
-            >
-              <FiSearch className="md:hidden" />
-              <span className="hidden md:inline">Search</span>
-            </button>
-          </form>
+          {/* AI-Powered Search Bar */}
+          <div className="relative w-full md:w-[500px]">
+            <AIAutocomplete
+              value={searchInput}
+              onChange={(value) => {
+                setSearchInput(value);
+                handleAISearchInput(value);
+              }}
+              onSelect={(suggestion) => {
+                setSearchInput(suggestion.text);
+                setSearchQuery(suggestion.text);
+                handleSuggestionSelect(suggestion);
+              }}
+              placeholder="Search news"
+              className="w-full md:w-[500px]"
+              suggestions={suggestions}
+              isLoading={aiLoading}
+              disabled={false}
+              showSubmitButton
+              submitLabel="Search"
+              onSubmit={() => setSearchQuery(searchInput)}
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
