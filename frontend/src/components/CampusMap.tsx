@@ -60,6 +60,18 @@ const CampusMap: React.FC<CampusMapProps> = () => {
 
   const { isLoaded, loadError } = useGoogleMaps();
 
+  // Lock page scrolling while the map page is mounted to ensure a single-frame view
+  useEffect(() => {
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+    const prevBodyOverflow = document.body.style.overflow;
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.documentElement.style.overflow = prevHtmlOverflow;
+      document.body.style.overflow = prevBodyOverflow;
+    };
+  }, []);
+
   // Memoize locations array to prevent unnecessary re-renders
   const locations = useMemo(() => [
     {
@@ -396,7 +408,7 @@ const CampusMap: React.FC<CampusMapProps> = () => {
   }
 
   return (
-    <div className="w-full h-screen flex flex-col bg-gray-100 relative overflow-hidden">
+    <div className="w-full h-screen flex flex-col bg-gray-100 relative overflow-hidden overscroll-none" style={{ height: '100dvh' }}>
       {/* Mobile Header - Only visible on mobile */}
       <div className="md:hidden p-3 bg-white shadow-sm border-b border-gray-200">
         <h1 className="text-xl font-bold text-gray-800 text-center">Campus Map</h1>
@@ -413,9 +425,9 @@ const CampusMap: React.FC<CampusMapProps> = () => {
         <div className="w-full md:w-2/3 h-full relative">
           <div className="bg-white shadow-lg overflow-hidden h-full relative">
             {/* Mobile Search Bar and Dropdown - Visible on mobile only, positioned over map */}
-            <div className="md:hidden absolute top-2 left-1/2 transform -translate-x-1/2 z-10 w-[95%] max-w-sm">
+            <div className="md:hidden absolute top-2 left-3 right-3 z-10">
               <form
-                className="relative w-full flex border border-gray-300 overflow-hidden shadow-lg focus-within:ring-2 focus-within:ring-[#00C6A7] focus-within:border-[#00C6A7] transition-all duration-300 rounded-full bg-white"
+                className="relative w-full flex border border-gray-300 overflow-hidden shadow-lg focus-within:ring-2 focus-within:ring-[#00C6A7] focus-within:border-[#00C6A7] transition-all duration-300 rounded-full bg-white box-border"
                 onSubmit={e => { e.preventDefault(); setSearchQuery(searchInput); }}
               >
                 <div className="relative flex items-center flex-1">

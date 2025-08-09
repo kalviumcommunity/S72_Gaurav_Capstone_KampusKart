@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import Navbar from './Navbar';
 import { useAuth } from '../contexts/AuthContext';
 import { FiSearch, FiX, FiClock, FiMapPin, FiUser, FiCalendar, FiMessageSquare, FiEdit2, FiTrash2, FiCheckCircle, FiInfo, FiTag, FiFileText, FiMail, FiAlertCircle } from 'react-icons/fi';
@@ -6,6 +6,8 @@ import SkeletonLoader from './SkeletonLoader';
 import UniversalLoader from './UniversalLoader';
 import { useDataLoading } from '../hooks/useLoading';
 import { API_BASE } from '../config';
+import AIAutocomplete from './AIAutocomplete';
+import { useAIAutocomplete } from '../hooks/useAIAutocomplete';
 
 interface LostFoundItem {
   _id: string;
@@ -81,6 +83,30 @@ const LostFound = () => {
     }, [isFetchingMore, currentPage, totalPages]);
   const [dragItem, setDragItem] = useState<number | null>(null);
   const [dragOverItem, setDragOverItem] = useState<number | null>(null);
+
+  // AI Autocomplete hook
+  const preExistingStrings = useMemo(() => {
+    const pool: string[] = [];
+    items.forEach(i => {
+      if (i.title) pool.push(i.title);
+      if (i.location) pool.push(i.location);
+      if (i.description) pool.push(i.description);
+    });
+    return Array.from(new Set(pool.map(s => s.trim()).filter(Boolean)));
+  }, [items]);
+
+  const {
+    suggestions,
+    isLoading: aiLoading,
+    error: aiError,
+    handleInputChange: handleAISearchInput,
+    handleSuggestionSelect,
+    clearSuggestions
+  } = useAIAutocomplete({
+    context: { section: 'lostfound' },
+    debounceMs: 300,
+    preExistingStrings
+  });
 
   const openAddItemModal = () => {
     setEditingItem(null);
@@ -336,33 +362,29 @@ const LostFound = () => {
               <option value="resolved">Resolved</option>
             </select>
           </div>
-          {/* Search Bar */}
-          <form className="relative w-full md:w-[500px] flex rounded-full border border-gray-300 overflow-hidden shadow-sm focus-within:ring-1 focus-within:ring-black focus-within:border-black" onSubmit={e => { e.preventDefault(); setSearchQuery(searchInput); }}>
-            <div className="relative flex items-center flex-1">
-              <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search by title, description, or location..."
-                className="w-full pl-10 pr-4 py-2 bg-white text-black outline-none text-lg border-none"
-                aria-label="Search lost and found items"
-                value={searchInput}
-                onChange={e => setSearchInput(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') {
-                    setSearchQuery(searchInput);
-                  }
-                }}
-              />
-            </div>
-            <button
-              type="submit"
-              aria-label="Search"
-              className="px-6 py-2 bg-[#00C6A7] text-white font-semibold hover:bg-[#009e87] transition rounded-r-full flex items-center justify-center"
-            >
-              <FiSearch className="md:hidden" />
-              <span className="hidden md:inline">Search</span>
-            </button>
-          </form>
+          {/* AI-Powered Search Bar */}
+          <div className="relative w-full md:w-[500px]">
+            <AIAutocomplete
+              value={searchInput}
+              onChange={(value) => {
+                setSearchInput(value);
+                handleAISearchInput(value);
+              }}
+              onSelect={(suggestion) => {
+                setSearchInput(suggestion.text);
+                setSearchQuery(suggestion.text);
+                handleSuggestionSelect(suggestion);
+              }}
+              placeholder="Search items"
+              className="w-full md:w-[500px]"
+              suggestions={suggestions}
+              isLoading={aiLoading}
+              disabled={false}
+              showSubmitButton
+              submitLabel="Search"
+              onSubmit={() => setSearchQuery(searchInput)}
+            />
+          </div>
         </div>
         {/* Card Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
