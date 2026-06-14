@@ -35,6 +35,10 @@ const LostFoundItemSchema = new mongoose.Schema({
       url: { type: String, required: true },
     }
   ],
+  imageEmbedding: {
+    type: [Number],
+    default: undefined,
+  },
   resolved: {
     type: Boolean,
     default: false,
