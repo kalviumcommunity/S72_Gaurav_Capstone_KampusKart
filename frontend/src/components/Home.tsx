@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FiMap, FiSearch, FiCalendar, FiFileText, FiAlertCircle, FiHome, FiUsers, FiMessageSquare } from 'react-icons/fi';
+import { FiMap, FiSearch, FiCalendar, FiFileText, FiAlertCircle, FiHome, FiUsers, FiMessageSquare, FiStar } from 'react-icons/fi';
 import { Footer } from './ui/footer';
 import { ShuffleGrid } from './ui/shuffle-grid';
 import { socialLinks } from '../utils/socialLinks';
@@ -17,6 +17,13 @@ const features = [
 ];
 
 const Home = () => {
+  const initialReviews = [
+    { id: 1, name: 'Asha', text: 'Great app — helped me find events quickly.', date: '2026-01-10' },
+    { id: 2, name: 'Rahul', text: 'Map feature is super handy on campus.', date: '2026-03-02' },
+  ];
+  const [reviews, setReviews] = useState(initialReviews);
+  const [reviewName, setReviewName] = useState('');
+  const [reviewText, setReviewText] = useState('');
   const scrollToFeatures = () => {
     const featuresSection = document.getElementById('features-section');
     if (featuresSection) {
@@ -103,6 +110,89 @@ const Home = () => {
               <p className="text-xs sm:text-sm text-gray-500 leading-relaxed">{feature.description}</p>
             </Link>
           ))}
+        </div>
+      </section>
+
+      {/* Reviews & Feedback */}
+      <section id="reviews-section" className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-10 md:py-14">
+        <div className="mb-6 text-center md:text-left">
+          <span className="inline-flex items-center gap-2 mb-4 px-3 py-1.5 rounded-lg bg-gray-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-800 text-xs font-semibold text-teal-700 uppercase tracking-widest">
+            Reviews & Feedback
+          </span>
+          <h3 className="text-2xl sm:text-3xl font-extrabold text-black dark:text-white mb-2">What people are saying</h3>
+          <p className="text-sm text-gray-500">Share feedback or read recent reviews from campus members.</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Form */}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!reviewText.trim()) return;
+              const next = {
+                id: Date.now(),
+                name: reviewName.trim() || 'Anonymous',
+                text: reviewText.trim(),
+                date: new Date().toISOString().slice(0, 10),
+              };
+              setReviews([next, ...reviews]);
+              setReviewName('');
+              setReviewText('');
+            }}
+            className="bg-white dark:bg-gray-900 rounded-lg border-2 border-gray-200 dark:border-gray-800 p-4 sm:p-6"
+          >
+            <label className="text-xs font-semibold text-gray-600 dark:text-gray-300">Name</label>
+            <input
+              value={reviewName}
+              onChange={(s) => setReviewName(s.target.value)}
+              placeholder="Your name (optional)"
+              className="w-full mt-2 mb-3 px-3 py-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm outline-none focus:ring-2 focus:ring-[#00C6A7]"
+            />
+
+            <label className="text-xs font-semibold text-gray-600 dark:text-gray-300">Feedback</label>
+            <textarea
+              value={reviewText}
+              onChange={(s) => setReviewText(s.target.value)}
+              placeholder="Share your experience..."
+              rows={4}
+              className="w-full mt-2 mb-3 px-3 py-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm outline-none focus:ring-2 focus:ring-[#00C6A7]"
+            />
+
+            <div className="flex items-center gap-3">
+              <button type="submit" className="px-4 py-2 rounded-lg bg-[#181818] text-white font-bold hover:bg-[#00C6A7] transition-colors">
+                Send Feedback
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setReviewName('');
+                  setReviewText('');
+                }}
+                className="px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 text-sm"
+              >
+                Clear
+              </button>
+            </div>
+          </form>
+
+          {/* Recent reviews */}
+          <div className="space-y-4">
+            {reviews.map((r) => (
+              <div key={r.id} className="bg-white dark:bg-gray-900 rounded-lg border-2 border-gray-200 dark:border-gray-800 p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-sm font-semibold">{r.name.charAt(0).toUpperCase()}</div>
+                    <div>
+                      <div className="text-sm font-bold text-black dark:text-white">{r.name}</div>
+                      <div className="text-xs text-gray-500">{r.date}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center text-yellow-400"><FiStar className="w-4 h-4" /><FiStar className="w-4 h-4" /></div>
+                </div>
+                <p className="text-sm text-gray-600 dark:text-gray-300">{r.text}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
