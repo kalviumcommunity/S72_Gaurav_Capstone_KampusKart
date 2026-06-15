@@ -16,6 +16,7 @@ export const ComplaintDetail: React.FC<ComplaintDetailProps> = ({
   onDelete,
 }) => {
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
+  const submittedBy = complaint.stayAnonymous ? 'Anonymous' : complaint.user?.name || 'Anonymous';
   const canManage = currentUser && complaint.user && (
     complaint.user._id === currentUser._id || 
     complaint.user._id === currentUser.id || 
@@ -106,7 +107,7 @@ export const ComplaintDetail: React.FC<ComplaintDetailProps> = ({
               </div>
               <div>
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Submitted By</p>
-                <p className="text-gray-900 font-bold">{complaint.user?.name || 'Anonymous'}</p>
+                <p className="text-gray-900 font-bold">{submittedBy}</p>
               </div>
             </div>
             <div className="flex items-start">

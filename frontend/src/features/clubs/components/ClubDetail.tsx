@@ -18,6 +18,7 @@ export const ClubDetail: React.FC<ClubDetailProps> = ({
   onDelete,
 }) => {
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
+  const applicationsClosed = club.status === 'Closed' || !club.formUrl;
 
   const buildWhatsAppShareUrl = () => {
     const contactSegments = [club.contactInfo?.name, club.contactInfo?.email, club.contactInfo?.phone].filter(Boolean);
@@ -87,8 +88,16 @@ export const ClubDetail: React.FC<ClubDetailProps> = ({
             </div>
           </div>
 
-          {club.formUrl && (
-            <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3">
+            {applicationsClosed ? (
+              <button
+                type="button"
+                disabled
+                className="w-full flex items-center justify-center gap-2 py-4 rounded-xl text-lg font-bold bg-gray-100 text-gray-400 cursor-not-allowed"
+              >
+                Applications Closed
+              </button>
+            ) : (
               <a
                 href={club.formUrl}
                 target="_blank"
@@ -97,16 +106,16 @@ export const ClubDetail: React.FC<ClubDetailProps> = ({
               >
                 Apply Now
               </a>
-              <a
-                href={buildWhatsAppShareUrl()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 w-full py-3 px-6 rounded-xl font-bold text-[#128C7E] border-2 border-[#25D366] bg-white hover:bg-green-50 transition-all"
-              >
-                <FaWhatsapp className="w-5 h-5" /> Share on WhatsApp
-              </a>
-            </div>
-          )}
+            )}
+            <a
+              href={buildWhatsAppShareUrl()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 w-full py-3 px-6 rounded-xl font-bold text-[#128C7E] border-2 border-[#25D366] bg-white hover:bg-green-50 transition-all"
+            >
+              <FaWhatsapp className="w-5 h-5" /> Share on WhatsApp
+            </a>
+          </div>
         </div>
       </div>
 

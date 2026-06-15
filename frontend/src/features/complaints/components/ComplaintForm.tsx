@@ -24,6 +24,7 @@ export const ComplaintForm: React.FC<ComplaintFormProps> = ({
     category: complaint?.category || ('Other' as Complaint['category']),
     priority: complaint?.priority || ('Medium' as Complaint['priority']),
     department: complaint?.department || ('Student Services' as Complaint['department']),
+    stayAnonymous: Boolean((complaint as any)?.stayAnonymous),
     status: complaint?.status || ('Open' as Complaint['status']),
     statusComment: '',
   });
@@ -42,6 +43,19 @@ export const ComplaintForm: React.FC<ComplaintFormProps> = ({
   useEffect(() => {
     setFormError(externalError);
   }, [externalError]);
+
+  useEffect(() => {
+    setFormData({
+      title: complaint?.title || '',
+      description: complaint?.description || '',
+      category: complaint?.category || ('Other' as Complaint['category']),
+      priority: complaint?.priority || ('Medium' as Complaint['priority']),
+      department: complaint?.department || ('Student Services' as Complaint['department']),
+      stayAnonymous: Boolean((complaint as any)?.stayAnonymous),
+      status: complaint?.status || ('Open' as Complaint['status']),
+      statusComment: '',
+    });
+  }, [complaint]);
 
   const validateField = (name: string, value: string): string | null => {
     switch (name) {
@@ -96,7 +110,7 @@ export const ComplaintForm: React.FC<ComplaintFormProps> = ({
     submitData.append('priority', formData.priority);
     submitData.append('department', formData.department);
     submitData.append('status', formData.status);
-
+    submitData.append('stayAnonymous', formData.stayAnonymous.toString());
     if (isAdmin && complaint && formData.status !== complaint.status) {
       submitData.append('statusComment', formData.statusComment.trim());
     }
@@ -215,6 +229,17 @@ export const ComplaintForm: React.FC<ComplaintFormProps> = ({
                 <option value="High">High</option>
                 <option value="Urgent">Urgent</option>
               </select>
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={formData.stayAnonymous}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, stayAnonymous: e.target.checked }))
+                }
+                className="h-5 w-5 text-[#00C6A7] border-gray-300 rounded focus:ring-[#00C6A7]"
+              />
+              <label className="text-sm font-bold text-gray-700">Stay Anonymous</label>
             </div>
             {isAdmin && complaint && (
               <div>

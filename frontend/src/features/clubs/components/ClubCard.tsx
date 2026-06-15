@@ -9,6 +9,8 @@ interface ClubCardProps {
 }
 
 export const ClubCard: React.FC<ClubCardProps> = ({ club, onSelect }) => {
+  const applicationsClosed = club.status === 'Closed' || !club.formUrl;
+
   return (
     <div 
       className="bg-white rounded-lg border-2 border-gray-200 overflow-hidden cursor-pointer hover:border-gray-300 transition-colors duration-200 h-full flex flex-col"
@@ -54,17 +56,17 @@ export const ClubCard: React.FC<ClubCardProps> = ({ club, onSelect }) => {
         <div className="mt-4 pt-4 border-t-2 border-gray-200">
           <button
             className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-bold transition-colors duration-200 ${
-              club.formUrl 
-                ? 'bg-[#181818] text-white hover:bg-[#00C6A7] active:bg-[#181818]' 
-                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              applicationsClosed
+                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                : 'bg-[#181818] text-white hover:bg-[#00C6A7] active:bg-[#181818]'
             }`}
-            disabled={!club.formUrl}
-            onClick={e => { 
-              e.stopPropagation(); 
-              if (club.formUrl) window.open(club.formUrl, '_blank'); 
+            disabled={applicationsClosed}
+            onClick={e => {
+              e.stopPropagation();
+              if (!applicationsClosed && club.formUrl) window.open(club.formUrl, '_blank');
             }}
           >
-            {club.formUrl ? 'Apply Now' : 'Applications Closed'}
+            {applicationsClosed ? 'Applications Closed' : 'Apply Now'}
           </button>
         </div>
       </div>

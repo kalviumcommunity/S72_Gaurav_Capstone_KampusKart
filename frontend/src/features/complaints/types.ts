@@ -27,6 +27,7 @@ export interface Complaint {
   }>;
   createdAt: string;
   lastUpdated: string;
+  stayAnonymous?: boolean;
   images?: { url: string; public_id?: string }[];
 }
 

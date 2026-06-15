@@ -1,6 +1,26 @@
 import { API_BASE } from '../../config';
 import { Complaint, ComplaintFilters } from './types';
 
+const getErrorMessage = async (response: Response, fallback: string): Promise<string> => {
+  try {
+    const errorData = await response.json();
+
+    if (Array.isArray(errorData?.details)) {
+      const messages = errorData.details
+        .map((detail: any) => detail?.message || detail?.msg)
+        .filter(Boolean);
+
+      if (messages.length > 0) {
+        return messages.join(' ');
+      }
+    }
+
+    return errorData?.message || fallback;
+  } catch {
+    return fallback;
+  }
+};
+
 export const complaintsApi = {
   listComplaints: async (
     token: string,
@@ -18,7 +38,9 @@ export const complaintsApi = {
     const response = await fetch(`${API_BASE}/api/complaints?${params}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    if (!response.ok) throw new Error('Failed to fetch complaints');
+    if (!response.ok) {
+      throw new Error(await getErrorMessage(response, 'Failed to fetch complaints'));
+    }
     return response.json();
   },
 
@@ -28,7 +50,9 @@ export const complaintsApi = {
       headers: { Authorization: `Bearer ${token}` },
       body: formData,
     });
-    if (!response.ok) throw new Error('Failed to create complaint');
+    if (!response.ok) {
+      throw new Error(await getErrorMessage(response, 'Failed to create complaint'));
+    }
     return response.json();
   },
 
@@ -38,7 +62,9 @@ export const complaintsApi = {
       headers: { Authorization: `Bearer ${token}` },
       body: formData,
     });
-    if (!response.ok) throw new Error('Failed to update complaint');
+    if (!response.ok) {
+      throw new Error(await getErrorMessage(response, 'Failed to update complaint'));
+    }
     return response.json();
   },
 
@@ -47,7 +73,9 @@ export const complaintsApi = {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
     });
-    if (!response.ok) throw new Error('Failed to delete complaint');
+    if (!response.ok) {
+      throw new Error(await getErrorMessage(response, 'Failed to delete complaint'));
+    }
     return response.json();
   },
 };

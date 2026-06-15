@@ -45,7 +45,7 @@ const listComplaints = async ({ status, category, search, page, limit }) => {
 };
 
 const createComplaint = async ({ userId, data, files }) => {
-  const { title, description, category, priority, department } = data;
+  const { title, description, category, priority, department, stayAnonymous } = data;
 
   if (!title || !description) {
     throw new ServiceError('Title and description are required.', 400);
@@ -64,7 +64,8 @@ const createComplaint = async ({ userId, data, files }) => {
     images,
     category,
     priority,
-    department
+    department,
+    stayAnonymous: stayAnonymous === true || stayAnonymous === 'true'
   });
 
   await complaint.populate('user', 'name email');
@@ -72,7 +73,7 @@ const createComplaint = async ({ userId, data, files }) => {
 };
 
 const updateComplaint = async ({ complaintId, userId, isAdmin, data, files }) => {
-  const { title, description, status, category, priority, department, keepImages, statusComment } = data;
+  const { title, description, status, category, priority, department, keepImages, statusComment, stayAnonymous } = data;
 
   const complaint = await complaintRepository.findById(complaintId);
   if (!complaint || complaint.isDeleted) {
@@ -99,6 +100,9 @@ const updateComplaint = async ({ complaintId, userId, isAdmin, data, files }) =>
   if (category) complaint.category = category;
   if (priority) complaint.priority = priority;
   if (department) complaint.department = department;
+  if (Object.prototype.hasOwnProperty.call(data, 'stayAnonymous')) {
+    complaint.stayAnonymous = stayAnonymous === true || stayAnonymous === 'true';
+  }
 
   let keepPublicIds = [];
   if (keepImages) {

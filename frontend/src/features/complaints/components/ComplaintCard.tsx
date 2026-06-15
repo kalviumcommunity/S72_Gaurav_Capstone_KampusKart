@@ -37,6 +37,8 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
     setVoteCount(newCount);
   };
 
+  const submittedBy = complaint.stayAnonymous ? 'Anonymous' : complaint.user?.name || 'Anonymous';
+
   return (
     <div
       className="bg-white rounded-lg border-2 border-gray-200 overflow-hidden cursor-pointer hover:border-gray-300 transition-colors duration-200 h-full flex flex-col"
@@ -89,7 +91,7 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
           </div>
           <div className="flex items-center text-sm text-gray-500">
             <FiUser className="mr-2 flex-shrink-0" />
-            <span className="truncate">By {complaint.user?.name || 'Anonymous'}</span>
+            <span className="truncate">By {submittedBy}</span>
           </div>
           <div className="flex items-center justify-between text-sm text-gray-500">
             <div className="flex items-center">

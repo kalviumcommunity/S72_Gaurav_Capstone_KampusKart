@@ -74,6 +74,10 @@ const complaintSchema = new mongoose.Schema({
     default: 'Open'
   },
   statusHistory: [statusUpdateSchema],
+  stayAnonymous: {
+    type: Boolean,
+    default: false
+  },
   createdAt: {
     type: Date,
     default: Date.now
