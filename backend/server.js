@@ -232,9 +232,9 @@ app.use((req, res) => {
 });
 
 // MongoDB Connection
-mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(() => {
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI);
     console.log('Connected to MongoDB');
     
     // Check if seeding is needed (e.g., if no facilities exist)
@@ -287,6 +287,7 @@ mongoose
   }
 };
 
+// Execute the connection routine
 connectDB();
 
 const PORT = process.env.PORT || 5000;
