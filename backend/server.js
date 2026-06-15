@@ -287,6 +287,7 @@ const connectDB = async () => {
   }
 };
 
+// Execute the connection routine
 connectDB();
 
 const PORT = process.env.PORT || 5000;
