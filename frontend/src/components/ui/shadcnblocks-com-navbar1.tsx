@@ -279,52 +279,48 @@ const renderMenuItem = (item: MenuItem) => {
           {item.title}
         </NavigationMenuTrigger>
         <NavigationMenuContent>
-          <ul className="w-80 p-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-lg">
-            {item.items.map((subItem) => (
-              <li key={subItem.title}>
-                <NavigationMenuLink asChild>
-                  <Link
-                    to={subItem.locked ? "#" : subItem.url}
-                    className={`flex select-none gap-3 rounded-lg p-3 leading-none no-underline outline-none transition-colors duration-200 focus:ring-0 ${
-                      subItem.locked
-                        ? "bg-gray-50 text-gray-400 cursor-not-allowed pointer-events-none"
-                        : "hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white"
-                    }`}
-                    aria-label={`Go to ${subItem.title}`}
-                    tabIndex={subItem.locked ? -1 : undefined}
-                    aria-disabled={subItem.locked}
-                    onClick={(e) => {
-                      if (subItem.locked) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                      }
-                    }}
-                  >
-                    <div className="flex-1">
-                      <div
-                        className={`text-sm font-semibold flex items-center gap-2 ${
-                          subItem.locked ? "text-gray-400" : "text-gray-900 dark:text-white"
-                        }`}
-                      >
-                        {subItem.title}
-                        {subItem.locked && <Lock className="h-3 w-3" />}
+          <div className="w-80 overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xl shadow-slate-900/10 ring-1 ring-slate-200/70 dark:border-slate-800/90 dark:bg-slate-950 dark:shadow-black/40 dark:ring-slate-800">
+            <div className="flex flex-col gap-1 p-1.5">
+              {item.items.map((subItem) => {
+                const isLocked = Boolean(subItem.locked);
+
+                return (
+                  <NavigationMenuLink asChild key={subItem.title}>
+                    <Link
+                      to={isLocked ? "#" : subItem.url}
+                      className={`group flex w-full flex-col gap-1 rounded-lg px-3 py-3 transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 dark:focus-visible:ring-slate-500 ${
+                        isLocked
+                          ? "cursor-not-allowed opacity-90"
+                          : "hover:bg-slate-50 dark:hover:bg-slate-800/60"
+                      }`}
+                      aria-label={`Go to ${subItem.title}`}
+                      tabIndex={isLocked ? -1 : undefined}
+                      aria-disabled={isLocked}
+                      onClick={(e) => {
+                        if (isLocked) {
+                          e.preventDefault();
+                          e.stopPropagation();
+                        }
+                      }}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <span className={`text-sm font-semibold ${isLocked ? "text-slate-500" : "text-slate-800 dark:text-slate-200"}`}>
+                          {subItem.title}
+                        </span>
+                        {isLocked && <Lock className="h-4 w-4 text-slate-500" />}
                       </div>
                       {subItem.description && (
-                        <p
-                          className={`text-xs leading-snug mt-1 ${
-                            subItem.locked ? "text-gray-400" : "text-gray-600 dark:text-gray-400"
-                          }`}
-                        >
+                        <p className={`text-sm leading-relaxed ${isLocked ? "text-slate-500" : "text-slate-500 dark:text-slate-400"}`}>
                           {subItem.description}
-                          {subItem.locked && " • Sign in to access"}
+                          {isLocked && " • Sign in to access"}
                         </p>
                       )}
-                    </div>
-                  </Link>
-                </NavigationMenuLink>
-              </li>
-            ))}
-          </ul>
+                    </Link>
+                  </NavigationMenuLink>
+                );
+              })}
+            </div>
+          </div>
         </NavigationMenuContent>
       </NavigationMenuItem>
     );
