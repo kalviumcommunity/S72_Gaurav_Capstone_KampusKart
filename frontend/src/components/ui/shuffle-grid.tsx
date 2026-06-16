@@ -56,14 +56,14 @@ const ImageSquare = ({ src, id }: ImageSquareProps) => {
       key={id}
       layout
       transition={{ duration: 1.5, type: "spring" }}
-      className="w-full h-full rounded-lg overflow-hidden border-2 border-gray-200 relative"
+      className="w-full h-full rounded-lg overflow-hidden border-2 border-gray-200 dark:border-gray-700 transition-colors duration-200 relative"
     >
       {!isLoaded && !hasError && (
-        <div className="w-full h-full absolute inset-0 bg-gray-200 animate-pulse rounded-md" />
+        <div className="w-full h-full absolute inset-0 bg-gray-200 dark:bg-gray-700 animate-pulse rounded-md" />
       )}
       {hasError && (
-        <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-          <span className="text-gray-400 text-xs">Image unavailable</span>
+        <div className="w-full h-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+          <span className="text-gray-400 dark:text-gray-500 text-xs">Image unavailable</span>
         </div>
       )}
       <img
@@ -115,30 +115,40 @@ export const ShuffleHero = () => {
     <section className="w-full px-4 sm:px-6 md:px-8 grid grid-cols-1 md:grid-cols-2 items-center gap-6 sm:gap-8 md:gap-10 lg:gap-12 max-w-6xl mx-auto">
       {/* Left: text */}
       <div className="text-center md:text-left space-y-3 sm:space-y-4 md:space-y-5">
-        <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-50 border-2 border-gray-200 text-xs font-semibold text-teal-700 uppercase tracking-widest">
+        {/* Badge: Modernized with dark mode support and premium letter-spacing */}
+        <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700 text-xs font-semibold text-teal-700 dark:text-teal-400 uppercase tracking-widest transition-colors duration-200">
           Your campus, simplified
         </span>
+        
+        {/* Main Heading: Full dark mode support with premium typography */}
         <h1
-          className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-black leading-tight"
+          className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-zinc-900 dark:text-zinc-50 leading-tight tracking-tight transition-colors duration-200"
           style={{ letterSpacing: "-0.02em" }}
         >
           Everything Campus, One App
         </h1>
-        <p className="text-sm sm:text-base md:text-lg text-gray-500 max-w-md mx-auto md:mx-0 leading-relaxed">
+        
+        {/* Subtext: Accessible muted tones for both light and dark modes */}
+        <p className="text-sm sm:text-base md:text-lg text-zinc-600 dark:text-zinc-400 max-w-md mx-auto md:mx-0 leading-relaxed transition-colors duration-200">
           Your all-in-one campus companion for navigation, events, news, lost & found, complaints, and more.
         </p>
+        
+        {/* CTA Buttons: Optimized with micro-interactions and enhanced accessibility */}
         <div className="flex flex-col xs:flex-row gap-2 sm:gap-3 justify-center md:justify-start pt-1 sm:pt-2">
+          {/* Primary CTA: Get Started */}
           <Link
             to="/signup"
             aria-label="Sign up for free account"
-            className="min-h-[48px] px-6 sm:px-8 py-3 rounded-lg font-bold text-white bg-[#181818] hover:bg-[#00C6A7] active:bg-[#181818] focus:outline-none focus:ring-2 focus:ring-[#00C6A7] focus:ring-offset-2 transition-colors duration-200 text-sm sm:text-base text-center"
+            className="min-h-[48px] px-6 sm:px-8 py-3 rounded-lg font-bold text-white bg-zinc-900 dark:bg-teal-600 hover:bg-zinc-800 dark:hover:bg-teal-500 active:bg-zinc-950 dark:active:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-400 focus:ring-offset-2 dark:focus:ring-offset-zinc-950 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-sm sm:text-base text-center"
           >
             Get started
           </Link>
+          
+          {/* Secondary CTA: Log In */}
           <Link
             to="/login"
             aria-label="Log in to your account"
-            className="min-h-[48px] px-6 sm:px-8 py-3 rounded-lg font-bold text-gray-700 bg-white border-2 border-gray-200 hover:bg-gray-50 active:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 transition-colors duration-200 text-sm sm:text-base text-center"
+            className="min-h-[48px] px-6 sm:px-8 py-3 rounded-lg font-bold text-zinc-900 dark:text-zinc-50 bg-white dark:bg-gray-900 border-2 border-zinc-200 dark:border-gray-700 hover:bg-zinc-50 dark:hover:bg-gray-800 hover:border-zinc-300 dark:hover:border-gray-600 active:bg-zinc-100 dark:active:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-gray-600 focus:ring-offset-2 dark:focus:ring-offset-zinc-950 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-sm sm:text-base text-center"
           >
             Log in
           </Link>
