@@ -55,3 +55,8 @@ eventSchema.index({ createdAt: -1 });
 eventSchema.index({ date: 1, status: 1 }); // Compound index for common queries
 
 module.exports = mongoose.model('Event', eventSchema); 
+
+category: {
+   type: String,
+   required : true,
+}

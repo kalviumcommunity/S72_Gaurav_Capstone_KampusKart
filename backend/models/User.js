@@ -90,3 +90,10 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
 };
 
 module.exports = mongoose.model('User', userSchema);
+
+interests: [
+  "Tech",
+  "Sports",
+  "Cultural",
+  "Music"
+]
