@@ -89,6 +89,30 @@ body {
   line-height: 1.6;
 }
 
+.nav-link {
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 0;
+  height: 2px;
+  background: #ffffff;
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #ffffff;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
 /* Theme Utility Classes */
 .text-primary { color: var(--color-primary); }
 .text-secondary { color: var(--color-secondary); }
