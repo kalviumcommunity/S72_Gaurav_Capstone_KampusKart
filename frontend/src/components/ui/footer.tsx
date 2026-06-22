@@ -35,27 +35,27 @@ export function Footer({
 
   return (
     <>
-      <footer className="border-t border-gray-200 bg-white pt-14 pb-8 mt-20">
+      <footer className="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 pt-10 pb-6 mt-16">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           {/* TOP */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pb-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 pb-8">
             {/* BRAND */}
             <div>
-              <Link to="/" className="flex items-center gap-3" aria-label={brandName}>
+              <Link to="/" className="flex items-center gap-2" aria-label={brandName}>
                 {logo}
 
-                <span className="text-2xl font-extrabold text-black tracking-tight">
+                <span className="text-xl font-extrabold text-black dark:text-white tracking-tight">
                   {brandName}
                 </span>
               </Link>
 
-              <p className="mt-5 text-gray-600 leading-7 text-sm">
+              <p className="mt-3 text-gray-500 dark:text-gray-400 leading-6 text-sm">
                 Your all-in-one campus companion for events, clubs, facilities, navigation, and
                 student life.
               </p>
 
               {/* SOCIALS */}
-              <div className="flex items-center gap-3 mt-6">
+              <div className="flex items-center gap-2 mt-4">
                 {socialLinks.map((link, i) => (
                   <a
                     key={i}
@@ -63,7 +63,7 @@ export function Footer({
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={link.label}
-                    className="w-11 h-11 rounded-xl border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-[#00C6A7] hover:text-white hover:border-[#00C6A7] transition-all duration-300 hover:-translate-y-1"
+                    className="w-9 h-9 rounded-lg border border-gray-200 dark:border-gray-800 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-[#00C6A7] hover:text-white hover:border-[#00C6A7] transition-all duration-300"
                   >
                     {link.icon}
                   </a>
@@ -73,14 +73,14 @@ export function Footer({
 
             {/* QUICK LINKS */}
             <div>
-              <h3 className="text-lg font-bold text-black mb-5">Quick Links</h3>
+              <h3 className="text-base font-bold text-black dark:text-white mb-4">Quick Links</h3>
 
-              <ul className="space-y-4">
+              <ul className="space-y-3">
                 {mainLinks.map((link, i) => (
                   <li key={i}>
                     <a
                       href={link.label.toLowerCase() === 'home' ? '/' : link.href}
-                      className="text-gray-600 hover:text-[#00C6A7] transition-colors duration-300"
+                      className="text-gray-500 dark:text-gray-400 hover:text-[#00C6A7] transition-colors duration-300 text-sm"
                     >
                       {link.label}
                     </a>
@@ -91,9 +91,9 @@ export function Footer({
 
             {/* LEGAL */}
             <div>
-              <h3 className="text-lg font-bold text-black mb-5">Legal</h3>
+              <h3 className="text-base font-bold text-black dark:text-white mb-4">Legal</h3>
 
-              <ul className="space-y-4">
+              <ul className="space-y-3">
                 {legalLinks.map((link, i) => (
                   <li key={i}>
                     <button
@@ -103,7 +103,7 @@ export function Footer({
                           link.label.toLowerCase().includes('privacy') ? 'privacy' : 'terms'
                         )
                       }
-                      className="text-gray-600 hover:text-[#00C6A7] transition-colors duration-300"
+                      className="text-gray-500 dark:text-gray-400 hover:text-[#00C6A7] transition-colors duration-300 text-sm"
                     >
                       {link.label}
                     </button>
@@ -114,29 +114,29 @@ export function Footer({
 
             {/* EXTRA */}
             <div>
-              <h3 className="text-lg font-bold text-black mb-5">KampusKart</h3>
+              <h3 className="text-base font-bold text-black dark:text-white mb-4">KampusKart</h3>
 
-              <p className="text-gray-600 text-sm leading-7">
+              <p className="text-gray-500 dark:text-gray-400 text-sm leading-6">
                 Simplifying campus life for students through smart navigation, clubs, events, and
                 community features.
               </p>
 
-              <div className="mt-5">
-                <span className="inline-flex items-center rounded-full bg-[#00C6A7]/10 px-4 py-2 text-sm font-medium text-[#00C6A7]">
-                  🚀 Built for Students
+              <div className="mt-4">
+                <span className="inline-flex items-center rounded-full bg-[#00C6A7]/10 px-3 py-1.5 text-xs font-medium text-[#00C6A7]">
+                  Built for Students
                 </span>
               </div>
             </div>
           </div>
 
           {/* BOTTOM */}
-          <div className="border-t border-gray-200 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="text-sm text-gray-500">
+          <div className="border-t border-gray-200 dark:border-gray-800 pt-4 flex flex-col md:flex-row items-center justify-between gap-3">
+            <div className="text-xs text-gray-500 dark:text-gray-400">
               {copyright.text}
               {copyright.license && <span> {copyright.license}</span>}
             </div>
 
-            <div className="text-sm text-gray-500">Made with ❤️ for students</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">Made for students</div>
           </div>
         </div>
       </footer>
@@ -144,25 +144,25 @@ export function Footer({
       {/* GLASSMORPHISM MODAL */}
       {activeModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md px-4">
-          <div className="relative max-w-2xl w-full rounded-3xl border border-white/30 bg-white/80 backdrop-blur-xl shadow-2xl p-8">
+          <div className="relative max-w-2xl w-full rounded-3xl border border-white/30 dark:border-gray-700 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-2xl p-6 sm:p-8">
             {/* CLOSE BUTTON */}
             <button
               onClick={() => setActiveModal(null)}
-              className="absolute top-4 right-5 text-gray-500 hover:text-black text-2xl"
+              className="absolute top-4 right-5 text-gray-500 hover:text-black dark:hover:text-white text-2xl"
             >
               ×
             </button>
 
             {/* TITLE */}
-            <h2 className="text-3xl font-extrabold text-gray-900 mb-4">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white mb-3">
               {activeModal === 'privacy' ? 'Privacy Policy' : 'Terms & Conditions'}
             </h2>
 
-            <p className="text-sm text-gray-500 mb-6">Last updated: May 24, 2026</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">Last updated: May 24, 2026</p>
 
             {/* CONTENT */}
             {activeModal === 'privacy' ? (
-              <div className="space-y-4 text-gray-700 leading-7">
+              <div className="space-y-3 text-gray-600 dark:text-gray-300 leading-7 text-sm">
                 <p>
                   We collect basic information such as your name, email address, and profile details
                   to improve your KampusKart experience.
@@ -176,7 +176,7 @@ export function Footer({
                 <p>We do not sell your personal information to third parties.</p>
               </div>
             ) : (
-              <div className="space-y-4 text-gray-700 leading-7">
+              <div className="space-y-3 text-gray-600 dark:text-gray-300 leading-7 text-sm">
                 <p>
                   By using KampusKart, you agree to use the platform responsibly and follow campus
                   community guidelines.
@@ -194,7 +194,7 @@ export function Footer({
             {/* BUTTON */}
             <button
               onClick={() => setActiveModal(null)}
-              className="mt-8 rounded-xl bg-[#00C6A7] px-6 py-3 text-white font-semibold hover:bg-[#00b093] transition"
+              className="mt-6 rounded-xl bg-[#00C6A7] px-6 py-3 text-white font-semibold hover:bg-[#00b093] transition"
             >
               Got it
             </button>

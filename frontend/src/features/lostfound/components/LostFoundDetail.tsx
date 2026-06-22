@@ -30,7 +30,7 @@ export const LostFoundDetail: React.FC<LostFoundDetailProps> = ({
           item.images.map((img, idx) => (
             <div 
               key={idx} 
-              className={`relative overflow-hidden rounded-xl border-2 border-gray-100 cursor-zoom-in group ${
+              className={`relative overflow-hidden rounded-xl border-2 border-gray-100 dark:border-gray-800 cursor-zoom-in group ${
                 item.images.length === 1 ? 'md:col-span-2 aspect-video' : 'aspect-square'
               }`}
               onClick={() => setZoomedImage(img.url)}
@@ -43,9 +43,9 @@ export const LostFoundDetail: React.FC<LostFoundDetailProps> = ({
             </div>
           ))
         ) : (
-          <div className="md:col-span-2 aspect-video bg-gray-50 rounded-xl flex flex-col items-center justify-center border-2 border-dashed border-gray-200">
-            <FiTag className="w-12 h-12 text-gray-200 mb-2" />
-            <span className="text-gray-400 font-medium">No images provided</span>
+          <div className="md:col-span-2 aspect-video bg-gray-50 dark:bg-gray-900 rounded-xl flex flex-col items-center justify-center border-2 border-dashed border-gray-200 dark:border-gray-800">
+            <FiTag className="w-12 h-12 text-gray-200 dark:text-gray-700 mb-2" />
+            <span className="text-gray-400 dark:text-gray-500 font-medium">No images provided</span>
           </div>
         )}
       </div>
@@ -55,71 +55,71 @@ export const LostFoundDetail: React.FC<LostFoundDetailProps> = ({
         <div>
           <div className="flex flex-wrap items-center gap-3 mb-4">
             <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-              item.type === 'lost' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
+              item.type === 'lost' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400' : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
             }`}>
               {item.type} Item
             </span>
             <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-              item.resolved ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'
+              item.resolved ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400'
             }`}>
               {item.resolved ? 'Resolved' : 'Unresolved'}
             </span>
           </div>
-          <h2 className="text-3xl font-extrabold text-gray-900 leading-tight mb-2">{item.title}</h2>
-          <div className="flex items-center text-gray-500 text-sm font-medium">
+          <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white leading-tight mb-2">{item.title}</h2>
+          <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm font-medium">
             <FiCalendar className="mr-2" />
             <span>Posted on {new Date(item.createdAt).toLocaleDateString()}</span>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 p-6 rounded-2xl border-2 border-gray-100">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 dark:bg-gray-900 p-6 rounded-2xl border-2 border-gray-100 dark:border-gray-800">
           <div className="space-y-4">
             <div className="flex items-start">
-              <div className="mt-1 p-2 bg-white rounded-lg border-2 border-gray-100 mr-3 text-[#00C6A7]">
+              <div className="mt-1 p-2 bg-white dark:bg-gray-800 rounded-lg border-2 border-gray-100 dark:border-gray-700 mr-3 text-[#00C6A7]">
                 <FiMapPin />
               </div>
               <div>
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Location</p>
-                <p className="text-gray-900 font-bold">{item.location || 'Not specified'}</p>
+                <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Location</p>
+                <p className="text-gray-900 dark:text-white font-bold">{item.location || 'Not specified'}</p>
               </div>
             </div>
             <div className="flex items-start">
-              <div className="mt-1 p-2 bg-white rounded-lg border-2 border-gray-100 mr-3 text-[#00C6A7]">
+              <div className="mt-1 p-2 bg-white dark:bg-gray-800 rounded-lg border-2 border-gray-100 dark:border-gray-700 mr-3 text-[#00C6A7]">
                 <FiCalendar />
               </div>
               <div>
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Date of {item.type === 'lost' ? 'Loss' : 'Finding'}</p>
-                <p className="text-gray-900 font-bold">{new Date(item.date).toLocaleDateString('en-US', { dateStyle: 'long' })}</p>
+                <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Date of {item.type === 'lost' ? 'Loss' : 'Finding'}</p>
+                <p className="text-gray-900 dark:text-white font-bold">{new Date(item.date).toLocaleDateString('en-US', { dateStyle: 'long' })}</p>
               </div>
             </div>
           </div>
           <div className="space-y-4">
             <div className="flex items-start">
-              <div className="mt-1 p-2 bg-white rounded-lg border-2 border-gray-100 mr-3 text-[#00C6A7]">
+              <div className="mt-1 p-2 bg-white dark:bg-gray-800 rounded-lg border-2 border-gray-100 dark:border-gray-700 mr-3 text-[#00C6A7]">
                 <FiUser />
               </div>
               <div>
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Posted By</p>
-                <p className="text-gray-900 font-bold">{item.user.name}</p>
+                <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Posted By</p>
+                <p className="text-gray-900 dark:text-white font-bold">{item.user.name}</p>
               </div>
             </div>
             <div className="flex items-start">
-              <div className="mt-1 p-2 bg-white rounded-lg border-2 border-gray-100 mr-3 text-[#00C6A7]">
+              <div className="mt-1 p-2 bg-white dark:bg-gray-800 rounded-lg border-2 border-gray-100 dark:border-gray-700 mr-3 text-[#00C6A7]">
                 <FiMail />
               </div>
               <div>
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Contact Info</p>
-                <p className="text-gray-900 font-bold">{item.contact}</p>
+                <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Contact Info</p>
+                <p className="text-gray-900 dark:text-white font-bold">{item.contact}</p>
               </div>
             </div>
           </div>
         </div>
 
         <div className="space-y-3">
-          <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <FiFileText className="text-[#00C6A7]" /> Description
           </h3>
-          <p className="text-gray-600 leading-relaxed text-lg bg-white p-6 rounded-2xl border-2 border-gray-100">
+          <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-lg bg-white dark:bg-gray-900 p-6 rounded-2xl border-2 border-gray-100 dark:border-gray-800">
             {item.description}
           </p>
         </div>
@@ -127,7 +127,7 @@ export const LostFoundDetail: React.FC<LostFoundDetailProps> = ({
 
       {/* Action Buttons */}
       {canManage && (
-        <div className="flex flex-wrap gap-4 pt-6 border-t-2 border-gray-100">
+        <div className="flex flex-wrap gap-4 pt-6 border-t-2 border-gray-100 dark:border-gray-800">
           {!item.resolved && (
             <button
               onClick={() => onResolve(item._id)}
@@ -146,7 +146,7 @@ export const LostFoundDetail: React.FC<LostFoundDetailProps> = ({
           )}
           <button
             onClick={() => onDelete(item._id)}
-            className="flex-none px-6 py-4 bg-white text-red-600 border-2 border-red-200 rounded-xl font-bold hover:bg-red-50 transition-all"
+            className="flex-none px-6 py-4 bg-white dark:bg-gray-900 text-red-600 dark:text-red-400 border-2 border-red-200 dark:border-red-800 rounded-xl font-bold hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
           >
             <FiTrash2 className="w-5 h-5" />
           </button>

@@ -36,7 +36,7 @@ export const LostFoundFilters: React.FC<LostFoundFiltersProps> = ({
           <select
             value={filters.type}
             onChange={e => onFilterChange({ type: e.target.value as any })}
-            className="appearance-none w-full sm:w-auto px-5 py-3 pr-10 rounded-lg bg-white text-gray-700 font-semibold border-2 border-gray-200 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] focus:border-transparent transition-all duration-200 cursor-pointer"
+            className="appearance-none w-full sm:w-auto px-5 py-3 pr-10 rounded-lg bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 font-semibold border-2 border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] focus:border-transparent transition-all duration-200 cursor-pointer"
           >
             <option value="all">All Types</option>
             <option value="lost">Lost Items</option>
@@ -53,7 +53,7 @@ export const LostFoundFilters: React.FC<LostFoundFiltersProps> = ({
           <select
             value={filters.resolved}
             onChange={e => onFilterChange({ resolved: e.target.value as any })}
-            className="appearance-none w-full sm:w-auto px-5 py-3 pr-10 rounded-lg bg-white text-gray-700 font-semibold border-2 border-gray-200 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] focus:border-transparent transition-all duration-200 cursor-pointer"
+            className="appearance-none w-full sm:w-auto px-5 py-3 pr-10 rounded-lg bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 font-semibold border-2 border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] focus:border-transparent transition-all duration-200 cursor-pointer"
           >
             <option value="all">All Statuses</option>
             <option value="unresolved">Unresolved</option>
@@ -69,7 +69,7 @@ export const LostFoundFilters: React.FC<LostFoundFiltersProps> = ({
 
       {/* Search Bar */}
       <div className="relative w-full sm:w-[380px] md:w-[440px] lg:w-[520px]" ref={searchRef}>
-        <div className="relative w-full rounded-lg border-2 border-gray-200 bg-white hover:border-gray-300 focus-within:ring-2 focus-within:ring-[#00C6A7] focus-within:border-transparent transition-all duration-200 flex items-center">
+        <div className="relative w-full rounded-lg border-2 border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-700 focus-within:ring-2 focus-within:ring-[#00C6A7] focus-within:border-transparent transition-all duration-200 flex items-center">
           <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
           <input
             type="text"
@@ -80,12 +80,12 @@ export const LostFoundFilters: React.FC<LostFoundFiltersProps> = ({
               else if (e.key === 'Escape') setShowSuggestions(false);
             }}
             placeholder="Search items..."
-            className="flex-1 pl-12 pr-3 py-3.5 bg-transparent text-gray-700 font-medium outline-none text-base border-none placeholder:text-gray-400 rounded-l-lg"
+            className="flex-1 pl-12 pr-3 py-3.5 bg-transparent text-gray-700 dark:text-gray-200 font-medium outline-none text-base border-none placeholder:text-gray-400 rounded-l-lg"
           />
           <button
             type="button"
             onClick={handleSearchSubmit}
-            className="px-6 py-3.5 bg-[#181818] text-white font-bold text-sm hover:bg-[#00C6A7] active:bg-[#181818] flex items-center justify-center gap-2 transition-all duration-200 border-l-2 border-gray-200 rounded-r-lg"
+            className="px-6 py-3.5 bg-[#181818] text-white font-bold text-sm hover:bg-[#00C6A7] active:bg-[#181818] flex items-center justify-center gap-2 transition-all duration-200 border-l-2 border-gray-200 dark:border-gray-800 rounded-r-lg"
           >
             <FiSearch className="w-4 h-4" />
             <span className="hidden sm:inline">Search</span>
@@ -93,7 +93,7 @@ export const LostFoundFilters: React.FC<LostFoundFiltersProps> = ({
         </div>
 
         {showSuggestions && suggestions.length > 0 && (
-          <div className="absolute z-[60] w-full mt-2 bg-white border-2 border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto">
+          <div className="absolute z-[60] w-full mt-2 bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-800 rounded-lg shadow-lg max-h-60 overflow-auto">
             {suggestions.map((suggestion, index) => (
               <div
                 key={index}
@@ -102,10 +102,10 @@ export const LostFoundFilters: React.FC<LostFoundFiltersProps> = ({
                   setSearchInput(suggestion);
                   onSuggestionSelect(suggestion);
                 }}
-                className="flex items-center px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors border-b-2 border-gray-200 last:border-b-0"
+                className="flex items-center px-4 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors border-b-2 border-gray-200 dark:border-gray-800 last:border-b-0"
               >
                 <FiSearch className="w-4 h-4 text-gray-400 mr-3 flex-shrink-0" />
-                <span className="text-sm font-medium text-gray-700">{suggestion}</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{suggestion}</span>
               </div>
             ))}
           </div>

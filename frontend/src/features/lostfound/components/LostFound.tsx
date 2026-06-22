@@ -167,12 +167,12 @@ const LostFound = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white font-sans">
+    <div className="min-h-screen bg-white dark:bg-gray-950 font-sans">
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
         <SuccessMessage message={successMessage} onDismiss={() => setSuccessMessage(null)} />
 
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
-          <h1 className="text-h2 font-extrabold text-black">Lost and Found</h1>
+          <h1 className="text-h2 font-extrabold text-black dark:text-white">Lost and Found</h1>
           <button
             onClick={openAddModal}
             className="flex items-center gap-2 px-6 py-3 rounded-lg bg-[#181818] text-white font-bold text-lg hover:bg-[#00C6A7] transition-colors"
@@ -192,7 +192,7 @@ const LostFound = () => {
         />
 
         {fetchError && (
-          <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg font-medium border-2 border-red-100">
+          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-lg font-medium border-2 border-red-100 dark:border-red-800">
             {fetchError}
           </div>
         )}
@@ -200,19 +200,19 @@ const LostFound = () => {
         {/* Active Filters Display */}
         {(filters.search || filters.type !== 'all' || filters.resolved !== 'all') && (
           <div className="mb-6 flex flex-wrap items-center gap-2">
-            <span className="text-xs font-semibold text-gray-500">Active filters:</span>
+            <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">Active filters:</span>
             {filters.type !== 'all' && (
-              <span className="text-xs px-3 py-1.5 rounded-lg border-2 border-gray-200 bg-white text-gray-700 font-semibold capitalize">
+              <span className="text-xs px-3 py-1.5 rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-semibold capitalize">
                 Type: {filters.type}
               </span>
             )}
             {filters.resolved !== 'all' && (
-              <span className="text-xs px-3 py-1.5 rounded-lg border-2 border-gray-200 bg-white text-gray-700 font-semibold capitalize">
+              <span className="text-xs px-3 py-1.5 rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-semibold capitalize">
                 Status: {filters.resolved}
               </span>
             )}
             {filters.search && (
-              <span className="text-xs px-3 py-1.5 rounded-lg border-2 border-gray-200 bg-white text-gray-700 font-semibold">
+              <span className="text-xs px-3 py-1.5 rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-semibold">
                 Search: {filters.search}
               </span>
             )}
@@ -231,19 +231,19 @@ const LostFound = () => {
             Array.from({ length: 6 }).map((_, idx) => (
               <div
                 key={idx}
-                className="bg-white rounded-lg border-2 border-gray-200 overflow-hidden animate-pulse h-[400px]"
+                className="bg-white dark:bg-gray-900 rounded-lg border-2 border-gray-200 dark:border-gray-800 overflow-hidden animate-pulse h-[400px]"
               >
-                <div className="h-64 bg-gray-200"></div>
+                <div className="h-64 bg-gray-200 dark:bg-gray-800"></div>
                 <div className="p-6 space-y-3">
-                  <div className="h-6 bg-gray-200 rounded w-3/4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-full"></div>
+                  <div className="h-6 bg-gray-200 dark:bg-gray-800 rounded w-3/4"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-full"></div>
                 </div>
               </div>
             ))
           ) : items.length === 0 ? (
             <div className="col-span-full flex flex-col items-center justify-center py-20">
-              <p className="text-xl font-bold text-gray-700">Nothing here yet</p>
-              <p className="text-gray-400 text-sm mt-2">No items match your criteria.</p>
+              <p className="text-xl font-bold text-gray-700 dark:text-gray-300">Nothing here yet</p>
+              <p className="text-gray-400 dark:text-gray-500 text-sm mt-2">No items match your criteria.</p>
             </div>
           ) : (
             items.map((item, idx) => (
@@ -270,7 +270,7 @@ const LostFound = () => {
 
         {!isFiltering && !isFetchingMore && items.length > 0 && filters.page >= totalPages && (
           <div className="mt-8 text-center">
-            <p className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-gray-200 text-sm font-semibold text-gray-600">
+            <p className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-gray-200 dark:border-gray-800 text-sm font-semibold text-gray-600 dark:text-gray-400">
               You have reached the end of results.
             </p>
           </div>
@@ -314,20 +314,20 @@ const LostFound = () => {
 
           {modalType === 'delete' && (
             <div className="p-6 text-center">
-              <h3 className="text-xl font-bold mb-4">Are you sure?</h3>
-              <p className="text-gray-600 mb-8">
+              <h3 className="text-xl font-bold mb-4 text-black dark:text-white">Are you sure?</h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-8">
                 This action cannot be undone. This will permanently delete your post.
               </p>
               <div className="flex justify-center gap-4">
                 <button
                   onClick={closeModal}
-                  className="px-6 py-2 border-2 border-gray-200 rounded-lg font-bold"
+                  className="px-6 py-2 border-2 border-gray-200 dark:border-gray-800 rounded-lg font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleDelete}
-                  className="px-6 py-2 bg-red-600 text-white rounded-lg font-bold"
+                  className="px-6 py-2 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700"
                 >
                   Delete Post
                 </button>

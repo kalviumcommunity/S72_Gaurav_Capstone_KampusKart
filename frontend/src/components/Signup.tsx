@@ -48,7 +48,10 @@ const Signup: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [confirmPasswordError, setConfirmPasswordError] = useState('');
   const [remember, setRemember] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -110,6 +113,14 @@ const Signup: React.FC = () => {
     }
     if (!name.trim()) {
       setError('Name is required');
+      return;
+    }
+    if (!confirmPassword) {
+      setConfirmPasswordError('Please confirm your password');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setConfirmPasswordError('Passwords do not match');
       return;
     }
 
@@ -248,6 +259,50 @@ const Signup: React.FC = () => {
                       </li>
                     )}
                   </ul>
+                )}
+              </div>
+
+              {/* Confirm Password */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                  Confirm Password
+                </label>
+                <div className="relative">
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    autoComplete="new-password"
+                    required
+                    className={`w-full px-4 py-3 pr-12 border-2 ${confirmPasswordError ? 'border-red-400' : 'border-gray-200 dark:border-gray-800'} rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00C6A7] focus:border-transparent bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 text-base placeholder:text-gray-400 transition-colors duration-200 min-h-touch`}
+                    placeholder="••••••••"
+                    value={confirmPassword}
+                    onChange={(e) => {
+                      setConfirmPassword(e.target.value);
+                      if (confirmPasswordError) setConfirmPasswordError('');
+                    }}
+                    onBlur={() => {
+                      if (confirmPassword && password !== confirmPassword) {
+                        setConfirmPasswordError('Passwords do not match');
+                      } else {
+                        setConfirmPasswordError('');
+                      }
+                    }}
+                  />
+                  <button
+                    type="button"
+                    tabIndex={-1}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors duration-200 bg-transparent p-2 border-0 min-h-touch min-w-touch"
+                    onClick={() => setShowConfirmPassword((v) => !v)}
+                    aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                  >
+                    {showConfirmPassword ? (
+                      <EyeSlashIcon className="h-5 w-5" />
+                    ) : (
+                      <EyeIcon className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
+                {confirmPasswordError && (
+                  <p className="mt-1.5 text-xs text-red-500">{confirmPasswordError}</p>
                 )}
               </div>
 

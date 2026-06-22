@@ -120,13 +120,13 @@ export const LostFoundForm: React.FC<LostFoundFormProps> = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
-      <div className="border-2 border-gray-200 rounded-lg p-6 mb-6">
-        <h3 className="text-lg font-bold mb-4 text-gray-900 flex items-center gap-2">
-          Item Details <FiInfo className="text-gray-400" />
+      <div className="border-2 border-gray-200 dark:border-gray-800 rounded-lg p-6 mb-6">
+        <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-white flex items-center gap-2">
+          Item Details <FiInfo className="text-gray-400 dark:text-gray-500" />
         </h3>
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">Item Type</label>
+            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Item Type</label>
             <div className="flex gap-4">
               {['lost', 'found'].map((t) => (
                 <label key={t} className="flex items-center gap-2 cursor-pointer">
@@ -143,21 +143,21 @@ export const LostFoundForm: React.FC<LostFoundFormProps> = ({
                     }
                     className="w-4 h-4 text-[#00C6A7] focus:ring-[#00C6A7]"
                   />
-                  <span className="text-sm font-semibold capitalize">{t} Item</span>
+                  <span className="text-sm font-semibold capitalize text-gray-700 dark:text-gray-300">{t} Item</span>
                 </label>
               ))}
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">Title *</label>
+            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Title *</label>
             <input
               type="text"
               value={formData.title}
               onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
               onBlur={(e) => handleBlur('title', e.target.value)}
-              className={`w-full px-4 py-3 rounded-lg border-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] transition-all ${
-                fieldErrors.title ? 'border-red-500' : 'border-gray-200'
+              className={`w-full px-4 py-3 rounded-lg border-2 bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] transition-all text-gray-900 dark:text-gray-100 ${
+                fieldErrors.title ? 'border-red-500' : 'border-gray-200 dark:border-gray-800'
               }`}
               placeholder="What did you lose/find?"
             />
@@ -167,14 +167,14 @@ export const LostFoundForm: React.FC<LostFoundFormProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">Description *</label>
+            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Description *</label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
               onBlur={(e) => handleBlur('description', e.target.value)}
               rows={4}
-              className={`w-full px-4 py-3 rounded-lg border-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] transition-all ${
-                fieldErrors.description ? 'border-red-500' : 'border-gray-200'
+              className={`w-full px-4 py-3 rounded-lg border-2 bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] transition-all text-gray-900 dark:text-gray-100 ${
+                fieldErrors.description ? 'border-red-500' : 'border-gray-200 dark:border-gray-800'
               }`}
               placeholder="Provide details like color, brand, etc."
             />
@@ -185,24 +185,24 @@ export const LostFoundForm: React.FC<LostFoundFormProps> = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Location</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Location</label>
               <input
                 type="text"
                 value={formData.location}
                 onChange={(e) => setFormData((prev) => ({ ...prev, location: e.target.value }))}
-                className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] transition-all"
+                className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] transition-all text-gray-900 dark:text-gray-100"
                 placeholder="Where?"
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Date *</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Date *</label>
               <input
                 type="date"
                 value={formData.date}
                 onChange={(e) => setFormData((prev) => ({ ...prev, date: e.target.value }))}
                 onBlur={(e) => handleBlur('date', e.target.value)}
-                className={`w-full px-4 py-3 rounded-lg border-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] transition-all ${
-                  fieldErrors.date ? 'border-red-500' : 'border-gray-200'
+                className={`w-full px-4 py-3 rounded-lg border-2 bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] transition-all text-gray-900 dark:text-gray-100 ${
+                  fieldErrors.date ? 'border-red-500' : 'border-gray-200 dark:border-gray-800'
                 }`}
               />
               {fieldErrors.date && (
@@ -213,8 +213,8 @@ export const LostFoundForm: React.FC<LostFoundFormProps> = ({
         </div>
       </div>
 
-      <div className="border-2 border-gray-200 rounded-lg p-6 mb-6">
-        <h3 className="text-lg font-bold mb-4 text-gray-900">Images</h3>
+      <div className="border-2 border-gray-200 dark:border-gray-800 rounded-lg p-6 mb-6">
+        <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-white">Images</h3>
         <ImageUpload
           images={formData.images}
           onImagesChange={(imgs: ImageFile[]) => setFormData((prev) => ({ ...prev, images: imgs }))}
@@ -222,15 +222,15 @@ export const LostFoundForm: React.FC<LostFoundFormProps> = ({
         />
       </div>
 
-      <div className="border-2 border-gray-200 rounded-lg p-6 mb-6">
-        <h3 className="text-lg font-bold mb-4 text-gray-900">Contact Information *</h3>
+      <div className="border-2 border-gray-200 dark:border-gray-800 rounded-lg p-6 mb-6">
+        <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-white">Contact Information *</h3>
         <input
           type="text"
           value={formData.contact}
           onChange={(e) => setFormData((prev) => ({ ...prev, contact: e.target.value }))}
           onBlur={(e) => handleBlur('contact', e.target.value)}
-          className={`w-full px-4 py-3 rounded-lg border-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] transition-all ${
-            fieldErrors.contact ? 'border-red-500' : 'border-gray-200'
+          className={`w-full px-4 py-3 rounded-lg border-2 bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] transition-all text-gray-900 dark:text-gray-100 ${
+            fieldErrors.contact ? 'border-red-500' : 'border-gray-200 dark:border-gray-800'
           }`}
           placeholder="Email or Phone Number"
         />
@@ -240,12 +240,12 @@ export const LostFoundForm: React.FC<LostFoundFormProps> = ({
       </div>
 
       {formError && (
-        <div className="p-4 bg-red-50 border-2 border-red-100 rounded-lg text-red-700 text-sm font-medium">
+        <div className="p-4 bg-red-50 dark:bg-red-900/20 border-2 border-red-100 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 text-sm font-medium">
           {formError}
         </div>
       )}
 
-      <div className="flex justify-end gap-4 pt-4 border-t-2 border-gray-200">
+      <div className="flex justify-end gap-4 pt-4 border-t-2 border-gray-200 dark:border-gray-800">
         <button
           type="submit"
           disabled={isSubmitting}

@@ -287,7 +287,7 @@ const renderMenuItem = (item: MenuItem) => {
                     to={subItem.locked ? "#" : subItem.url}
                     className={`flex select-none gap-3 rounded-lg p-3 leading-none no-underline outline-none transition-colors duration-200 focus:ring-0 ${
                       subItem.locked
-                        ? "bg-gray-50 text-gray-400 cursor-not-allowed pointer-events-none"
+                        ? "bg-gray-50 dark:bg-gray-800/50 text-gray-500 cursor-not-allowed pointer-events-none"
                         : "hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white"
                     }`}
                     aria-label={`Go to ${subItem.title}`}
@@ -303,7 +303,7 @@ const renderMenuItem = (item: MenuItem) => {
                     <div className="flex-1">
                       <div
                         className={`text-sm font-semibold flex items-center gap-2 ${
-                          subItem.locked ? "text-gray-400" : "text-gray-900 dark:text-white"
+                          subItem.locked ? "text-gray-500 dark:text-gray-400" : "text-gray-900 dark:text-white"
                         }`}
                       >
                         {subItem.title}
@@ -312,7 +312,7 @@ const renderMenuItem = (item: MenuItem) => {
                       {subItem.description && (
                         <p
                           className={`text-xs leading-snug mt-1 ${
-                            subItem.locked ? "text-gray-400" : "text-gray-600 dark:text-gray-400"
+                            subItem.locked ? "text-gray-500 dark:text-gray-400" : "text-gray-600 dark:text-gray-400"
                           }`}
                         >
                           {subItem.description}
@@ -362,7 +362,7 @@ const renderMobileMenuItem = (item: MenuItem, pathname: string) => {
                 <Link
                   key={subItem.title}
                   to="#"
-                  className="flex select-none gap-3 rounded-lg p-3 leading-none outline-none transition-colors duration-200 border focus:ring-0 bg-gray-50 dark:bg-gray-950 text-gray-400 cursor-not-allowed border-gray-200 dark:border-gray-800"
+                  className="flex select-none gap-3 rounded-lg p-3 leading-none outline-none transition-colors duration-200 border focus:ring-0 bg-gray-50 dark:bg-gray-800/50 text-gray-500 cursor-not-allowed border-gray-200 dark:border-gray-800"
                   aria-label={`Go to ${subItem.title}`}
                   tabIndex={-1}
                   aria-disabled={true}
@@ -372,12 +372,12 @@ const renderMobileMenuItem = (item: MenuItem, pathname: string) => {
                   }}
                 >
                   <div className="flex-1">
-                    <div className="text-sm font-semibold flex items-center gap-2 mb-1 text-gray-400">
+                    <div className="text-sm font-semibold flex items-center gap-2 mb-1 text-gray-500">
                       {subItem.title}
                       <Lock className="h-3 w-3" />
                     </div>
                     {subItem.description && (
-                      <p className="text-xs leading-snug text-gray-400">
+                      <p className="text-xs leading-snug text-gray-500 dark:text-gray-400">
                         {subItem.description} • Sign in to access
                       </p>
                     )}
