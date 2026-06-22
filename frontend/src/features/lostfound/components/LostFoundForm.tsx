@@ -3,6 +3,7 @@ import { FiInfo } from 'react-icons/fi';
 import { ImageUpload, ImageFile } from '../../../components/common/ImageUpload';
 import { LostFoundItem } from '../types';
 import { validateEmail, validatePhone } from '../../../utils/formValidation';
+import { compressImage } from '../../../utils/imageCompressor';
 
 interface LostFoundFormProps {
   item?: LostFoundItem | null;
@@ -104,9 +105,33 @@ export const LostFoundForm: React.FC<LostFoundFormProps> = ({
     submitData.append('date', formData.date);
     submitData.append('contact', formData.contact.trim());
 
-    formData.images.forEach((img) => {
-      if (img.file) submitData.append('images', img.file);
-    });
+    // Compress client-side images concurrently before appending to form data
+    try {
+      const imageProcessingPromises = formData.images.map(async (img) => {
+        if (img.file) {
+          try {
+            // Target max-width 1024px with 70% quality compression
+            return await compressImage(img.file, 1024, 0.7);
+          } catch (compressErr) {
+            console.error('Image compression failed, using original', compressErr);
+            return img.file;
+          }
+        }
+        return null;
+      });
+
+      const processedFiles = await Promise.all(imageProcessingPromises);
+      
+      processedFiles.forEach((file) => {
+        if (file) submitData.append('images', file);
+      });
+    } catch (err) {
+      console.error('Error during image processing bundle execution', err);
+      // Fallback: Append original files if loop errors out
+      formData.images.forEach((img) => {
+        if (img.file) submitData.append('images', img.file);
+      });
+    }
 
     if (item) {
       const keepPublicIds = formData.images
