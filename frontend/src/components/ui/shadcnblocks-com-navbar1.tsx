@@ -118,7 +118,7 @@ const Navbar1 = ({
             {auth.signup.onClick ? (
               <Button
                 onClick={auth.signup.onClick}
-                className="h-10 px-4 text-sm font-semibold bg-[#181818] text-white hover:bg-[#00C6A7] active:bg-[#181818] transition-colors duration-200 focus:outline-none focus:ring-0 rounded-lg border-0"
+                className="h-10 px-4 text-sm font-semibold bg-[#181818] text-white hover:bg-[#00C6A7] active:bg-[#181818] dark:border dark:border-gray-600 transition-colors duration-200 focus:outline-none focus:ring-0 rounded-lg"
                 aria-label={auth.signup.text}
               >
                 {auth.signup.text}
@@ -126,7 +126,7 @@ const Navbar1 = ({
             ) : (
               <Button
                 asChild
-                className="h-10 px-4 text-sm font-semibold bg-[#181818] text-white hover:bg-[#00C6A7] active:bg-[#181818] transition-colors duration-200 focus:outline-none focus:ring-0 rounded-lg border-0"
+                className="h-10 px-4 text-sm font-semibold bg-[#181818] text-white hover:bg-[#00C6A7] active:bg-[#181818] dark:border dark:border-gray-600 transition-colors duration-200 focus:outline-none focus:ring-0 rounded-lg"
               >
                 <Link to={auth.signup.url}>{auth.signup.text}</Link>
               </Button>
@@ -235,7 +235,7 @@ const Navbar1 = ({
                     <SheetClose asChild>
                       <Button
                         onClick={auth.signup.onClick}
-                        className="w-full h-11 text-sm font-semibold bg-[#181818] text-white hover:bg-[#00C6A7] active:bg-[#181818] transition-colors duration-200 rounded-lg focus:outline-none focus:ring-0"
+                        className="w-full h-11 text-sm font-semibold bg-[#181818] text-white hover:bg-[#00C6A7] active:bg-[#181818] dark:border dark:border-gray-600 transition-colors duration-200 rounded-lg focus:outline-none focus:ring-0"
                         aria-label={auth.signup.text}
                       >
                         {auth.signup.text}
@@ -245,7 +245,7 @@ const Navbar1 = ({
                     <SheetClose asChild>
                       <Button
                         asChild
-                        className="w-full h-11 text-sm font-semibold bg-[#181818] text-white hover:bg-[#00C6A7] active:bg-[#181818] transition-colors duration-200 rounded-lg focus:outline-none focus:ring-0"
+                        className="w-full h-11 text-sm font-semibold bg-[#181818] text-white hover:bg-[#00C6A7] active:bg-[#181818] dark:border dark:border-gray-600 transition-colors duration-200 rounded-lg focus:outline-none focus:ring-0"
                       >
                         <Link to={auth.signup.url}>{auth.signup.text}</Link>
                       </Button>
