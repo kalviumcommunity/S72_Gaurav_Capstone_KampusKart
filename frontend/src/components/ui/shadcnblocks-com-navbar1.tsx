@@ -273,7 +273,7 @@ const renderMenuItem = (item: MenuItem) => {
     return (
       <NavigationMenuItem key={item.title}>
         <NavigationMenuTrigger
-          className="text-gray-700 dark:text-gray-200 font-semibold px-4 py-2 rounded-lg focus:outline-none focus:ring-0"
+          className="text-gray-700 dark:text-gray-200 font-semibold px-4 py-2 rounded-lg focus:outline-none focus:ring-0 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
           aria-label={`${item.title} menu`}
         >
           {item.title}
