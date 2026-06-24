@@ -56,6 +56,8 @@ router.put(
   authMiddleware,
   itemRateLimiter,
   upload.array('images', 5),
+  sanitizeInput,
+  validateLostFoundItem,
   lostfoundController.updateItem
 );
 router.delete('/:id', authMiddleware, itemRateLimiter, lostfoundController.deleteItem);

@@ -119,12 +119,12 @@ export const ShuffleHero = () => {
           Your campus, simplified
         </span>
         <h1
-          className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-black leading-tight"
+          className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-black leading-tight dark:text-white"
           style={{ letterSpacing: "-0.02em" }}
         >
           Everything Campus, One App
         </h1>
-        <p className="text-sm sm:text-base md:text-lg text-gray-500 max-w-md mx-auto md:mx-0 leading-relaxed">
+        <p className="text-sm sm:text-base md:text-lg text-gray-500 dark:text-gray-300 max-w-md mx-auto md:mx-0 leading-relaxed">
           Your all-in-one campus companion for navigation, events, news, lost & found, complaints, and more.
         </p>
         <div className="flex flex-col xs:flex-row gap-2 sm:gap-3 justify-center md:justify-start pt-1 sm:pt-2">
