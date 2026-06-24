@@ -287,7 +287,7 @@ const renderMenuItem = (item: MenuItem) => {
                     to={subItem.locked ? "#" : subItem.url}
                     className={`flex select-none gap-3 rounded-lg p-3 leading-none no-underline outline-none transition-colors duration-200 focus:ring-0 ${
                       subItem.locked
-                        ? "bg-gray-50 text-gray-400 cursor-not-allowed pointer-events-none"
+                        ? "bg-gray-50 text-gray-400 dark:bg-gray-900 dark:text-gray-500 cursor-not-allowed pointer-events-none"
                         : "hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white"
                     }`}
                     aria-label={`Go to ${subItem.title}`}
