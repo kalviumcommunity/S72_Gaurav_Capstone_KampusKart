@@ -49,7 +49,7 @@ router.post(
   complaintsController.adminCleanupExpired
 );
 
-router.put('/:id', authMiddleware, complaintWriteLimiter,  upload.array('images', 5), complaintsController.updateComplaint);
+router.put('/:id', authMiddleware, complaintWriteLimiter, sanitizeInput, validateComplaint,  upload.array('images', 5), complaintsController.updateComplaint);
 router.delete('/:id', authMiddleware, complaintWriteLimiter, complaintsController.deleteComplaint)
 
 module.exports = router;
