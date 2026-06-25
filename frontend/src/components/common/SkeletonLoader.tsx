@@ -8,11 +8,11 @@ interface SkeletonProps {
   rounded?: 'none' | 'sm' | 'md' | 'lg' | 'full';
 }
 
-const Skeleton: React.FC<SkeletonProps> = ({ 
-  className = '', 
-  width = '100%', 
+const Skeleton: React.FC<SkeletonProps> = ({
+  className = '',
+  width = '100%',
   height = '1rem',
-  rounded = 'md'
+  rounded = 'md',
 }) => {
   const roundedClasses = {
     none: 'rounded-none',
@@ -24,7 +24,7 @@ const Skeleton: React.FC<SkeletonProps> = ({
 
   return (
     <div
-      className={`bg-gray-200 animate-pulse ${roundedClasses[rounded]} ${className}`}
+      className={`bg-gray-200 dark:bg-gray-800 animate-pulse ${roundedClasses[rounded]} ${className}`}
       style={{ width, height }}
     />
   );
@@ -37,7 +37,7 @@ export const CardSkeleton: React.FC<{ count?: number }> = ({ count = 6 }) => {
       {Array.from({ length: count }).map((_, index) => (
         <div
           key={index}
-          className="bg-white rounded-lg border-2 border-gray-200 overflow-hidden"
+          className="bg-white dark:bg-gray-900 rounded-lg border-2 border-gray-200 dark:border-gray-800 overflow-hidden"
         >
           <div className={UI_PATTERNS.skeletonCardMedia} />
           <div className={UI_PATTERNS.skeletonCardBody}>
@@ -62,7 +62,7 @@ export const CardSkeleton4Col: React.FC<{ count?: number }> = ({ count = 8 }) =>
       {Array.from({ length: count }).map((_, index) => (
         <div
           key={index}
-          className="bg-white rounded-lg border-2 border-gray-200 overflow-hidden"
+          className="bg-white dark:bg-gray-900 rounded-lg border-2 border-gray-200 dark:border-gray-800 overflow-hidden"
         >
           <div className={UI_PATTERNS.skeletonCardMedia} />
           <div className={UI_PATTERNS.skeletonCardBody}>
@@ -87,7 +87,7 @@ export const ListSkeleton: React.FC<{ count?: number }> = ({ count = 5 }) => {
       {Array.from({ length: count }).map((_, index) => (
         <div
           key={index}
-          className="bg-white rounded-lg border-2 border-gray-200 p-4"
+          className="bg-white dark:bg-gray-900 rounded-lg border-2 border-gray-200 dark:border-gray-800 p-4"
         >
           <div className="flex items-start gap-4">
             <Skeleton width={48} height={48} rounded="full" />
@@ -104,25 +104,20 @@ export const ListSkeleton: React.FC<{ count?: number }> = ({ count = 5 }) => {
 };
 
 // Table Skeleton
-export const TableSkeleton: React.FC<{ rows?: number; cols?: number }> = ({ 
-  rows = 5, 
-  cols = 4 
+export const TableSkeleton: React.FC<{ rows?: number; cols?: number }> = ({
+  rows = 5,
+  cols = 4,
 }) => {
   return (
-    <div className="bg-white rounded-lg border-2 border-gray-200 overflow-hidden">
-      <div className="p-4 border-b border-gray-200">
+    <div className="bg-white dark:bg-gray-900 rounded-lg border-2 border-gray-200 dark:border-gray-800 overflow-hidden">
+      <div className="p-4 border-b border-gray-200 dark:border-gray-800">
         <Skeleton height="24px" width="30%" />
       </div>
-      <div className="divide-y divide-gray-200">
+      <div className="divide-y divide-gray-200 dark:divide-gray-800">
         {Array.from({ length: rows }).map((_, rowIndex) => (
           <div key={rowIndex} className="p-4 flex gap-4">
             {Array.from({ length: cols }).map((_, colIndex) => (
-              <Skeleton
-                key={colIndex}
-                height="20px"
-                width={`${100 / cols}%`}
-                className="flex-1"
-              />
+              <Skeleton key={colIndex} height="20px" width={`${100 / cols}%`} className="flex-1" />
             ))}
           </div>
         ))}
@@ -132,23 +127,23 @@ export const TableSkeleton: React.FC<{ rows?: number; cols?: number }> = ({
 };
 
 // Page Skeleton with header and content
-export const PageSkeleton: React.FC<{ 
+export const PageSkeleton: React.FC<{
   showHeader?: boolean;
   showFilters?: boolean;
   filterCount?: number; // Number of filter dropdowns (1 or 2)
   contentType?: 'cards' | 'cards4col' | 'list' | 'table';
   itemCount?: number;
   showAddButton?: boolean;
-}> = ({ 
-  showHeader = true, 
+}> = ({
+  showHeader = true,
   showFilters = true,
   filterCount = 1,
   contentType = 'cards',
   itemCount = 6,
-  showAddButton = true
+  showAddButton = true,
 }) => {
   return (
-    <div className="min-h-screen bg-white font-sans">
+    <div className="min-h-screen bg-white dark:bg-gray-950 font-sans">
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
         {showHeader && (
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
@@ -156,7 +151,7 @@ export const PageSkeleton: React.FC<{
             {showAddButton && <Skeleton height="48px" width="180px" rounded="lg" />}
           </div>
         )}
-        
+
         {showFilters && (
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
             <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
@@ -203,14 +198,12 @@ export const ChatMessageSkeleton: React.FC<{ count?: number }> = ({ count = 5 })
 // Chat Page Skeleton with Header
 export const ChatSkeleton: React.FC<{ messageCount?: number }> = ({ messageCount = 8 }) => {
   return (
-    <div className="flex flex-col h-full bg-white overflow-hidden">
+    <div className="flex flex-col h-full bg-white dark:bg-gray-950 overflow-hidden">
       {/* Chat Header Skeleton - matches actual ChatHeader */}
-      <div 
-        className="bg-white border-b-2 border-gray-200 px-3 sm:px-6 py-2 sm:py-3 flex items-center justify-between"
-      >
+      <div className="bg-white dark:bg-gray-900 border-b-2 border-gray-200 dark:border-gray-800 px-3 sm:px-6 py-2 sm:py-3 flex items-center justify-between">
         <div className="flex items-center gap-2 sm:gap-3">
           {/* Avatar with border box */}
-          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-gray-100 border-2 border-gray-200 flex items-center justify-center shadow-sm">
+          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-gray-100 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 flex items-center justify-center shadow-sm">
             <Skeleton width={36} height={36} rounded="full" />
           </div>
           <div className="space-y-1">
@@ -231,7 +224,7 @@ export const ChatSkeleton: React.FC<{ messageCount?: number }> = ({ messageCount
       </div>
 
       {/* Input Area Skeleton */}
-      <div className="border-t border-gray-200 p-3 sm:p-4 bg-white">
+      <div className="border-t border-gray-200 dark:border-gray-800 p-3 sm:p-4 bg-white dark:bg-gray-900">
         <div className="flex items-center gap-2">
           <Skeleton height="40px" width="40px" rounded="full" />
           <Skeleton height="48px" width="100%" rounded="full" />
@@ -245,7 +238,7 @@ export const ChatSkeleton: React.FC<{ messageCount?: number }> = ({ messageCount
 // Map Skeleton
 export const MapSkeleton: React.FC = () => {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-gray-950">
       <div className="p-4">
         <Skeleton height="40px" width="200px" className="mb-4" />
       </div>
@@ -254,7 +247,7 @@ export const MapSkeleton: React.FC = () => {
         <div className="absolute top-4 left-4 right-4">
           <Skeleton height="48px" rounded="full" />
         </div>
-        <div className="absolute bottom-4 right-4 w-80 bg-white rounded-lg border-2 border-gray-200 p-4">
+        <div className="absolute bottom-4 right-4 w-80 bg-white dark:bg-gray-900 rounded-lg border-2 border-gray-200 dark:border-gray-800 p-4">
           <Skeleton height="24px" width="60%" className="mb-4" />
           <div className="space-y-2">
             {Array.from({ length: 5 }).map((_, index) => (
@@ -268,4 +261,3 @@ export const MapSkeleton: React.FC = () => {
 };
 
 export default Skeleton;
-

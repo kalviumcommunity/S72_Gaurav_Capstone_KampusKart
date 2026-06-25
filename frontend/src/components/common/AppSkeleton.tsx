@@ -7,11 +7,11 @@ interface SkeletonProps {
   rounded?: 'none' | 'sm' | 'md' | 'lg' | 'full';
 }
 
-const Skeleton: React.FC<SkeletonProps> = ({ 
-  className = '', 
-  width = '100%', 
+const Skeleton: React.FC<SkeletonProps> = ({
+  className = '',
+  width = '100%',
   height = '1rem',
-  rounded = 'md'
+  rounded = 'md',
 }) => {
   const roundedClasses = {
     none: 'rounded-none',
@@ -23,7 +23,7 @@ const Skeleton: React.FC<SkeletonProps> = ({
 
   return (
     <div
-      className={`bg-gray-200 animate-pulse ${roundedClasses[rounded]} ${className}`}
+      className={`bg-gray-200 dark:bg-gray-800 animate-pulse ${roundedClasses[rounded]} ${className}`}
       style={{ width, height }}
     />
   );
@@ -32,7 +32,7 @@ const Skeleton: React.FC<SkeletonProps> = ({
 // Simple app-level skeleton for initial auth loading
 export const AppSkeleton: React.FC = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white">
+    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950">
       <div className="text-center">
         <Skeleton width={80} height={80} rounded="full" className="mx-auto mb-4" />
         <Skeleton height="24px" width="200px" className="mx-auto mb-2" />
@@ -41,4 +41,3 @@ export const AppSkeleton: React.FC = () => {
     </div>
   );
 };
-

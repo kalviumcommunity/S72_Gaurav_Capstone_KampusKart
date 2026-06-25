@@ -155,14 +155,16 @@ const CampusMap: React.FC = () => {
 
   if (!isDemoMode && loadError) {
     return (
-      <div className="h-screen flex flex-col items-center justify-center p-8 text-center bg-white">
-        <h3 className="text-2xl font-black text-gray-900 mb-4">Map Loading Failed</h3>
-        <p className="text-gray-500 mb-8 max-w-md">
+      <div className="h-screen flex flex-col items-center justify-center p-8 text-center bg-white dark:bg-gray-950">
+        <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-4">
+          Map Loading Failed
+        </h3>
+        <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md">
           We couldn't load the campus map. Please check your connection or API key.
         </p>
         <button
           onClick={() => window.location.reload()}
-          className="px-8 py-3 bg-[#181818] text-white rounded-xl font-bold hover:bg-[#00C6A7] transition-all"
+          className="px-8 py-3bg-[#181818] dark:bg-gray-800 text-white rounded-xl font-bold hover:bg-[#00C6A7] transition-all"
         >
           Retry Loading
         </button>
@@ -173,10 +175,10 @@ const CampusMap: React.FC = () => {
   if (!isDemoMode && !isLoaded) return <MapSkeleton />;
 
   return (
-    <div className="h-screen w-full flex flex-col pt-[72px] bg-white overflow-hidden select-none">
+    <div className="h-screen w-full flex flex-col pt-[72px] bg-white dark:bg-gray-950 overflow-hidden select-none">
       {/* Demo Warning Banner */}
       {isDemoMode && (
-        <div className="bg-amber-50 border-b border-amber-200 px-4 py-2 flex items-center justify-between text-xs text-amber-800 font-medium z-20 shrink-0">
+        <div className="bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-700px-4 py-2 flex items-center justify-between text-xs text-amber-800 dark:text-amber-300 font-medium z-20 shrink-0">
           <div className="flex items-center gap-2">
             <FiInfo className="w-4 h-4 text-amber-600 shrink-0" />
             <span>
@@ -188,15 +190,18 @@ const CampusMap: React.FC = () => {
 
       <div className="flex-grow flex flex-col md:flex-row min-h-0 relative">
         {/* Map Container */}
-        <div className="flex-grow relative h-full bg-slate-50 overflow-hidden">
+        <div className="flex-grow relative h-full bg-slate-50 dark:bg-gray-900 overflow-hidden">
           {isDemoMode ? (
             /* Interactive Vector Fallback Map */
-            <div className="absolute inset-0 w-full h-full bg-[#fafbfc] overflow-hidden flex items-center justify-center">
+            <div className="absolute inset-0 w-full h-full bg-[#fafbfc] dark:bg-gray-950 overflow-hidden flex items-center justify-center">
               {/* Grid Background Effect */}
               <div
                 className="absolute inset-0 opacity-[0.03]"
                 style={{
-                  backgroundImage: `radial-gradient(#181818 1.5px, transparent 1.5px)`,
+                  backgroundImage: `radial-gradient(currentColor 1.5px, transparent 1.5px)`,
+                  color: document.documentElement.classList.contains('dark')
+                    ? '#374151'
+                    : '#181818',
                   backgroundSize: '24px 24px',
                 }}
               />
@@ -261,7 +266,7 @@ const CampusMap: React.FC = () => {
                     </div>
 
                     {/* Simple Hover Tooltip */}
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2 py-1 bg-[#181818] text-white text-[10px] font-bold rounded shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-20">
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2 py-1bg-[#181818] dark:bg-gray-800 text-white text-[10px] font-bold rounded shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-20">
                       {loc.name.split(',')[0]}
                     </div>
                   </div>
@@ -271,7 +276,7 @@ const CampusMap: React.FC = () => {
               {/* Mock Info Window */}
               {selectedLocation && infoWindowPosition && (
                 <div
-                  className="absolute z-20 bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 w-[280px] max-w-sm transform -translate-x-1/2 -translate-y-[110%] transition-all duration-300"
+                  className="absolute z-20 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 p-4 w-[280px] max-w-sm transform -translate-x-1/2 -translate-y-[110%] transition-all duration-300"
                   style={{
                     left: getXY(selectedLocation.lat, selectedLocation.lng).x,
                     top: getXY(selectedLocation.lat, selectedLocation.lng).y,
@@ -355,7 +360,7 @@ const CampusMap: React.FC = () => {
             {!isDemoMode && (
               <button
                 onClick={recenterToUser}
-                className="p-4 bg-white text-gray-900 rounded-2xl shadow-2xl border-2 border-gray-100 hover:text-[#00C6A7] transition-all"
+                className="p-4 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-2xl shadow-2xl border-2 border-gray-100 dark:border-gray-700 hover:text-[#00C6A7] transition-all"
                 title="Find my location"
               >
                 <FiTarget className="w-6 h-6" />
@@ -363,7 +368,7 @@ const CampusMap: React.FC = () => {
             )}
             <button
               onClick={() => setIsPanelOpen(!isPanelOpen)}
-              className="p-4 bg-white text-gray-900 rounded-2xl shadow-2xl border-2 border-gray-100 hover:text-[#00C6A7] transition-all"
+              className="p-4 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-2xl shadow-2xl border-2 border-gray-100 dark:border-gray-700 hover:text-[#00C6A7] transition-all"
               title={isPanelOpen ? 'Close Sidebar' : 'Open Sidebar'}
             >
               <FiList className="w-6 h-6" />
@@ -397,8 +402,10 @@ const CampusMap: React.FC = () => {
           <div className="w-20 h-20 bg-teal-50 text-[#00C6A7] rounded-full flex items-center justify-center mx-auto mb-6">
             <FiNavigation className="w-10 h-10" />
           </div>
-          <h3 className="text-xl font-black text-gray-900 mb-2">Navigate to Location</h3>
-          <p className="text-gray-500 mb-8">
+          <h3 className="text-xl font-black text-gray-900 dark:text-white mb-2">
+            Navigate to Location
+          </h3>
+          <p className="text-gray-500 dark:text-gray-400 mb-8">
             This will open Google Maps in a new tab to provide step-by-step directions.
           </p>
           <div className="flex gap-4">
@@ -410,7 +417,7 @@ const CampusMap: React.FC = () => {
             </button>
             <button
               onClick={confirmDirections}
-              className="flex-1 px-6 py-4 bg-[#181818] text-white rounded-2xl font-bold hover:bg-[#00C6A7] transition-all shadow-xl"
+              className="flex-1 px-6 py-4bg-[#181818] dark:bg-gray-800 text-white rounded-2xl font-bold hover:bg-[#00C6A7] transition-all shadow-xl"
             >
               Open Maps
             </button>

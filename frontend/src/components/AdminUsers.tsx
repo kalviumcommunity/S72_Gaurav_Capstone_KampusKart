@@ -220,13 +220,16 @@ const AdminUsers = () => {
 
   if (pageLoading) {
     return (
-      <div className="min-h-screen bg-white pt-24 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-white dark:bg-gray-950 pt-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto animate-pulse">
-          <div className="h-10 w-72 bg-gray-200 rounded-lg mb-4" />
-          <div className="h-12 w-full bg-gray-100 rounded-lg mb-8" />
+          <div className="h-10 w-72 bg-gray-200 dark:bg-gray-800 rounded-lg mb-4" />
+          <div className="h-12 w-full bg-gray-100 dark:bg-gray-900 rounded-lg mb-8" />
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {Array.from({ length: 6 }).map((_, index) => (
-              <div key={index} className="h-44 bg-gray-100 rounded-2xl border border-gray-200" />
+              <div
+                key={index}
+                className="h-44 bg-gray-100 dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-600"
+              />
             ))}
           </div>
         </div>
@@ -235,7 +238,8 @@ const AdminUsers = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-[#F4FDFB] to-white font-sans pt-24">
+    <div className="min-h-screen bg-gradient-to-b from-white via-[#F4FDFB] to-white dark:from-gray-950 dark:via-gray-950 dark:to-gray-950 font-sans pt-24">
+      {' '}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
         <div className="flex flex-col gap-6 mb-8">
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
@@ -243,10 +247,10 @@ const AdminUsers = () => {
               <p className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#E6FFFA] text-[#007C6A] text-xs font-bold uppercase tracking-[0.18em] mb-4">
                 <FiShield className="w-3.5 h-3.5" /> Admin only
               </p>
-              <h1 className="text-3xl sm:text-4xl font-extrabold text-black tracking-tight">
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-black dark:text-white tracking-tight">
                 User Management
               </h1>
-              <p className="text-sm sm:text-base text-gray-600 mt-2 max-w-2xl">
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-2 max-w-2xl">
                 Search, review, update, and remove campus users from one place.
               </p>
             </div>
@@ -258,7 +262,7 @@ const AdminUsers = () => {
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
                   placeholder="Search by name, email, or program..."
-                  className="w-full h-12 pl-11 pr-4 rounded-xl border-2 border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00C6A7]"
+                  className="w-full h-12 pl-11 pr-4 rounded-xl border-2 border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00C6A7]"
                 />
               </div>
 
@@ -266,7 +270,7 @@ const AdminUsers = () => {
                 <select
                   value={sortBy}
                   onChange={(event) => setSortBy(event.target.value)}
-                  className="w-full h-12 px-4 rounded-xl border-2 border-gray-200 bg-white text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00C6A7]"
+                  className="w-full h-12 px-4 rounded-xl border-2 border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#00C6A7]"
                 >
                   <option value="createdAt-asc">Oldest First (Default)</option>
                   <option value="createdAt-desc">Newest First</option>
@@ -294,7 +298,7 @@ const AdminUsers = () => {
               {paginatedUsers.map((entry) => (
                 <article
                   key={entry._id}
-                  className="rounded-2xl border-2 border-gray-200 bg-white p-5 shadow-sm"
+                  className="rounded-2xl border-2 border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-sm"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-center gap-3 min-w-0">
@@ -302,7 +306,7 @@ const AdminUsers = () => {
                         <img
                           src={entry.profilePicture.url}
                           alt={entry.name}
-                          className="h-12 w-12 rounded-xl object-cover flex-shrink-0 border-2 border-gray-100"
+                          className="h-12 w-12 rounded-xl object-cover flex-shrink-0 border-2 border-gray-100 dark:border-gray-800"
                         />
                       ) : (
                         <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#181818] text-white flex-shrink-0">
@@ -310,7 +314,9 @@ const AdminUsers = () => {
                         </div>
                       )}
                       <div className="min-w-0">
-                        <h2 className="text-base font-bold text-black truncate">{entry.name}</h2>
+                        <h2 className="text-base font-bold text-black dark:text-white truncate">
+                          {entry.name}
+                        </h2>
                         <p className="text-sm text-gray-500 truncate">{entry.email}</p>
                       </div>
                     </div>
@@ -324,19 +330,27 @@ const AdminUsers = () => {
                   <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
                     <div>
                       <p className="text-gray-400 text-xs uppercase tracking-wide">Phone</p>
-                      <p className="font-medium text-gray-900">{entry.phone || 'Not set'}</p>
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        {entry.phone || 'Not set'}
+                      </p>
                     </div>
                     <div>
                       <p className="text-gray-400 text-xs uppercase tracking-wide">Program</p>
-                      <p className="font-medium text-gray-900">{entry.program || 'Not set'}</p>
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        {entry.program || 'Not set'}
+                      </p>
                     </div>
                     <div>
                       <p className="text-gray-400 text-xs uppercase tracking-wide">Major</p>
-                      <p className="font-medium text-gray-900">{entry.major || 'Not set'}</p>
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        {entry.major || 'Not set'}
+                      </p>
                     </div>
                     <div>
                       <p className="text-gray-400 text-xs uppercase tracking-wide">Joined</p>
-                      <p className="font-medium text-gray-900">{formatDate(entry.createdAt)}</p>
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        {formatDate(entry.createdAt)}
+                      </p>
                     </div>
                   </div>
 
@@ -352,7 +366,7 @@ const AdminUsers = () => {
                       type="button"
                       onClick={() => setPendingDeleteUser(entry)}
                       disabled={deletingId === entry._id || entry._id === user?._id}
-                      className="inline-flex items-center gap-2 rounded-lg border-2 border-red-200 bg-white px-4 py-2.5 text-sm font-semibold text-red-700 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+                      className="inline-flex items-center gap-2 rounded-lg border-2 border-red-200 dark:border-red-900 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm font-semibold text-red-700 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       <FiTrash2 className="w-4 h-4" />{' '}
                       {deletingId === entry._id ? 'Deleting...' : 'Delete'}
@@ -364,7 +378,7 @@ const AdminUsers = () => {
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-2xl border-2 border-gray-200 shadow-sm text-sm">
+              <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white dark:bg-gray-900 p-4 rounded-2xl border-2 border-gray-200 dark:border-gray-800 shadow-sm text-sm">
                 <div className="flex items-center gap-3">
                   <span className="text-gray-500">Show</span>
                   <select
@@ -373,15 +387,19 @@ const AdminUsers = () => {
                       setItemsPerPage(Number(e.target.value));
                       setCurrentPage(1);
                     }}
-                    className="h-9 px-2.5 rounded-lg border-2 border-gray-200 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00C6A7]"
+                    className="h-9 px-2.5 rounded-lg border-2 border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#00C6A7]"
                   >
                     <option value={10}>10 per page</option>
                     <option value={12}>12 per page</option>
                     <option value={24}>24 per page</option>
                     <option value={48}>48 per page</option>
                   </select>
-                  <span className="text-gray-500">
-                    of <strong className="text-black font-semibold">{totalItems}</strong> entries
+                  <span className="text-gray-500 dark:text-white">
+                    of{' '}
+                    <strong className="text-black dark:text-white font-semibold">
+                      {totalItems}
+                    </strong>{' '}
+                    entries
                   </span>
                 </div>
 
@@ -390,19 +408,25 @@ const AdminUsers = () => {
                     type="button"
                     disabled={currentPage === 1}
                     onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                    className="h-10 px-4 rounded-xl border-2 border-gray-200 font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-colors"
+                    className="h-10 px-4 rounded-xl border-2 border-gray-200 dark:border-gray-800 font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-colors"
                   >
                     Previous
                   </button>
-                  <span className="text-gray-500 px-2">
-                    Page <strong className="text-black font-semibold">{currentPage}</strong> of{' '}
-                    <strong className="text-black font-semibold">{totalPages}</strong>
+                  <span className="text-gray-500 dark:text-white px-2">
+                    Page{' '}
+                    <strong className="text-black dark:text-white font-semibold">
+                      {currentPage}
+                    </strong>{' '}
+                    of{' '}
+                    <strong className="text-black dark:text-white font-semibold">
+                      {totalPages}
+                    </strong>
                   </span>
                   <button
                     type="button"
                     disabled={currentPage === totalPages}
                     onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                    className="h-10 px-4 rounded-xl border-2 border-gray-200 font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-colors"
+                    className="h-10 px-4 rounded-xl border-2 border-gray-200 dark:border-gray-800 font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent transition-colors"
                   >
                     Next
                   </button>
@@ -411,18 +435,18 @@ const AdminUsers = () => {
             )}
           </div>
 
-          <aside className="sticky top-28 rounded-3xl border-2 border-gray-200 bg-white p-6 shadow-sm">
+          <aside className="sticky top-28 rounded-3xl border-2 border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
             {selectedUser ? (
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <h2 className="text-xl font-bold text-black">Edit user</h2>
+                    <h2 className="text-xl font-bold text-black dark:text-white">Edit user</h2>
                     <p className="text-sm text-gray-500 truncate">{selectedUser.email}</p>
                   </div>
                   <button
                     type="button"
                     onClick={closeEditor}
-                    className="rounded-full p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-black"
+                    className="rounded-full p-2 text-gray-500 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-black dark:hover:text-white"
                     aria-label="Close editor"
                   >
                     <FiX className="w-5 h-5" />
@@ -430,38 +454,38 @@ const AdminUsers = () => {
                 </div>
 
                 <div className="grid gap-4">
-                  <label className="grid gap-2 text-sm font-medium text-gray-700">
+                  <label className="grid gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                     Name
                     <input
                       value={formData.name}
                       onChange={(event) =>
                         setFormData((current) => ({ ...current, name: event.target.value }))
                       }
-                      className="h-11 rounded-xl border-2 border-gray-200 px-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00C6A7]"
+                      className="h-11 rounded-xl border-2 border-gray-200 dark:border-gray-800 px-3 text-gray-900 dark:text-white bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00C6A7]"
                     />
                   </label>
-                  <label className="grid gap-2 text-sm font-medium text-gray-700">
+                  <label className="grid gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                     Phone
                     <input
                       value={formData.phone}
                       onChange={(event) =>
                         setFormData((current) => ({ ...current, phone: event.target.value }))
                       }
-                      className="h-11 rounded-xl border-2 border-gray-200 px-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00C6A7]"
+                      className="h-11 rounded-xl border-2 border-gray-200 dark:border-gray-800 px-3 text-gray-900 dark:text-white bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00C6A7]"
                     />
                   </label>
-                  <label className="grid gap-2 text-sm font-medium text-gray-700">
+                  <label className="grid gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                     Major
                     <input
                       value={formData.major}
                       onChange={(event) =>
                         setFormData((current) => ({ ...current, major: event.target.value }))
                       }
-                      className="h-11 rounded-xl border-2 border-gray-200 px-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00C6A7]"
+                      className="h-11 rounded-xl border-2 border-gray-200 dark:border-gray-800 px-3 text-gray-900 dark:text-white bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00C6A7]"
                     />
                   </label>
                   <div className="grid gap-4 sm:grid-cols-2">
-                    <label className="grid gap-2 text-sm font-medium text-gray-700">
+                    <label className="grid gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                       Year
                       <select
                         value={formData.yearOfStudy}
@@ -471,7 +495,7 @@ const AdminUsers = () => {
                             yearOfStudy: event.target.value,
                           }))
                         }
-                        className="h-11 rounded-xl border-2 border-gray-200 px-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] bg-white"
+                        className="h-11 rounded-xl border-2 border-gray-200 dark:border-gray-800 px-3 text-gray-900 dark:text-white bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00C6A7]"
                       >
                         <option value="">Not set</option>
                         <option value="1st Year">1st Year</option>
@@ -482,14 +506,14 @@ const AdminUsers = () => {
                         <option value="Graduate">Graduate</option>
                       </select>
                     </label>
-                    <label className="grid gap-2 text-sm font-medium text-gray-700">
+                    <label className="grid gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                       Gender
                       <select
                         value={formData.gender}
                         onChange={(event) =>
                           setFormData((current) => ({ ...current, gender: event.target.value }))
                         }
-                        className="h-11 rounded-xl border-2 border-gray-200 px-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] bg-white"
+                        className="h-11 rounded-xl border-2 border-gray-200 dark:border-gray-800 px-3 text-gray-900 dark:text-white bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00C6A7]"
                       >
                         <option value="">Not set</option>
                         <option value="Male">Male</option>
@@ -498,14 +522,14 @@ const AdminUsers = () => {
                       </select>
                     </label>
                   </div>
-                  <label className="grid gap-2 text-sm font-medium text-gray-700">
+                  <label className="grid gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                     Program
                     <select
                       value={formData.program}
                       onChange={(event) =>
                         setFormData((current) => ({ ...current, program: event.target.value }))
                       }
-                      className="h-11 rounded-xl border-2 border-gray-200 px-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] bg-white"
+                      className="h-11 rounded-xl border-2 border-gray-200 dark:border-gray-800 px-3 text-gray-900 dark:text-white bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00C6A7]"
                     >
                       <option value="">Not set</option>
                       <option value="B.Tech">B.Tech</option>
@@ -520,7 +544,7 @@ const AdminUsers = () => {
                       <option value="Other">Other</option>
                     </select>
                   </label>
-                  <label className="grid gap-2 text-sm font-medium text-gray-700">
+                  <label className="grid gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                     Date of Birth
                     <input
                       type="date"
@@ -528,7 +552,7 @@ const AdminUsers = () => {
                       onChange={(event) =>
                         setFormData((current) => ({ ...current, dateOfBirth: event.target.value }))
                       }
-                      className="h-11 rounded-xl border-2 border-gray-200 px-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00C6A7]"
+                      className="h-11 rounded-xl border-2 border-gray-200 dark:border-gray-800 px-3 text-gray-900 dark:text-white bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00C6A7]"
                     />
                   </label>
                 </div>
@@ -544,7 +568,7 @@ const AdminUsers = () => {
                   <button
                     type="button"
                     onClick={closeEditor}
-                    className="inline-flex items-center justify-center rounded-xl border-2 border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50"
+                    className="inline-flex items-center justify-center rounded-xl border-2 border-gray-200 dark:border-gray-800 px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 transition-colors hover:bg-gray-50 dark:hover:bg-gray-600"
                   >
                     Cancel
                   </button>
@@ -555,8 +579,8 @@ const AdminUsers = () => {
                 <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#E6FFFA] text-[#007C6A]">
                   <FiUser className="w-7 h-7" />
                 </div>
-                <h2 className="text-xl font-bold text-black">Select a user</h2>
-                <p className="mt-2 max-w-xs text-sm text-gray-500">
+                <h2 className="text-xl font-bold text-black dark:text-white">Select a user</h2>
+                <p className="mt-2 max-w-xs text-sm text-gray-500 dark:text-gray-400">
                   Choose a user card to review and update profile details.
                 </p>
               </div>
@@ -564,7 +588,6 @@ const AdminUsers = () => {
           </aside>
         </section>
       </main>
-
       <FeatureModal
         isOpen={Boolean(pendingDeleteUser)}
         onClose={() => setPendingDeleteUser(null)}
@@ -572,16 +595,18 @@ const AdminUsers = () => {
         size="sm"
       >
         <div className="space-y-4">
-          <p className="text-sm text-gray-700">
+          <p className="text-sm text-gray-700 dark:text-gray-300">
             Are you sure you want to delete{' '}
-            <span className="font-semibold text-black">{pendingDeleteUser?.name}</span>? This cannot
-            be undone.
+            <span className="font-semibold text-black dark:text-white">
+              {pendingDeleteUser?.name}
+            </span>
+            ? This cannot be undone.
           </p>
           <div className="flex gap-3 justify-end">
             <button
               type="button"
               onClick={() => setPendingDeleteUser(null)}
-              className="rounded-lg border-2 border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+              className="rounded-lg border-2 border-gray-200 dark:border-gray-800 px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
             >
               Cancel
             </button>
@@ -596,7 +621,6 @@ const AdminUsers = () => {
           </div>
         </div>
       </FeatureModal>
-
       <Footer
         logo={<img src="/Logo.webp" alt="KampusKart Logo" className="h-7 w-7" />}
         brandName="KampusKart"

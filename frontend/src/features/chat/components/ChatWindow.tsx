@@ -27,19 +27,57 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ReplyIcon from '@mui/icons-material/Reply';
 import { API_BASE, SOCKET_URL } from '../../../config';
 import { ChatSkeleton } from '../../../components/common/SkeletonLoader';
+import { useTheme } from '../../../contexts/ThemeContext';
 
 // Chat Color Theme Configuration
 // Using the same color scheme as buttons and other feature components
-const CHAT_THEME = {
-  primary: '#181818', // Dark gray/black - matches button default bg
-  primaryHover: '#00C6A7', // Teal - matches button hover state
-  primaryDark: '#009e87', // Darker teal
-  background: '#ffffff', // White background
-  cardBg: '#f9fafb', // Light gray for cards
-  border: '#e5e7eb', // Border color
-  textPrimary: '#1f2937', // Primary text
-  textSecondary: '#6b7280', // Secondary text
-  textMuted: '#9ca3af', // Muted text
+
+const lightTheme = {
+  primary: '#181818',
+  primaryHover: '#00C6A7',
+  primaryDark: '#009e87',
+
+  background: '#ffffff',
+  cardBg: '#f9fafb',
+  border: '#e5e7eb',
+
+  textPrimary: '#1f2937',
+  textSecondary: '#6b7280',
+  textMuted: '#9ca3af',
+
+  success: '#10b981',
+  messageOwn: '#f0fdf4',
+  ownMessageBg: 'rgba(0, 198, 167, 0.1)',
+
+  disabledBg: '#e5e7eb',
+  disabledText: '#9ca3af',
+  disabledHover: '#d1d5db',
+  menuShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
+  dangerHover: '#fef2f2',
+};
+
+const darkTheme = {
+  primary: '#181818',
+  primaryHover: '#00C6A7',
+  primaryDark: '#009e87',
+
+  background: '#030712', // gray-950
+  cardBg: '#111827', // gray-900
+  border: '#1f2937', // gray-800
+
+  textPrimary: '#ffffff',
+  textSecondary: '#9ca3af',
+  textMuted: '#6b7280',
+
+  success: '#10b981',
+  messageOwn: '#1f2937',
+  ownMessageBg: 'rgba(0, 198, 167, 0.18)',
+
+  disabledBg: '#1f2937', // gray-800
+  disabledText: '#6b7280', // gray-500
+  disabledHover: '#374151', // gray-700
+  menuShadow: '0 4px 16px rgba(0, 0, 0, 0.4)',
+  dangerHover: '#741616',
 };
 
 interface ChatUser {
@@ -137,6 +175,7 @@ const ChatWindow = () => {
   const [sendingMessage, setSendingMessage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const { user } = useAuth();
+  const { theme } = useTheme();
   const socketRef = useRef<Socket<ServerToClientEvents, ClientToServerEvents> | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null); // Separate ref for load-more trigger (top of list)
@@ -144,7 +183,7 @@ const ChatWindow = () => {
   const observerRef = useRef<IntersectionObserver | null>(null);
   const emojiPickerRef = useRef<HTMLDivElement | null>(null);
   const emojiToggleButtonRef = useRef<HTMLButtonElement | null>(null);
-
+  const CHAT_THEME = theme === 'dark' ? darkTheme : lightTheme;
   const canSendMessage = newMessage.trim().length > 0 || attachments.length > 0;
 
   const markMessageAsRead = useCallback(async (messageId: string) => {
@@ -611,7 +650,7 @@ const ChatWindow = () => {
                 width: 8,
                 height: 8,
                 borderRadius: '50%',
-                background: '#10b981',
+                background: CHAT_THEME.success,
               }}
             />
             <Typography
@@ -682,7 +721,7 @@ const ChatWindow = () => {
         </ListItemAvatar>
         <Box
           sx={{
-            bgcolor: isOwnMessage ? '#f0fdf4' : CHAT_THEME.background,
+            bgcolor: isOwnMessage ? CHAT_THEME.messageOwn : CHAT_THEME.background,
             border: `2px solid ${CHAT_THEME.border}`,
             borderRadius: '12px',
             p: { xs: 1.5, sm: 1.75 },
@@ -737,7 +776,7 @@ const ChatWindow = () => {
               variant="body2"
               sx={{
                 wordBreak: 'break-word',
-                color: '#1f2937',
+                color: CHAT_THEME.textPrimary,
                 fontSize: '0.9375rem',
                 lineHeight: 1.6,
                 fontWeight: 400,
@@ -750,7 +789,7 @@ const ChatWindow = () => {
                   variant="caption"
                   sx={{
                     ml: 1,
-                    color: '#6b7280',
+                    color: CHAT_THEME.textSecondary,
                     fontSize: '0.75rem',
                     fontStyle: 'italic',
                   }}
@@ -798,7 +837,7 @@ const ChatWindow = () => {
                     component="span"
                     variant="caption"
                     sx={{
-                      bgcolor: isOwnMessage ? 'rgba(0, 198, 167, 0.1)' : CHAT_THEME.cardBg,
+                      bgcolor: isOwnMessage ? CHAT_THEME.ownMessageBg : CHAT_THEME.cardBg,
                       px: 1,
                       py: 0.25,
                       borderRadius: '8px',
@@ -898,7 +937,7 @@ const ChatWindow = () => {
           zIndex: 10,
           display: 'flex',
           flexDirection: 'column',
-          bgcolor: '#f7f7fa',
+          bgcolor: CHAT_THEME.background,
           overflow: 'hidden',
           minHeight: 0,
           pt: '72px',
@@ -910,12 +949,12 @@ const ChatWindow = () => {
           sx={{
             p: 2,
             mb: 0,
-            bgcolor: '#fff',
+            bgcolor: CHAT_THEME.cardBg,
             borderRadius: '0 0 16px 16px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            borderBottom: '1px solid #e0e0e0',
+            borderBottom: '1px solid ${CHAT_THEME.border}',
             boxShadow: 'none',
           }}
         >
@@ -1008,7 +1047,7 @@ const ChatWindow = () => {
           zIndex: 10,
           display: 'flex',
           flexDirection: 'column',
-          bgcolor: '#ffffff',
+          bgcolor: CHAT_THEME.background,
           overflow: 'hidden',
           minHeight: 0,
           pt: '72px',
@@ -1034,7 +1073,7 @@ const ChatWindow = () => {
         zIndex: 10,
         display: 'flex',
         flexDirection: 'column',
-        bgcolor: '#fafafa',
+        bgcolor: CHAT_THEME.background,
         overflow: 'hidden',
         minHeight: 0,
         pt: `${NAVBAR_H}px`,
@@ -1069,7 +1108,7 @@ const ChatWindow = () => {
             width: '8px',
           },
           '&::-webkit-scrollbar-track': {
-            background: 'rgba(0, 0, 0, 0.02)',
+            background: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
             borderRadius: '10px',
           },
           '&::-webkit-scrollbar-thumb': {
@@ -1132,7 +1171,7 @@ const ChatWindow = () => {
           bottom: 0,
           left: 0,
           right: 0,
-          background: '#fafafa',
+          background: CHAT_THEME.cardBg,
           zIndex: 20,
           pt: 2,
           pb: { xs: 'max(env(safe-area-inset-bottom), 12px)', sm: 2 },
@@ -1145,7 +1184,7 @@ const ChatWindow = () => {
             sx={{
               p: 1.5,
               mb: 1.5,
-              bgcolor: '#f0fdf4',
+              bgcolor: CHAT_THEME.ownMessageBg,
               borderRadius: '8px',
               border: `2px solid ${CHAT_THEME.border}`,
               position: 'relative',
@@ -1367,7 +1406,7 @@ const ChatWindow = () => {
               {emojiPickerComponent && emojiData ? (
                 React.createElement(emojiPickerComponent, {
                   data: emojiData,
-                  theme: 'light',
+                  theme: theme === 'dark' ? 'dark' : 'light',
                   onEmojiSelect: (emoji: EmojiSelectData) => {
                     setNewMessage((prev) => prev + (emoji?.native || ''));
                     setShowEmojiPicker(false);
@@ -1486,14 +1525,18 @@ const ChatWindow = () => {
               width: { xs: 40, sm: 44 },
               height: { xs: 40, sm: 44 },
               borderRadius: '8px',
-              background: canSendMessage && !sendingMessage ? CHAT_THEME.primary : '#e5e7eb',
-              color: canSendMessage && !sendingMessage ? '#ffffff' : '#9ca3af',
+              background:
+                canSendMessage && !sendingMessage ? CHAT_THEME.primary : CHAT_THEME.disabledBg,
+              color: canSendMessage && !sendingMessage ? '#ffffff' : CHAT_THEME.disabledText,
               '&:hover': {
-                background: canSendMessage && !sendingMessage ? CHAT_THEME.primaryHover : '#d1d5db',
+                background:
+                  canSendMessage && !sendingMessage
+                    ? CHAT_THEME.primaryHover
+                    : CHAT_THEME.disabledHover,
               },
               '&:disabled': {
-                background: '#e5e7eb',
-                color: '#9ca3af',
+                background: CHAT_THEME.disabledBg,
+                color: CHAT_THEME.disabledText,
               },
               transition: 'background 0.2s ease',
             }}
@@ -1515,8 +1558,10 @@ const ChatWindow = () => {
         PaperProps={{
           sx: {
             borderRadius: '8px',
-            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
+            boxShadow: CHAT_THEME.menuShadow,
             border: `2px solid ${CHAT_THEME.border}`,
+            bgcolor: CHAT_THEME.cardBg,
+            color: CHAT_THEME.textPrimary,
             minWidth: 120,
           },
         }}
@@ -1569,7 +1614,7 @@ const ChatWindow = () => {
                   mx: 0.5,
                   my: 0.25,
                   '&:hover': {
-                    backgroundColor: '#fef2f2',
+                    backgroundColor: CHAT_THEME.dangerHover,
                   },
                 }}
               >

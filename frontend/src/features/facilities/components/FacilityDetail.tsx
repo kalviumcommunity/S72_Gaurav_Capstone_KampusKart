@@ -28,7 +28,7 @@ export const FacilityDetail: React.FC<FacilityDetailProps> = ({
           facility.images.map((img, idx) => (
             <div
               key={idx}
-              className={`relative overflow-hidden rounded-xl border-2 border-gray-100 cursor-zoom-in group ${
+              className={`relative overflow-hidden rounded-xl border-2 border-gray-100 dark:border-gray-700 cursor-zoom-in group ${
                 facility.images?.length === 1 ? 'md:col-span-2 aspect-video' : 'aspect-square'
               }`}
               onClick={() => setZoomedImage(img.url ?? null)}
@@ -41,13 +41,13 @@ export const FacilityDetail: React.FC<FacilityDetailProps> = ({
             </div>
           ))
         ) : (
-          <div className="md:col-span-2 aspect-video bg-gray-50 rounded-xl flex flex-col items-center justify-center border-2 border-dashed border-gray-200">
+          <div className="md:col-span-2 aspect-video bg-gray-50 dark:bg-gray-800 rounded-xl flex flex-col items-center justify-center border-2 border-dashed border-gray-200 dark:border-gray-700">
             <div
-              className={`p-6 rounded-2xl bg-white shadow-sm mb-4 ${iconOption?.color || 'text-gray-400'}`}
+              className={`p-6 rounded-2xl bg-white dark:bg-gray-900 shadow-sm mb-4 ${iconOption?.color || 'text-gray-400 dark:text-gray-500'}`}
             >
               {iconOption?.icon || <MdSchool className="w-16 h-16" />}
             </div>
-            <span className="text-gray-400 font-medium">No gallery images</span>
+            <span className="text-gray-400 dark:text-gray-500 font-medium">No gallery images</span>
           </div>
         )}
       </div>
@@ -56,46 +56,55 @@ export const FacilityDetail: React.FC<FacilityDetailProps> = ({
       <div className="space-y-6">
         <div>
           <div className="flex flex-wrap items-center gap-3 mb-4">
-            <span className="px-4 py-1.5 rounded-full bg-teal-50 text-[#00C6A7] text-xs font-bold uppercase tracking-wider border border-teal-100 flex items-center gap-2">
+            <span className="px-4 py-1.5 rounded-full bg-teal-50 dark:bg-teal-900/30 text-[#00C6A7] dark:text-teal-300 text-xs font-bold uppercase tracking-wider border border-teal-100 dark:border-teal-800 flex items-center gap-2">
               <FiTag /> {facility.type}
             </span>
-            <span className="px-4 py-1.5 rounded-full bg-blue-50 text-blue-600 text-xs font-bold uppercase tracking-wider border border-blue-100 flex items-center gap-2">
+
+            <span className="px-4 py-1.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 text-xs font-bold uppercase tracking-wider border border-blue-100 dark:border-blue-800 flex items-center gap-2">
               <FiMapPin /> {facility.location}
             </span>
           </div>
-          <h2 className="text-4xl font-extrabold text-gray-900 leading-tight mb-2">
+
+          <h2 className="text-4xl font-extrabold text-gray-900 dark:text-white leading-tight mb-2">
             {facility.name}
           </h2>
+
           {facility.createdAt && (
-            <div className="flex items-center text-gray-400 text-sm font-medium">
+            <div className="flex items-center text-gray-400 dark:text-gray-500 text-sm font-medium">
               <FiCalendar className="mr-2" />
               <span>
                 Added on{' '}
-                {new Date(facility.createdAt).toLocaleDateString('en-US', { dateStyle: 'long' })}
+                {new Date(facility.createdAt).toLocaleDateString('en-US', {
+                  dateStyle: 'long',
+                })}
               </span>
             </div>
           )}
         </div>
 
-        <div className="bg-gray-50 p-8 rounded-3xl border-2 border-gray-100">
-          <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2 mb-4">
-            <FiFileText className="text-[#00C6A7]" /> About this Facility
+        <div className="bg-gray-50 dark:bg-gray-800 p-8 rounded-3xl border-2 border-gray-100 dark:border-gray-700">
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-4">
+            <FiFileText className="text-[#00C6A7] dark:text-teal-400" />
+            About this Facility
           </h3>
-          <p className="text-gray-600 leading-relaxed text-lg whitespace-pre-wrap">
+
+          <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-lg whitespace-pre-wrap">
             {facility.description}
           </p>
         </div>
 
         {facility.createdBy && (
-          <div className="flex items-center gap-4 p-6 bg-white rounded-2xl border-2 border-gray-100">
-            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+          <div className="flex items-center gap-4 p-6 bg-white dark:bg-gray-900 rounded-2xl border-2 border-gray-100 dark:border-gray-700">
+            <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-400 dark:text-gray-500">
               <FiUser className="w-6 h-6" />
             </div>
+
             <div>
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+              <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
                 Contributed By
               </p>
-              <p className="text-gray-900 font-bold">
+
+              <p className="text-gray-900 dark:text-white font-bold">
                 {facility.createdBy.name || facility.createdBy.email}
               </p>
             </div>
@@ -105,16 +114,17 @@ export const FacilityDetail: React.FC<FacilityDetailProps> = ({
 
       {/* Admin Actions */}
       {isAdmin && (
-        <div className="flex flex-wrap gap-4 pt-6 border-t-2 border-gray-100">
+        <div className="flex flex-wrap gap-4 pt-6 border-t-2 border-gray-100 dark:border-gray-700">
           <button
             onClick={() => onEdit(facility)}
-            className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-[#181818] text-white rounded-xl font-bold hover:bg-[#00C6A7] transition-all shadow-lg shadow-gray-100"
+            className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-[#181818] dark:bg-[#00C6A7] text-white rounded-xl font-bold hover:bg-[#00C6A7] dark:hover:bg-[#00b095] transition-all shadow-lg shadow-gray-100 dark:shadow-none"
           >
             <FiEdit2 /> Edit Facility
           </button>
+
           <button
             onClick={() => onDelete(facility._id)}
-            className="flex-none px-6 py-4 bg-white text-red-600 border-2 border-red-200 rounded-xl font-bold hover:bg-red-50 transition-all"
+            className="flex-none px-6 py-4 bg-white dark:bg-gray-900 text-red-600 dark:text-red-400 border-2 border-red-200 dark:border-red-900 rounded-xl font-bold hover:bg-red-50 dark:hover:bg-red-950/30 transition-all"
           >
             <FiTrash2 className="w-5 h-5" />
           </button>

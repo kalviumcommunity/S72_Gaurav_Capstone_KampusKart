@@ -70,7 +70,7 @@ export const FeatureModal: React.FC<FeatureModalProps> = ({
       'input:not([disabled])',
       'select:not([disabled])',
       'textarea:not([disabled])',
-      '[tabindex]:not([tabindex="-1"])'
+      '[tabindex]:not([tabindex="-1"])',
     ].join(',');
 
     const getFocusable = () => Array.from(root.querySelectorAll<HTMLElement>(selector));
@@ -120,7 +120,7 @@ export const FeatureModal: React.FC<FeatureModalProps> = ({
   };
 
   return (
-    <div 
+    <div
       className="fixed inset-0 bg-black/60 flex items-end sm:items-center justify-center z-[9999] p-0 sm:p-4"
       onClick={handleBackdropClick}
       role="dialog"
@@ -131,11 +131,8 @@ export const FeatureModal: React.FC<FeatureModalProps> = ({
     >
       <div
         ref={sheetRef}
-        className={`bg-white sm:rounded-xl rounded-t-xl shadow-2xl border-2 border-gray-200 p-4 sm:p-6 md:p-8 ${sizeClasses[size]} w-full mx-auto overflow-y-auto relative`}
+        className={`bg-white dark:bg-gray-950 sm:rounded-xl rounded-t-xl shadow-2xl border-2 border-gray-200 dark:border-gray-800 p-4 sm:p-6 md:p-8 ${sizeClasses[size]} w-full mx-auto overflow-y-auto relative`}
         style={{
-          colorScheme: 'light',
-          backgroundColor: '#ffffff',
-          color: '#213547',
           maxHeight: 'min(95vh, 95dvh)',
           transform: `translateY(${sheetOffsetY}px)`,
           transition: sheetOffsetY === 0 ? 'transform 220ms ease' : 'none',
@@ -162,10 +159,13 @@ export const FeatureModal: React.FC<FeatureModalProps> = ({
           touchStartYRef.current = null;
         }}
       >
-        <div className="sm:hidden w-10 h-1 rounded-full bg-gray-300 mx-auto mb-4" aria-hidden="true" />
+        <div
+          className="sm:hidden w-10 h-1 rounded-full bg-gray-300 dark:bg-gray-700 mx-auto mb-4"
+          aria-hidden="true"
+        />
         {/* Header */}
-        <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
-          <h2 id={titleId} className="text-xl sm:text-2xl font-bold text-gray-900">
+        <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200 dark:border-gray-800">
+          <h2 id={titleId} className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
             {title}
           </h2>
           <button
@@ -185,11 +185,8 @@ export const FeatureModal: React.FC<FeatureModalProps> = ({
         )}
 
         {/* Content */}
-        <div className="modal-content">
-          {children}
-        </div>
+        <div className="modal-content">{children}</div>
       </div>
     </div>
   );
 };
-

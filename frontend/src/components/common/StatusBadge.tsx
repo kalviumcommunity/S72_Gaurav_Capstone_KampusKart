@@ -21,12 +21,12 @@ interface StatusBadgeProps {
 /**
  * Reusable status badge component with consistent styling
  */
-export const StatusBadge: React.FC<StatusBadgeProps> = ({ 
-  status, 
+export const StatusBadge: React.FC<StatusBadgeProps> = ({
+  status,
   type = 'event',
-  className = '' 
+  className = '',
 }) => {
-  let colorClass = 'bg-gray-100 text-gray-800';
+  let colorClass = 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200';
 
   switch (type) {
     case 'event':
@@ -50,7 +50,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
   }
 
   return (
-    <span 
+    <span
       className={`text-xs px-3 py-1.5 rounded-lg font-medium ${colorClass} ${className}`}
       role="status"
     >
