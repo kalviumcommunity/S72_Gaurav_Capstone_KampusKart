@@ -5,8 +5,7 @@ const BackToTop: React.FC = () => {
 
   useEffect(() => {
     const toggleVisibility = () => {
-      const scrollTop =
-        document.documentElement.scrollTop || document.body.scrollTop;
+      const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
 
       setVisible(scrollTop > 300);
     };
@@ -36,7 +35,7 @@ const BackToTop: React.FC = () => {
     <button
       onClick={scrollToTop}
       aria-label="Back to top"
-      className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-[9999] bg-[#00C6A7] text-white px-4 py-2 rounded-full shadow-lg hover:bg-[#00b095] hover:scale-105 transition"
+      className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-[9999] bg-[#00C6A7] dark:bg-[#00A58C] text-white px-4 py-2 rounded-full shadow-lg shadow-gray-300 dark:shadow-black/40 hover:bg-[#00b095] dark:hover:bg-[#00C6A7] hover:scale-105 transition"
     >
       ↑
     </button>

@@ -92,19 +92,19 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
     : `PNG, JPG, GIF up to ${maxSizeMB}MB each. Add clear images to help illustrate.`;
 
   return (
-    <div className="bg-gray-50 rounded-lg p-6" style={{ colorScheme: 'light', backgroundColor: '#f9fafb' }}>
-      <h3 className="text-lg font-bold mb-4 text-gray-900 flex items-center gap-2">
+    <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-6">
+      <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-white flex items-center gap-2">
         {label} {!single && `(Optional, Max ${maxImages})`}
       </h3>
-      <label className="block text-sm font-medium text-gray-700 mb-1">
+      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
         {single ? 'Image' : 'Images'}
       </label>
-      <div className="mt-1 flex justify-center px-4 pt-4 pb-5 sm:px-6 sm:pt-5 sm:pb-6 border-2 border-gray-200 rounded-md">
+      <div className="mt-1 flex justify-center px-4 pt-4 pb-5 sm:px-6 sm:pt-5 sm:pb-6 border-2 border-gray-200 dark:border-gray-800 rounded-md">
         <div className="space-y-1 text-center">
-          <div className="flex text-sm text-gray-600">
+          <div className="flex text-sm text-gray-600 dark:text-gray-400">
             <label
               htmlFor={id}
-              className={`relative cursor-pointer bg-white rounded-md font-medium text-[#3FA9F6] hover:text-blue-500 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500 ${
+              className={`relative cursor-pointer bg-white dark:bg-gray-950 rounded-md font-medium text-[#3FA9F6] hover:text-blue-500 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500 ${
                 disabled || isMaxReached ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
@@ -122,19 +122,21 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
             </label>
             <p className="pl-1">or drag and drop</p>
           </div>
-          <p className="text-xs text-gray-500">{helpText || defaultHelpText}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{helpText || defaultHelpText}</p>
         </div>
       </div>
 
       {/* Image Previews */}
       {images.length > 0 && (
-        <div className={`mt-4 grid gap-2 ${single ? 'grid-cols-1' : 'grid-cols-2 xs:grid-cols-3 sm:grid-cols-4'}`}>
+        <div
+          className={`mt-4 grid gap-2 ${single ? 'grid-cols-1' : 'grid-cols-2 xs:grid-cols-3 sm:grid-cols-4'}`}
+        >
           {images.map((image, index) => (
             <div key={index} className="relative group">
               <img
                 src={image.previewUrl || image.url}
                 alt={`Preview ${index + 1}`}
-                className={`${single ? 'h-48 w-full' : 'h-24 w-full sm:h-28'} object-cover rounded-lg border-2 border-gray-200`}
+                className={`${single ? 'h-48 w-full' : 'h-24 w-full sm:h-28'} object-cover rounded-lg border-2 border-gray-200 dark:border-gray-800`}
               />
               <button
                 type="button"
@@ -151,4 +153,3 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
     </div>
   );
 };
-

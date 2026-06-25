@@ -25,10 +25,9 @@ class ErrorBoundary extends Component<Props, State> {
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log error to console and any error reporting service
     console.error('ErrorBoundary caught an error:', error, errorInfo);
-    
     this.setState({
       error,
-      errorInfo
+      errorInfo,
     });
 
     // You can also log the error to an error reporting service here
@@ -38,53 +37,55 @@ class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       // You can render any custom fallback UI
-      return this.props.fallback || (
-        <div className="min-h-screen flex items-center justify-center bg-white">
-          <div className="max-w-md w-full bg-white border-2 border-gray-200 rounded-lg p-6">
-            <div className="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full">
-              <svg
-                className="w-6 h-6 text-red-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
-                />
-              </svg>
-            </div>
-            <div className="mt-4 text-center">
-              <h3 className="text-lg font-medium text-gray-900">
-                Something went wrong
-              </h3>
-              <p className="mt-2 text-sm text-gray-500">
-                We're sorry, but something unexpected happened. Please try refreshing the page.
-              </p>
-              <div className="mt-4">
-                <button
-                  onClick={() => window.location.reload()}
-                  className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg text-white bg-[#181818] hover:bg-[#00C6A7] active:bg-[#181818] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00C6A7]"
+      return (
+        this.props.fallback || (
+          <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950">
+            <div className="max-w-md w-full bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-800 rounded-lg p-6">
+              <div className="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full">
+                <svg
+                  className="w-6 h-6 text-red-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  Refresh Page
-                </button>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                  />
+                </svg>
               </div>
-              {import.meta.env.DEV && this.state.error && (
-                <details className="mt-4 text-left">
-                  <summary className="cursor-pointer text-sm text-gray-600">
-                    Error Details (Development)
-                  </summary>
-                  <pre className="mt-2 text-xs text-red-600 bg-red-50 p-2 rounded overflow-auto">
-                    {this.state.error.toString()}
-                    {this.state.errorInfo?.componentStack}
-                  </pre>
-                </details>
-              )}
+              <div className="mt-4 text-center">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                  Something went wrong
+                </h3>
+                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                  We're sorry, but something unexpected happened. Please try refreshing the page.
+                </p>
+                <div className="mt-4">
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg text-white bg-[#181818] hover:bg-[#00C6A7] active:bg-[#181818] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00C6A7]"
+                  >
+                    Refresh Page
+                  </button>
+                </div>
+                {import.meta.env.DEV && this.state.error && (
+                  <details className="mt-4 text-left">
+                    <summary className="cursor-pointer text-sm text-gray-600 dark:text-gray-400">
+                      Error Details (Development)
+                    </summary>
+                    <pre className="mt-2 text-xs text-red-600 bg-red-50 dark:bg-red-950/30 p-2 rounded overflow-auto">
+                      {this.state.error.toString()}
+                      {this.state.errorInfo?.componentStack}
+                    </pre>
+                  </details>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        )
       );
     }
 
@@ -92,4 +93,4 @@ class ErrorBoundary extends Component<Props, State> {
   }
 }
 
-export default ErrorBoundary; 
+export default ErrorBoundary;

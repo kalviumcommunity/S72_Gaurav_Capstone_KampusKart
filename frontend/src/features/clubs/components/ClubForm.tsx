@@ -100,20 +100,22 @@ export const ClubForm: React.FC<ClubFormProps> = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
-      <div className="border-2 border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-bold mb-4 text-gray-900 flex items-center gap-2">
-          Recruitment Details <FiInfo className="text-gray-400" />
+      <div className="border-2 border-gray-200 dark:border-gray-800 dark:border-gray-800 rounded-lg p-6">
+        <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-white flex items-center gap-2">
+          Recruitment Details <FiInfo className="text-gray-400 dark:text-gray-500" />
         </h3>
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Title *</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                Title *
+              </label>
               <input
                 type="text"
                 value={formData.title}
                 onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
-                className={`w-full px-4 py-3 rounded-lg border-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] transition-all ${
-                  fieldErrors.title ? 'border-red-500' : 'border-gray-200'
+                className={`w-full px-4 py-3 rounded-lg border-2 bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] transition-all ${
+                  fieldErrors.title ? 'border-red-500' : 'border-gray-200 dark:border-gray-800'
                 }`}
                 placeholder="e.g. Drama Club 2024 Intake"
               />
@@ -122,13 +124,15 @@ export const ClubForm: React.FC<ClubFormProps> = ({
               )}
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Club Name *</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                Club Name *
+              </label>
               <input
                 type="text"
                 value={formData.clubName}
                 onChange={(e) => setFormData((prev) => ({ ...prev, clubName: e.target.value }))}
-                className={`w-full px-4 py-3 rounded-lg border-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] transition-all ${
-                  fieldErrors.clubName ? 'border-red-500' : 'border-gray-200'
+                className={`w-full px-4 py-3 rounded-lg border-2 bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] transition-all ${
+                  fieldErrors.clubName ? 'border-red-500' : 'border-gray-200 dark:border-gray-800'
                 }`}
                 placeholder="Which club is recruiting?"
               />
@@ -140,13 +144,15 @@ export const ClubForm: React.FC<ClubFormProps> = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Start Date *</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                Start Date *
+              </label>
               <input
                 type="date"
                 value={formData.startDate}
                 onChange={(e) => setFormData((prev) => ({ ...prev, startDate: e.target.value }))}
-                className={`w-full px-4 py-3 rounded-lg border-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] transition-all ${
-                  fieldErrors.startDate ? 'border-red-500' : 'border-gray-200'
+                className={`w-full px-4 py-3 rounded-lg border-2 bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] transition-all ${
+                  fieldErrors.startDate ? 'border-red-500' : 'border-gray-200 dark:border-gray-800'
                 }`}
               />
               {fieldErrors.startDate && (
@@ -154,13 +160,15 @@ export const ClubForm: React.FC<ClubFormProps> = ({
               )}
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">End Date *</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                End Date *
+              </label>
               <input
                 type="date"
                 value={formData.endDate}
                 onChange={(e) => setFormData((prev) => ({ ...prev, endDate: e.target.value }))}
-                className={`w-full px-4 py-3 rounded-lg border-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] transition-all ${
-                  fieldErrors.endDate ? 'border-red-500' : 'border-gray-200'
+                className={`w-full px-4 py-3 rounded-lg border-2 bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] transition-all ${
+                  fieldErrors.endDate ? 'border-red-500' : 'border-gray-200 dark:border-gray-800'
                 }`}
               />
               {fieldErrors.endDate && (
@@ -170,13 +178,15 @@ export const ClubForm: React.FC<ClubFormProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">Description *</label>
+            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+              Description *
+            </label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
               rows={4}
-              className={`w-full px-4 py-3 rounded-lg border-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] transition-all ${
-                fieldErrors.description ? 'border-red-500' : 'border-gray-200'
+              className={`w-full px-4 py-3 rounded-lg border-2 bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] transition-all ${
+                fieldErrors.description ? 'border-red-500' : 'border-gray-200 dark:border-gray-800'
               }`}
               placeholder="Requirements, process, highlights..."
             />
@@ -187,13 +197,15 @@ export const ClubForm: React.FC<ClubFormProps> = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Form URL *</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                Form URL *
+              </label>
               <input
                 type="url"
                 value={formData.formUrl}
                 onChange={(e) => setFormData((prev) => ({ ...prev, formUrl: e.target.value }))}
-                className={`w-full px-4 py-3 rounded-lg border-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] transition-all ${
-                  fieldErrors.formUrl ? 'border-red-500' : 'border-gray-200'
+                className={`w-full px-4 py-3 rounded-lg border-2 bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] transition-all ${
+                  fieldErrors.formUrl ? 'border-red-500' : 'border-gray-200 dark:border-gray-800'
                 }`}
                 placeholder="https://forms.gle/..."
               />
@@ -202,13 +214,15 @@ export const ClubForm: React.FC<ClubFormProps> = ({
               )}
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Status</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                Status
+              </label>
               <select
                 value={formData.status}
                 onChange={(e) =>
                   setFormData((prev) => ({ ...prev, status: e.target.value as Club['status'] }))
                 }
-                className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#00C6A7]"
+                className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00C6A7]"
               >
                 <option value="Open">Open</option>
                 <option value="Closed">Closed</option>
@@ -218,8 +232,8 @@ export const ClubForm: React.FC<ClubFormProps> = ({
         </div>
       </div>
 
-      <div className="border-2 border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-bold mb-4 text-gray-900 flex items-center gap-2">
+      <div className="border-2 border-gray-200 dark:border-gray-800 rounded-lg p-6">
+        <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-white flex items-center gap-2">
           Contact Person
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -232,7 +246,7 @@ export const ClubForm: React.FC<ClubFormProps> = ({
                 contactInfo: { ...prev.contactInfo, name: e.target.value },
               }))
             }
-            className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-[#00C6A7] outline-none"
+            className="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-800 rounded-lg focus:ring-2 focus:ring-[#00C6A7] outline-none"
             placeholder="Name"
           />
           <input
@@ -244,7 +258,7 @@ export const ClubForm: React.FC<ClubFormProps> = ({
                 contactInfo: { ...prev.contactInfo, email: e.target.value },
               }))
             }
-            className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-[#00C6A7] outline-none"
+            className="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-800 rounded-lg focus:ring-2 focus:ring-[#00C6A7] outline-none"
             placeholder="Email"
           />
           <input
@@ -256,14 +270,14 @@ export const ClubForm: React.FC<ClubFormProps> = ({
                 contactInfo: { ...prev.contactInfo, phone: e.target.value },
               }))
             }
-            className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-[#00C6A7] outline-none"
+            className="w-full px-4 py-2 border-2 border-gray-200 dark:border-gray-800 rounded-lg focus:ring-2 focus:ring-[#00C6A7] outline-none"
             placeholder="Phone"
           />
         </div>
       </div>
 
-      <div className="border-2 border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-bold mb-4 text-gray-900">Banner Image</h3>
+      <div className="border-2 border-gray-200 dark:border-gray-800 rounded-lg p-6">
+        <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-white">Banner Image</h3>
         <ImageUpload images={images} onImagesChange={setImages} maxImages={3} />
       </div>
 
@@ -273,7 +287,7 @@ export const ClubForm: React.FC<ClubFormProps> = ({
         </div>
       )}
 
-      <div className="flex justify-end gap-4 pt-4 border-t-2 border-gray-200">
+      <div className="flex justify-end gap-4 pt-4 border-t-2 border-gray-200 dark:border-gray-800">
         <button
           type="submit"
           disabled={isSubmitting}

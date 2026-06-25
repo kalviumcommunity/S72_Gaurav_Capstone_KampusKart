@@ -149,12 +149,12 @@ const News = () => {
   });
 
   return (
-    <div className="min-h-screen bg-white font-sans">
+    <div className="min-h-screen bg-white dark:bg-gray-900 font-sans">
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
         <SuccessMessage message={successMessage} onDismiss={() => setSuccessMessage(null)} />
 
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
-          <h1 className="text-h2 font-extrabold text-black">Campus News</h1>
+          <h1 className="text-h2 font-extrabold text-black dark:text-white">Campus News</h1>
           {user?.isAdmin && (
             <button
               onClick={openAddModal}
@@ -176,7 +176,7 @@ const News = () => {
         />
 
         {fetchError && (
-          <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg font-medium border-2 border-red-100">
+          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 rounded-lg font-medium border-2 border-red-100 dark:border-red-800">
             {fetchError}
           </div>
         )}
@@ -185,8 +185,8 @@ const News = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredNews.length === 0 ? (
             <div className="col-span-full flex flex-col items-center justify-center py-20 text-center">
-              <p className="text-xl font-bold text-gray-700">No news found</p>
-              <p className="text-gray-400 text-sm mt-2">
+              <p className="text-xl font-bold text-gray-700 dark:text-gray-200">No news found</p>
+              <p className="text-gray-400 dark:text-gray-500 text-sm mt-2">
                 Try adjusting your filters or search terms.
               </p>
             </div>
@@ -240,21 +240,23 @@ const News = () => {
 
           {modalType === 'delete' && (
             <div className="p-6 text-center">
-              <h3 className="text-xl font-bold mb-4">Delete News Item?</h3>
-              <p className="text-gray-600 mb-8">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                Delete News Item?
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-8">
                 Are you sure you want to delete &quot;{selectedNews?.title}&quot;? This action
                 cannot be undone.
               </p>
               <div className="flex justify-center gap-4">
                 <button
                   onClick={closeModal}
-                  className="px-6 py-2 border-2 border-gray-200 rounded-lg font-bold"
+                  className="px-6 py-2 border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg font-bold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleDelete}
-                  className="px-6 py-2 bg-red-600 text-white rounded-lg font-bold"
+                  className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold transition-colors"
                 >
                   Delete News
                 </button>

@@ -151,16 +151,16 @@ const Facilities = () => {
   });
 
   return (
-    <div className="min-h-screen bg-white font-sans">
+    <div className="min-h-screen bg-white dark:bg-gray-950 font-sans">
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
         <SuccessMessage message={successMessage} onDismiss={() => setSuccessMessage(null)} />
 
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
-          <h1 className="text-h2 font-extrabold text-black">Campus Facilities</h1>
+          <h1 className="text-h2 font-extrabold text-black dark:text-white">Campus Facilities</h1>
           {user?.isAdmin && (
             <button
               onClick={openAddModal}
-              className="flex items-center gap-2 px-6 py-3 rounded-lg bg-[#181818] text-white font-bold text-lg hover:bg-[#00C6A7] transition-colors"
+              className="flex items-center gap-2 px-6 py-3 rounded-lg bg-[#181818] dark:bg-[#00C6A7] text-white font-bold text-lg hover:bg-[#00C6A7] dark:hover:bg-[#00b095] transition-colors"
             >
               + Add Facility
             </button>
@@ -178,7 +178,7 @@ const Facilities = () => {
         />
 
         {fetchError && (
-          <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg font-medium border-2 border-red-100">
+          <div className="mb-6 p-4 bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-300 rounded-lg font-medium border-2 border-red-100 dark:border-red-900">
             {fetchError}
           </div>
         )}
@@ -187,8 +187,10 @@ const Facilities = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredFacilities.length === 0 ? (
             <div className="col-span-full flex flex-col items-center justify-center py-20 text-center">
-              <p className="text-xl font-bold text-gray-700">No facilities found</p>
-              <p className="text-gray-400 text-sm mt-2">
+              <p className="text-xl font-bold text-gray-700 dark:text-gray-200">
+                No facilities found
+              </p>
+              <p className="text-gray-400 dark:text-gray-500 text-sm mt-2">
                 Try adjusting your filters or search terms.
               </p>
             </div>
@@ -242,21 +244,23 @@ const Facilities = () => {
 
           {modalType === 'delete' && (
             <div className="p-6 text-center">
-              <h3 className="text-xl font-bold mb-4">Delete Facility?</h3>
-              <p className="text-gray-600 mb-8">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                Delete Facility?
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-8">
                 Are you sure you want to delete &quot;{selectedFacility?.name}&quot;? This action
                 cannot be undone.
               </p>
               <div className="flex justify-center gap-4">
                 <button
                   onClick={closeModal}
-                  className="px-6 py-2 border-2 border-gray-200 rounded-lg font-bold"
+                  className="px-6 py-2 border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg font-bold"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleDelete}
-                  className="px-6 py-2 bg-red-600 text-white rounded-lg font-bold"
+                  className="px-6 py-2 bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 text-white rounded-lg font-bold"
                 >
                   Delete Facility
                 </button>

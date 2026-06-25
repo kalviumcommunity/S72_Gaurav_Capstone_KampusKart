@@ -87,20 +87,22 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
-      <div className="border-2 border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-bold mb-4 text-gray-900 flex items-center gap-2">
-          Facility Details <FiInfo className="text-gray-400" />
+      <div className="border-2 border-gray-200 dark:border-gray-700 rounded-lg p-6 bg-white dark:bg-gray-900">
+        <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100 flex items-center gap-2">
+          Facility Details <FiInfo className="text-gray-400 dark:text-gray-500" />
         </h3>
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Name *</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                Name *
+              </label>
               <input
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
                 onBlur={(e) => handleBlur('name', e.target.value)}
-                className={`w-full px-4 py-3 rounded-lg border-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] transition-all ${
+                className={`w-full px-4 py-3 rounded-lg border-2 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] transition-all ${
                   fieldErrors.name ? 'border-red-500' : 'border-gray-200'
                 }`}
                 placeholder="e.g. Main Library"
@@ -110,13 +112,15 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({
               )}
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Location *</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                Location *
+              </label>
               <input
                 type="text"
                 value={formData.location}
                 onChange={(e) => setFormData((prev) => ({ ...prev, location: e.target.value }))}
                 onBlur={(e) => handleBlur('location', e.target.value)}
-                className={`w-full px-4 py-3 rounded-lg border-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] transition-all ${
+                className={`w-full px-4 py-3 rounded-lg border-2 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] transition-all ${
                   fieldErrors.location ? 'border-red-500' : 'border-gray-200'
                 }`}
                 placeholder="e.g. Block A, 1st Floor"
@@ -128,13 +132,15 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">Description *</label>
+            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+              Description *
+            </label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
               onBlur={(e) => handleBlur('description', e.target.value)}
               rows={3}
-              className={`w-full px-4 py-3 rounded-lg border-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] transition-all ${
+              className={`w-full px-4 py-3 rounded-lg border-2 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] transition-all ${
                 fieldErrors.description ? 'border-red-500' : 'border-gray-200'
               }`}
               placeholder="Tell us more about this facility..."
@@ -146,13 +152,15 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Type</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                Type
+              </label>
               <select
                 value={formData.type}
                 onChange={(e) =>
                   setFormData((prev) => ({ ...prev, type: e.target.value as Facility['type'] }))
                 }
-                className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#00C6A7]"
+                className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#00C6A7]"
               >
                 <option value="Academic">Academic</option>
                 <option value="Food">Food</option>
@@ -161,11 +169,13 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Primary Icon</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                Primary Icon
+              </label>
               <select
                 value={formData.icon}
                 onChange={(e) => setFormData((prev) => ({ ...prev, icon: e.target.value }))}
-                className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#00C6A7]"
+                className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#00C6A7]"
               >
                 {ICON_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -177,7 +187,7 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-3">
+            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">
               Choose Icon Representation
             </label>
             <div className="grid grid-cols-5 sm:grid-cols-10 gap-3">
@@ -189,7 +199,7 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({
                   className={`p-3 rounded-xl border-2 transition-all duration-200 flex items-center justify-center ${
                     formData.icon === opt.value
                       ? 'border-[#00C6A7] bg-[#00C6A7] text-white shadow-lg shadow-teal-100 scale-110'
-                      : 'border-gray-100 bg-white text-gray-400 hover:border-gray-200 hover:text-gray-600'
+                      : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-600 dark:hover:text-gray-300'
                   }`}
                   title={opt.label}
                 >
@@ -201,22 +211,24 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({
         </div>
       </div>
 
-      <div className="border-2 border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-bold mb-4 text-gray-900 flex items-center gap-2">Gallery</h3>
+      <div className="border-2 border-gray-200 dark:border-gray-700 rounded-lg p-6 bg-white dark:bg-gray-900">
+        <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100 flex items-center gap-2">
+          Gallery
+        </h3>
         <ImageUpload images={images} onImagesChange={setImages} maxImages={6} />
       </div>
 
       {formError && (
-        <div className="p-4 bg-red-50 border-2 border-red-100 rounded-lg text-red-700 text-sm font-medium">
+        <div className="p-4 bg-red-50 dark:bg-red-900/20 border-2 border-red-100 dark:border-red-800 rounded-lg text-red-700 dark:text-red-300 text-sm font-medium">
           {formError}
         </div>
       )}
 
-      <div className="flex justify-end gap-4 pt-4 border-t-2 border-gray-200">
+      <div className="flex justify-end gap-4 pt-4 border-t-2 border-gray-200 dark:border-gray-700">
         <button
           type="submit"
           disabled={isSubmitting}
-          className="px-8 py-3 bg-[#181818] text-white font-bold rounded-lg hover:bg-[#00C6A7] transition-colors disabled:opacity-50"
+          className="px-8 py-3 bg-[#181818] dark:bg-[#00C6A7] text-white font-bold rounded-lg hover:bg-[#00C6A7] dark:hover:bg-[#00b095] transition-colors disabled:opacity-50"
         >
           {isSubmitting ? 'Saving...' : facility ? 'Update Facility' : 'Add Facility'}
         </button>

@@ -115,20 +115,22 @@ export const ComplaintForm: React.FC<ComplaintFormProps> = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
-      <div className="border-2 border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-bold mb-4 text-gray-900 flex items-center gap-2">
-          Complaint Details <FiInfo className="text-gray-400" />
+      <div className="border-2 border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 rounded-lg p-6">
+        <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-white flex items-center gap-2">
+          Complaint Details <FiInfo className="text-gray-400 dark:text-gray-500" />
         </h3>
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">Title *</label>
+            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+              Title *
+            </label>
             <input
               type="text"
               value={formData.title}
               onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
               onBlur={(e) => handleBlur('title', e.target.value)}
-              className={`w-full px-4 py-3 rounded-lg border-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] transition-all ${
-                fieldErrors.title ? 'border-red-500' : 'border-gray-200'
+              className={`w-full px-4 py-3 rounded-lg border-2 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] transition-all ${
+                fieldErrors.title ? 'border-red-500' : 'border-gray-200 dark:border-gray-800'
               }`}
               placeholder="Brief summary of the issue"
             />
@@ -138,14 +140,16 @@ export const ComplaintForm: React.FC<ComplaintFormProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">Description *</label>
+            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+              Description *
+            </label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
               onBlur={(e) => handleBlur('description', e.target.value)}
               rows={4}
-              className={`w-full px-4 py-3 rounded-lg border-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] transition-all ${
-                fieldErrors.description ? 'border-red-500' : 'border-gray-200'
+              className={`w-full px-4 py-3 rounded-lg border-2 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] transition-all ${
+                fieldErrors.description ? 'border-red-500' : 'border-gray-200 dark:border-gray-800'
               }`}
               placeholder="Describe the problem in detail..."
             />
@@ -156,7 +160,9 @@ export const ComplaintForm: React.FC<ComplaintFormProps> = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Category</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                Category
+              </label>
               <select
                 value={formData.category}
                 onChange={(e) =>
@@ -165,7 +171,7 @@ export const ComplaintForm: React.FC<ComplaintFormProps> = ({
                     category: e.target.value as Complaint['category'],
                   }))
                 }
-                className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#00C6A7]"
+                className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#00C6A7]"
               >
                 <option value="Academic">Academic</option>
                 <option value="Administrative">Administrative</option>
@@ -176,7 +182,9 @@ export const ComplaintForm: React.FC<ComplaintFormProps> = ({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Department</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                Department
+              </label>
               <select
                 value={formData.department}
                 onChange={(e) =>
@@ -185,7 +193,7 @@ export const ComplaintForm: React.FC<ComplaintFormProps> = ({
                     department: e.target.value as Complaint['department'],
                   }))
                 }
-                className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#00C6A7]"
+                className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#00C6A7]"
               >
                 <option value="Academic Affairs">Academic Affairs</option>
                 <option value="Administration">Administration</option>
@@ -199,7 +207,9 @@ export const ComplaintForm: React.FC<ComplaintFormProps> = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Priority</label>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                Priority
+              </label>
               <select
                 value={formData.priority}
                 onChange={(e) =>
@@ -208,7 +218,7 @@ export const ComplaintForm: React.FC<ComplaintFormProps> = ({
                     priority: e.target.value as Complaint['priority'],
                   }))
                 }
-                className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#00C6A7]"
+                className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#00C6A7]"
               >
                 <option value="Low">Low</option>
                 <option value="Medium">Medium</option>
@@ -218,7 +228,7 @@ export const ComplaintForm: React.FC<ComplaintFormProps> = ({
             </div>
             {isAdmin && complaint && (
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
+                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                   Status (Admin Only)
                 </label>
                 <select
@@ -229,7 +239,7 @@ export const ComplaintForm: React.FC<ComplaintFormProps> = ({
                       status: e.target.value as Complaint['status'],
                     }))
                   }
-                  className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#00C6A7]"
+                  className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#00C6A7]"
                 >
                   <option value="Open">Open</option>
                   <option value="In Progress">In Progress</option>
@@ -243,30 +253,32 @@ export const ComplaintForm: React.FC<ComplaintFormProps> = ({
       </div>
 
       {isAdmin && complaint && formData.status !== complaint.status && (
-        <div className="border-2 border-blue-200 bg-blue-50 rounded-lg p-6">
-          <label className="block text-sm font-bold text-blue-700 mb-2">Status Update Note *</label>
+        <div className="border-2 border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/30 rounded-lg p-6">
+          <label className="block text-sm font-bold text-blue-700 dark:text-blue-300 mb-2">
+            Status Update Note *
+          </label>
           <textarea
             value={formData.statusComment}
             onChange={(e) => setFormData((prev) => ({ ...prev, statusComment: e.target.value }))}
-            className="w-full px-4 py-3 rounded-lg border-2 border-blue-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="w-full px-4 py-3 rounded-lg border-2 border-blue-200 dark:border-blue-900 bg-white dark:bg-gray-950 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
             placeholder="Explain why the status is being changed..."
             rows={3}
           />
         </div>
       )}
 
-      <div className="border-2 border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-bold mb-4 text-gray-900">Images</h3>
+      <div className="border-2 border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 rounded-lg p-6">
+        <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-white">Images</h3>
         <ImageUpload images={images} onImagesChange={setImages} maxImages={3} />
       </div>
 
       {formError && (
-        <div className="p-4 bg-red-50 border-2 border-red-100 rounded-lg text-red-700 text-sm font-medium">
+        <div className="p-4 bg-red-50 dark:bg-red-950/30 border-2 border-red-100 dark:border-red-900 rounded-lg text-red-700 dark:text-red-300 text-sm font-medium">
           {formError}
         </div>
       )}
 
-      <div className="flex justify-end gap-4 pt-4 border-t-2 border-gray-200">
+      <div className="flex justify-end gap-4 pt-4 border-t-2 border-gray-200 dark:border-gray-800">
         <button
           type="submit"
           disabled={isSubmitting}
