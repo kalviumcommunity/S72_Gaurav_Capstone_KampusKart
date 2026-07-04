@@ -122,12 +122,12 @@ Open frontend at `http://localhost:5173`.
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/kalviumcommunity/S72_Gaurav_Capstone_KampusKart.git
+git clone [https://github.com/kalviumcommunity/S72_Gaurav_Capstone_KampusKart.git](https://github.com/kalviumcommunity/S72_Gaurav_Capstone_KampusKart.git)
 cd S72_Gaurav_Capstone_KampusKart
 
 cd frontend && npm install
 cd ../backend && npm install
-
+```
 
 ### Maps Feature Dependencies
 
