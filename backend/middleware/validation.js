@@ -116,7 +116,6 @@ const validateComplaint = [
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log('Validation errors:', errors.array());
       return res.status(400).json({
         message: 'Validation failed',
         details: errors.array().map(err => ({
@@ -151,7 +150,6 @@ const validateLostFoundItem = [
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log('Validation errors:', errors.array());
       return res.status(400).json({
         message: 'Validation failed',
         details: errors.array().map(err => ({
