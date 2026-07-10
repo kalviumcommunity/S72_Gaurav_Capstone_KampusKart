@@ -3,7 +3,7 @@ import axios from 'axios';
 import { API_BASE } from '../config';
 import { AppSkeleton } from '../components/common/AppSkeleton';
 
-interface User {
+export interface User {
   _id: string;
   id: string;
   email: string;

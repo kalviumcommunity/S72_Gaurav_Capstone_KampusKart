@@ -2,11 +2,12 @@ import React from 'react';
 import { FiEdit2, FiTrash2, FiUser, FiCalendar, FiTag } from 'react-icons/fi';
 import { Complaint } from '../types';
 import { UI_PATTERNS } from '../../../theme/uiPatterns';
-import { UpvoteButton } from './UpvoteButton'; // Add this import
+import { UpvoteButton } from './UpvoteButton';
+import { User } from '../../../contexts/AuthContext';
 
 interface ComplaintCardProps {
   complaint: Complaint;
-  currentUser: any;
+  currentUser: User | null;
   onSelect: (complaint: Complaint) => void;
   onEdit: (complaint: Complaint) => void;
   onDelete: (id: string) => void;
