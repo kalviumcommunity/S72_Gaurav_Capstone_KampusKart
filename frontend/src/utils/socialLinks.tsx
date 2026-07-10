@@ -1,4 +1,3 @@
-import React from 'react';
 import { Instagram, Linkedin, Globe, Github } from 'lucide-react';
 
 // Centralised social links for the footer — update here to reflect everywhere
