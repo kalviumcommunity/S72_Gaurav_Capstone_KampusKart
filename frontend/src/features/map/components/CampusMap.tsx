@@ -382,7 +382,7 @@ const CampusMap: React.FC = () => {
             suggestions={filteredSuggestions}
             showSuggestions={showSuggestions}
             setShowSuggestions={setShowSuggestions}
-            searchRef={searchRef as any}
+            searchRef={searchRef}
           />
         )}
       </div>
