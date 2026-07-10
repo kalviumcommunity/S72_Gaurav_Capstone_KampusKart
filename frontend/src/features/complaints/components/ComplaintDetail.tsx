@@ -4,7 +4,7 @@ import { Complaint } from '../types';
 
 interface ComplaintDetailProps {
   complaint: Complaint;
-  currentUser: any;
+  currentUser: { _id: string; id: string; isAdmin?: boolean } | null;
   onEdit: (complaint: Complaint) => void;
   onDelete: (id: string) => void;
 }
