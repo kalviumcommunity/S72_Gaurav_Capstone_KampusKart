@@ -34,7 +34,7 @@ export const EventFilters: React.FC<EventFiltersProps> = ({
         <div className="relative">
           <select 
             value={filters.status} 
-            onChange={e => onFilterChange({ status: e.target.value as any })}
+            onChange={e => onFilterChange({ status: e.target.value as Filters['status'] })}
             className="appearance-none w-full sm:w-auto px-5 py-3 pr-10 rounded-lg bg-white text-gray-700 font-semibold border-2 border-gray-200 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] focus:border-transparent transition-all duration-200 cursor-pointer"
           >
             <option value="All">All Statuses</option>
