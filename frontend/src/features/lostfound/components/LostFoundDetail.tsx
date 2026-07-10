@@ -4,7 +4,7 @@ import { LostFoundItem } from '../types';
 
 interface LostFoundDetailProps {
   item: LostFoundItem;
-  currentUser: any;
+  currentUser: { _id: string; id: string; isAdmin?: boolean } | null;
   token: string | null;
   onResolve: (id: string) => void;
   onEdit: (item: LostFoundItem) => void;
