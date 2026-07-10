@@ -1,4 +1,3 @@
-import React from 'react';
 import { MdSchool, MdRestaurant, MdLocalLaundryService, MdHotel, MdLibraryBooks, MdFastfood, MdLocalCafe, MdRoomService, MdBed, MdApartment } from 'react-icons/md';
 
 export const ICON_OPTIONS = [
