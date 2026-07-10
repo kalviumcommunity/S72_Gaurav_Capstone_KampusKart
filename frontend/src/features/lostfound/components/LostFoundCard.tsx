@@ -5,7 +5,7 @@ import { UI_PATTERNS } from '../../../theme/uiPatterns';
 
 interface LostFoundCardProps {
   item: LostFoundItem;
-  currentUser: any;
+  currentUser: { _id: string; id: string; isAdmin?: boolean } | null;
   token: string | null;
   onSelect: (item: LostFoundItem) => void;
   onResolve: (id: string) => void;
