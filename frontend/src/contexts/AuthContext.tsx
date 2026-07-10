@@ -143,7 +143,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const refreshToken = async () => {
     // Prevent concurrent refresh attempts
     if (isRefreshingRef.current) {
-      console.log('Token refresh already in progress, skipping...');
       return;
     }
 
@@ -152,11 +151,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const currentToken = tokenRef.current;
       
       if (!currentToken) {
-        console.log('No token available for refresh');
         return;
       }
       
-      console.log('Refreshing authentication token...');
       const response = await axios.post(`${API_BASE}/api/auth/refresh`, {}, {
         headers: { Authorization: `Bearer ${currentToken}` }
       });
@@ -172,8 +169,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.setItem('token', newToken);
         localStorage.setItem('token_expiry', expiry.toString());
       }
-      
-      console.log('Token refreshed successfully');
     } catch (error) {
       console.error('Token refresh failed:', error);
       // Only logout if the error is authentication-related
