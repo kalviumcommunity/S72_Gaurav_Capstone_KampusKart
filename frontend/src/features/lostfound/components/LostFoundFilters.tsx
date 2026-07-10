@@ -35,7 +35,7 @@ export const LostFoundFilters: React.FC<LostFoundFiltersProps> = ({
         <div className="relative">
           <select
             value={filters.type}
-            onChange={e => onFilterChange({ type: e.target.value as any })}
+            onChange={e => onFilterChange({ type: e.target.value as Filters['type'] })}
             className="appearance-none w-full sm:w-auto px-5 py-3 pr-10 rounded-lg bg-white text-gray-700 font-semibold border-2 border-gray-200 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] focus:border-transparent transition-all duration-200 cursor-pointer"
           >
             <option value="all">All Types</option>
@@ -52,7 +52,7 @@ export const LostFoundFilters: React.FC<LostFoundFiltersProps> = ({
         <div className="relative">
           <select
             value={filters.resolved}
-            onChange={e => onFilterChange({ resolved: e.target.value as any })}
+            onChange={e => onFilterChange({ resolved: e.target.value as Filters['resolved'] })}
             className="appearance-none w-full sm:w-auto px-5 py-3 pr-10 rounded-lg bg-white text-gray-700 font-semibold border-2 border-gray-200 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#00C6A7] focus:border-transparent transition-all duration-200 cursor-pointer"
           >
             <option value="all">All Statuses</option>
