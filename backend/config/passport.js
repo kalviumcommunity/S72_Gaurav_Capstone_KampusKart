@@ -15,9 +15,6 @@ const getCallbackURL = () => {
   return 'http://localhost:5000/api/auth/google/callback';
 };
 
-// Log the callback URL for debugging
-console.log('Google OAuth Callback URL:', getCallbackURL());
-
 passport.use(
   new GoogleStrategy(
     {
@@ -28,7 +25,6 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        console.log('Google OAuth profile:', profile);
         
         // Check if profile has emails
         if (!profile.emails || profile.emails.length === 0) {
