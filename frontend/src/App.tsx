@@ -71,7 +71,7 @@ const GoogleCallback: React.FC = () => {
     const token = params.get('token');
     if (token) {
       handleGoogleCallback(token)
-        .catch(() => {})
+        .catch((err) => console.error('Google callback failed:', err))
         .finally(() => setDone(true));
     } else {
       setDone(true);
