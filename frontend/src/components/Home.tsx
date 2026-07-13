@@ -60,9 +60,9 @@ const Home = () => {
             </div>
           </div>
 
-          {/* Right: shuffle grid — hidden on mobile */}
-          <div className="hidden md:block w-full">
-            <div className="w-full aspect-square max-w-[420px] lg:max-w-[520px] mx-auto">
+          {/* Right: shuffle grid */}
+          <div className="w-full">
+            <div className="w-full aspect-square max-w-[420px] lg:max-w-[520px] mx-auto mt-2 md:mt-0">
               <ShuffleGrid />
             </div>
           </div>

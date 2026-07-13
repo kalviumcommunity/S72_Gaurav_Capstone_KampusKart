@@ -115,16 +115,16 @@ export const ShuffleHero = () => {
     <section className="w-full px-4 sm:px-6 md:px-8 grid grid-cols-1 md:grid-cols-2 items-center gap-6 sm:gap-8 md:gap-10 lg:gap-12 max-w-6xl mx-auto">
       {/* Left: text */}
       <div className="text-center md:text-left space-y-3 sm:space-y-4 md:space-y-5">
-        <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-50 border-2 border-gray-200 text-xs font-semibold text-teal-700 uppercase tracking-widest">
+        <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-50 dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-800 text-xs font-semibold text-teal-700 dark:text-teal-300 uppercase tracking-widest">
           Your campus, simplified
         </span>
         <h1
-          className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-black leading-tight"
+          className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-black dark:text-white leading-tight"
           style={{ letterSpacing: "-0.02em" }}
         >
           Everything Campus, One App
         </h1>
-        <p className="text-sm sm:text-base md:text-lg text-gray-500 max-w-md mx-auto md:mx-0 leading-relaxed">
+        <p className="text-sm sm:text-base md:text-lg text-gray-500 dark:text-gray-300 max-w-md mx-auto md:mx-0 leading-relaxed">
           Your all-in-one campus companion for navigation, events, news, lost & found, complaints, and more.
         </p>
         <div className="flex flex-col xs:flex-row gap-2 sm:gap-3 justify-center md:justify-start pt-1 sm:pt-2">
@@ -138,16 +138,16 @@ export const ShuffleHero = () => {
           <Link
             to="/login"
             aria-label="Log in to your account"
-            className="min-h-[48px] px-6 sm:px-8 py-3 rounded-lg font-bold text-gray-700 bg-white border-2 border-gray-200 hover:bg-gray-50 active:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 transition-colors duration-200 text-sm sm:text-base text-center"
+            className="min-h-[48px] px-6 sm:px-8 py-3 rounded-lg font-bold text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 active:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 transition-colors duration-200 text-sm sm:text-base text-center"
           >
             Log in
           </Link>
         </div>
       </div>
 
-      {/* Right: shuffle grid — hidden on mobile */}
-      <div className="hidden md:block w-full">
-        <div className="w-full aspect-square max-w-[420px] lg:max-w-[520px] mx-auto">
+      {/* Right: shuffle grid */}
+      <div className="w-full">
+        <div className="w-full aspect-square max-w-[420px] lg:max-w-[520px] mx-auto mt-2 md:mt-0">
           <ShuffleGrid />
         </div>
       </div>
