@@ -5,6 +5,8 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import KampusKartNavbar from './components/KampusKartNavbar';
 import BackToTop from './components/common/BackToTop';
+import ScrollToTop from './components/common/ScrollToTop';
+
 
 // Lazy load all route components
 const Login = React.lazy(() => import('./pages/Login'));
@@ -107,6 +109,7 @@ const AppLayout: React.FC = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <ScrollToTop />
       {showNavbar && <KampusKartNavbar />}
       <div className="flex-grow">
         <React.Suspense fallback={<PageLoader />}>

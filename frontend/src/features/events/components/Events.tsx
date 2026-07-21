@@ -141,12 +141,12 @@ const Events = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white font-sans">
+    <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-sans">
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
         <SuccessMessage message={successMessage} onDismiss={() => setSuccessMessage(null)} />
 
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
-          <h1 className="text-h2 font-extrabold text-black">Campus Events</h1>
+          <h1 className="text-h2 font-extrabold text-black dark:text-white">Campus Events</h1>
           {user?.isAdmin && (
             <button
               onClick={openAddModal}
