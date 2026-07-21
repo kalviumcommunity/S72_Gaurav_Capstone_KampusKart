@@ -220,7 +220,7 @@ const AdminUsers = () => {
 
   if (pageLoading) {
     return (
-      <div className="min-h-screen bg-white pt-24 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 pt-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto animate-pulse">
           <div className="h-10 w-72 bg-gray-200 rounded-lg mb-4" />
           <div className="h-12 w-full bg-gray-100 rounded-lg mb-8" />
@@ -235,7 +235,7 @@ const AdminUsers = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-[#F4FDFB] to-white font-sans pt-24">
+    <div className="min-h-screen bg-gradient-to-b from-white via-[#F4FDFB] to-white dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 text-gray-900 dark:text-gray-100 font-sans pt-24">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
         <div className="flex flex-col gap-6 mb-8">
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
@@ -243,7 +243,7 @@ const AdminUsers = () => {
               <p className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#E6FFFA] text-[#007C6A] text-xs font-bold uppercase tracking-[0.18em] mb-4">
                 <FiShield className="w-3.5 h-3.5" /> Admin only
               </p>
-              <h1 className="text-3xl sm:text-4xl font-extrabold text-black tracking-tight">
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-black dark:text-white tracking-tight">
                 User Management
               </h1>
               <p className="text-sm sm:text-base text-gray-600 mt-2 max-w-2xl">

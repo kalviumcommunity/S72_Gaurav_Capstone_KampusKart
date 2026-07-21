@@ -167,18 +167,18 @@ header button:active {
 
 /* ─── Form inputs — force light theme ───────────────────────────────────────── */
 
-/* Force light theme on native inputs — excludes MUI components */
-input:not(.MuiInputBase-input),
-input[type="text"]:not(.MuiInputBase-input),
-input[type="email"]:not(.MuiInputBase-input),
-input[type="password"]:not(.MuiInputBase-input),
-input[type="tel"]:not(.MuiInputBase-input),
-input[type="number"]:not(.MuiInputBase-input),
-input[type="search"]:not(.MuiInputBase-input),
-input[type="url"]:not(.MuiInputBase-input),
-input[type="date"]:not(.MuiInputBase-input),
-textarea:not(.MuiInputBase-input),
-select {
+/* Force light theme on native inputs when in light mode — excludes MUI components */
+html:not(.dark) input:not(.MuiInputBase-input),
+html:not(.dark) input[type="text"]:not(.MuiInputBase-input),
+html:not(.dark) input[type="email"]:not(.MuiInputBase-input),
+html:not(.dark) input[type="password"]:not(.MuiInputBase-input),
+html:not(.dark) input[type="tel"]:not(.MuiInputBase-input),
+html:not(.dark) input[type="number"]:not(.MuiInputBase-input),
+html:not(.dark) input[type="search"]:not(.MuiInputBase-input),
+html:not(.dark) input[type="url"]:not(.MuiInputBase-input),
+html:not(.dark) input[type="date"]:not(.MuiInputBase-input),
+html:not(.dark) textarea:not(.MuiInputBase-input),
+html:not(.dark) select {
   background-color: #ffffff !important;
   color: #374151 !important;
   font-size: max(16px, 1rem) !important;
@@ -188,34 +188,74 @@ select {
   -webkit-touch-callout: default;
 }
 
+html.dark input:not(.MuiInputBase-input),
+html.dark input[type="text"]:not(.MuiInputBase-input),
+html.dark input[type="email"]:not(.MuiInputBase-input),
+html.dark input[type="password"]:not(.MuiInputBase-input),
+html.dark input[type="tel"]:not(.MuiInputBase-input),
+html.dark input[type="number"]:not(.MuiInputBase-input),
+html.dark input[type="search"]:not(.MuiInputBase-input),
+html.dark input[type="url"]:not(.MuiInputBase-input),
+html.dark input[type="date"]:not(.MuiInputBase-input),
+html.dark textarea:not(.MuiInputBase-input),
+html.dark select {
+  background-color: #030712 !important;
+  color: #f9fafb !important;
+  font-size: max(16px, 1rem) !important;
+  color-scheme: dark !important;
+  -webkit-text-fill-color: #f9fafb !important;
+  touch-action: manipulation;
+  -webkit-touch-callout: default;
+}
+
 .MuiInputBase-input {
   font-size: 16px !important;
 }
 
 /* CRITICAL: Prevent page dimming when focusing inputs */
-input:not(.MuiInputBase-input):focus,
-input:not(.MuiInputBase-input):active,
-textarea:not(.MuiInputBase-input):focus,
-textarea:not(.MuiInputBase-input):active,
-select:focus,
-select:active {
+html:not(.dark) input:not(.MuiInputBase-input):focus,
+html:not(.dark) input:not(.MuiInputBase-input):active,
+html:not(.dark) textarea:not(.MuiInputBase-input):focus,
+html:not(.dark) textarea:not(.MuiInputBase-input):active,
+html:not(.dark) select:focus,
+html:not(.dark) select:active {
   background-color: #ffffff !important;
   color: #374151 !important;
   -webkit-text-fill-color: #374151 !important;
 }
 
-
+html.dark input:not(.MuiInputBase-input):focus,
+html.dark input:not(.MuiInputBase-input):active,
+html.dark textarea:not(.MuiInputBase-input):focus,
+html.dark textarea:not(.MuiInputBase-input):active,
+html.dark select:focus,
+html.dark select:active {
+  background-color: #030712 !important;
+  color: #f9fafb !important;
+  -webkit-text-fill-color: #f9fafb !important;
+}
 
 /* Autofill light theme override */
-input:not(.MuiInputBase-input):-webkit-autofill,
-input:not(.MuiInputBase-input):-webkit-autofill:hover,
-input:not(.MuiInputBase-input):-webkit-autofill:focus,
-input:not(.MuiInputBase-input):-webkit-autofill:active {
+html:not(.dark) input:not(.MuiInputBase-input):-webkit-autofill,
+html:not(.dark) input:not(.MuiInputBase-input):-webkit-autofill:hover,
+html:not(.dark) input:not(.MuiInputBase-input):-webkit-autofill:focus,
+html:not(.dark) input:not(.MuiInputBase-input):-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0 30px #ffffff inset !important;
   -webkit-text-fill-color: #374151 !important;
   caret-color: #374151 !important;
   color-scheme: light only !important;
 }
+
+html.dark input:not(.MuiInputBase-input):-webkit-autofill,
+html.dark input:not(.MuiInputBase-input):-webkit-autofill:hover,
+html.dark input:not(.MuiInputBase-input):-webkit-autofill:focus,
+html.dark input:not(.MuiInputBase-input):-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #030712 inset !important;
+  -webkit-text-fill-color: #f9fafb !important;
+  caret-color: #f9fafb !important;
+  color-scheme: dark !important;
+}
+
 
 /* Date input - force light mode */
 input[type="date"] { 
@@ -370,3 +410,52 @@ input[type="date"]:invalid::-webkit-datetime-edit { color: #9ca3af; }
     transform: scale(0.76);
   }
 }
+
+/* ─── Global Dark Mode Fallback Overrides ───────────────────────────────────── */
+
+html.dark {
+  background-color: #030712 !important;
+  color: #f9fafb !important;
+  color-scheme: dark !important;
+}
+
+html.dark body {
+  background-color: #030712 !important;
+  color: #f9fafb !important;
+}
+
+html.dark .bg-white {
+  background-color: #030712;
+  color: #f9fafb;
+}
+
+html.dark .bg-gray-50 {
+  background-color: #111827;
+}
+
+html.dark .bg-gray-100 {
+  background-color: #1f2937;
+}
+
+html.dark .text-black,
+html.dark .text-gray-900,
+html.dark .text-gray-800 {
+  color: #f9fafb;
+}
+
+html.dark .text-gray-700,
+html.dark .text-gray-600 {
+  color: #d1d5db;
+}
+
+html.dark .text-gray-500,
+html.dark .text-gray-400 {
+  color: #9ca3af;
+}
+
+html.dark .border-gray-200,
+html.dark .border-gray-100,
+html.dark .border-gray-300 {
+  border-color: #1f2937;
+}
+

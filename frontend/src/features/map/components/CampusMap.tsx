@@ -173,7 +173,7 @@ const CampusMap: React.FC = () => {
   if (!isDemoMode && !isLoaded) return <MapSkeleton />;
 
   return (
-    <div className="h-screen w-full flex flex-col pt-[72px] bg-white overflow-hidden select-none">
+    <div className="h-screen w-full flex flex-col pt-[72px] bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 overflow-hidden select-none">
       {/* Demo Warning Banner */}
       {isDemoMode && (
         <div className="bg-amber-50 border-b border-amber-200 px-4 py-2 flex items-center justify-between text-xs text-amber-800 font-medium z-20 shrink-0">

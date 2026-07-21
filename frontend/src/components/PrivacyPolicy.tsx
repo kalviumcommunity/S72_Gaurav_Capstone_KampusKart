@@ -5,13 +5,13 @@ import { socialLinks } from '../utils/socialLinks';
 
 const PrivacyPolicy: React.FC = () => {
   return (
-    <div className="min-h-screen bg-white flex flex-col pt-[72px]">
+    <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex flex-col pt-[72px]">
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 sm:px-6 py-10 sm:py-16">
         <Link to="/" className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-[#00C6A7] mb-8 transition-colors">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
           Back
         </Link>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-4" style={{ letterSpacing: '-0.01em' }}>Privacy Policy</h1>
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white mb-4" style={{ letterSpacing: '-0.01em' }}>Privacy Policy</h1>
         <p className="text-sm text-gray-400 mb-8">Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
 
         <div className="space-y-8 text-gray-700 text-sm sm:text-base leading-relaxed">

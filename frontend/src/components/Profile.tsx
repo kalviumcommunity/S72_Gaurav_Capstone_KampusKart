@@ -279,13 +279,13 @@ const Profile = () => {
   const completion = calculateCompletion(profileData);
 
   return (
-    <div className="min-h-screen flex flex-col bg-white font-sans">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-sans">
       <main className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
         <div className="max-w-3xl mx-auto">
 
           {/* Page header */}
           <div className="flex items-center justify-between mb-8 gap-4">
-            <h1 className="text-h2 font-extrabold text-black">My Profile</h1>
+            <h1 className="text-h2 font-extrabold text-black dark:text-white">My Profile</h1>
             {!isEditing && (
               <button
                 onClick={() => setIsEditing(true)}
