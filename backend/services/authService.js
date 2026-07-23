@@ -117,6 +117,10 @@ const requestPasswordReset = async ({ email }) => {
 };
 
 const resetPassword = async ({ email, otp, newPassword }) => {
+  if (!otp || !newPassword) {
+    throw new ServiceError('OTP and new password are required', 400);
+  }
+
   const normalizedEmail = email.toLowerCase();
   const user = await userRepository.findByEmail(normalizedEmail);
   if (!user) {
@@ -129,9 +133,6 @@ const resetPassword = async ({ email, otp, newPassword }) => {
   }
 
   const hashedProvidedOtp = crypto.createHash('sha256').update(otp).digest('hex');
-  if (user.resetPasswordOTP.length !== hashedProvidedOtp.length) {
-    throw new ServiceError('Invalid or expired OTP', 400);
-  }
 
   try {
     const otpMatch = crypto.timingSafeEqual(
