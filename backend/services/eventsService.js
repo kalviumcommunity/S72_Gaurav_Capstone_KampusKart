@@ -106,7 +106,7 @@ const createEvent = async ({ data, file }) => {
   const event = await eventRepository.create({
     title,
     description,
-    date,
+    date: eventDate,
     location,
     status: status || 'Upcoming',
     registerUrl,
@@ -197,7 +197,7 @@ const updateEvent = async ({ eventId, data, file }) => {
 
   event.title = title;
   event.description = description;
-  event.date = date;
+  event.date = eventDate;
   event.location = location;
   event.status = status;
   event.registerUrl = registerUrl;
