@@ -92,14 +92,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     if (token) {
-      fetchProfile().catch(err => {
-        console.error('Failed to fetch profile:', err);
-        // If profile fetch fails, clear the token to prevent infinite loops
-        if (err.response?.status === 401) {
-          logout();
-        }
-      });
-      // Set up token refresh
+      fetchProfile();
       setupTokenRefresh();
     } else {
       setUser(null);

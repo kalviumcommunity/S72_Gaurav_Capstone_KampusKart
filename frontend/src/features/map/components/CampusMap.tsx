@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 import React, { useState, useEffect, useCallback } from 'react';
-import { GoogleMap, useLoadScript, InfoWindow, Libraries } from '@react-google-maps/api';
+import { GoogleMap, useLoadScript, Marker, InfoWindow, Libraries } from '@react-google-maps/api';
 import { MapSkeleton } from '../../../components/common/SkeletonLoader';
 import { FeatureModal } from '../../../components/common/FeatureModal';
 import { useSearchSuggestions } from '../../../hooks/useSearchSuggestions';
@@ -304,22 +304,19 @@ const CampusMap: React.FC = () => {
               }}
             >
               {filteredLocations.map((loc) => (
-                <React.Fragment key={loc.id}>
-                  <InfoWindow
-                    position={{ lat: loc.lat, lng: loc.lng }}
-                    options={{ pixelOffset: new google.maps.Size(0, -40) }}
-                  >
-                    <div onClick={() => handleMarkerClick(loc)} className="cursor-pointer p-1">
-                      <div
-                        className={`w-3 h-3 rounded-full border-2 border-white shadow-md ${
-                          selectedLocation?.id === loc.id
-                            ? 'bg-[#00C6A7] scale-125'
-                            : 'bg-[#181818]'
-                        }`}
-                      />
-                    </div>
-                  </InfoWindow>
-                </React.Fragment>
+                <Marker
+                  key={loc.id}
+                  position={{ lat: loc.lat, lng: loc.lng }}
+                  onClick={() => handleMarkerClick(loc)}
+                  icon={{
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: selectedLocation?.id === loc.id ? 10 : 7,
+                    fillColor: selectedLocation?.id === loc.id ? '#00C6A7' : '#181818',
+                    fillOpacity: 1,
+                    strokeColor: '#ffffff',
+                    strokeWeight: 2,
+                  }}
+                />
               ))}
 
               {selectedLocation && infoWindowPosition && (
