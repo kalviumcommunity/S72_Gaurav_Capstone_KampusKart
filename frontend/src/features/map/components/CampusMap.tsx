@@ -100,11 +100,13 @@ const CampusMap: React.FC = () => {
 
   // Lock scroll
   useEffect(() => {
+    const prevDocOverflow = document.documentElement.style.overflow;
+    const prevBodyOverflow = document.body.style.overflow;
     document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
     return () => {
-      document.documentElement.style.overflow = 'auto';
-      document.body.style.overflow = 'auto';
+      document.documentElement.style.overflow = prevDocOverflow;
+      document.body.style.overflow = prevBodyOverflow;
     };
   }, []);
 
@@ -150,7 +152,7 @@ const CampusMap: React.FC = () => {
         navigateToLocation(loc);
       }
     },
-    [navigateToLocation, setSelectedLocation, setInfoWindowPosition]
+    [navigateToLocation, setSelectedLocation, setInfoWindowPosition, isDemoMode]
   );
 
   if (!isDemoMode && loadError) {
