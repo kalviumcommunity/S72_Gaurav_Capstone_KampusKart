@@ -91,7 +91,7 @@ const requestPasswordReset = async ({ email }) => {
     return { message: 'If that email is registered, an OTP has been sent' };
   }
 
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const otp = crypto.randomInt(100000, 999999).toString();
   const hashedOtp = crypto.createHash('sha256').update(otp).digest('hex');
 
   user.resetPasswordOTP = hashedOtp;
@@ -117,10 +117,18 @@ const requestPasswordReset = async ({ email }) => {
 };
 
 const resetPassword = async ({ email, otp, newPassword }) => {
+  if (!email || !otp || !newPassword) {
+    throw new ServiceError('Email, OTP, and new password are required', 400);
+  }
+
   const normalizedEmail = email.toLowerCase();
   const user = await userRepository.findByEmail(normalizedEmail);
   if (!user) {
     throw new ServiceError('User not found', 404);
+  }
+
+  if (newPassword.length < 8) {
+    throw new ServiceError('New password must be at least 8 characters', 400);
   }
 
   const now = Date.now();
