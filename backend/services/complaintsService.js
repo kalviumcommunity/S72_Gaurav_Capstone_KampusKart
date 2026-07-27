@@ -206,7 +206,7 @@ const adminRestoreComplaint = async (complaintId) => {
   }
 
   complaint.isDeleted = false;
-  complaint.deletedAt = undefined;
+  complaint.deletedAt = null;
   await complaint.save();
 
   await complaint.populate('user', 'name email');

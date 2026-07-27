@@ -277,7 +277,7 @@ const adminRestoreItem = async (itemId) => {
   }
 
   item.isDeleted = false;
-  item.deletedAt = undefined;
+  item.deletedAt = null;
   await item.save();
 
   await item.populate('user', 'name email');
