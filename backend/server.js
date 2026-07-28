@@ -22,20 +22,22 @@ const missingEnvVars = requiredEnvVars.filter((varName) => !process.env[varName]
 const criticalVars = ['JWT_SECRET', 'MONGODB_URI'];
 const missingCritical = criticalVars.filter((varName) => !process.env[varName]);
 
-if (missingCritical.length > 0 && process.env.NODE_ENV === 'production' && !process.env.CI) {
+const isCI = process.env.CI && process.env.CI !== 'false' && process.env.CI !== '0';
+
+if (missingCritical.length > 0 && process.env.NODE_ENV === 'production' && !isCI) {
   console.error('❌ Missing critical environment variables:');
   missingCritical.forEach((varName) => console.error(`   - ${varName}`));
   console.error('Please check your .env file and ensure all required variables are set.');
   process.exit(1);
 }
 
-if (missingEnvVars.length > 0 && !process.env.CI) {
+if (missingEnvVars.length > 0 && !isCI) {
   console.warn('⚠️ Missing optional environment variables:');
   missingEnvVars.forEach((varName) => console.warn(`   - ${varName}`));
   console.warn('Some features may not work correctly.');
 }
 
-if (!process.env.CI) {
+if (!isCI) {
   console.log('✅ Environment variables validated');
 }
 
@@ -476,12 +478,15 @@ process.on('unhandledRejection', (reason, promise) => {
 
 process.on('uncaughtException', (error) => {
   console.error('Uncaught Exception:', error);
-  // Log to error tracking service in production
   if (process.env.NODE_ENV === 'production') {
     // TODO: Send to error tracking service (e.g., Sentry)
   }
-  // Give the server time to finish current requests before exiting
+  // Close the server gracefully before exiting
+  server.close(() => {
+    process.exit(1);
+  });
+  // Force exit if graceful shutdown hangs
   setTimeout(() => {
     process.exit(1);
-  }, 1000);
+  }, 3000);
 });
