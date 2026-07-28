@@ -43,15 +43,17 @@ const ForgotPassword = () => {
         body: JSON.stringify({ email }),
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        setMessage(data.message);
-        setStep('reset_password');
-        setCountdown(300); // 5 minutes
-      } else {
+      if (!response.ok) {
+        const data = await response.json();
         setError(data.message || 'Failed to send OTP');
+        setLoading(false);
+        return;
       }
+
+      const data = await response.json();
+      setMessage(data.message);
+      setStep('reset_password');
+      setCountdown(300); // 5 minutes
     } catch (err) {
       setError('An error occurred. Please try again');
     } finally {
@@ -83,14 +85,16 @@ const ForgotPassword = () => {
         body: JSON.stringify({ email, otp, newPassword }),
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        setMessage('Password reset successful! Redirecting to login...');
-        setTimeout(() => navigate('/login'), 2000);
-      } else {
+      if (!response.ok) {
+        const data = await response.json();
         setError(data.message || 'Failed to reset password. Please check your OTP');
+        setLoading(false);
+        return;
       }
+
+      const data = await response.json();
+      setMessage('Password reset successful! Redirecting to login...');
+      setTimeout(() => navigate('/login'), 2000);
     } catch (err) {
       setError('An error occurred. Please try again');
     } finally {
