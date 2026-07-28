@@ -244,28 +244,31 @@ const Profile = () => {
         headers: { 'Authorization': `Bearer ${token}` },
         body: formData,
       });
-      const data = await res.json();
-      if (res.ok) {
-        const updated = {
-          name: data.name || '',
-          email: data.email || '',
-          phone: data.phone || '',
-          major: data.major || '',
-          yearOfStudy: data.yearOfStudy || '',
-          profilePicture: data.profilePicture || null,
-          gender: data.gender || '',
-          dateOfBirth: data.dateOfBirth ? data.dateOfBirth.split('T')[0] : '',
-          program: data.program || '',
-        };
-        setProfileData(updated);
-        setInitialProfileData(updated);
-        setSelectedFile(null);
-        setPreviewUrl(null);
-        setSuccessMessage('Profile updated successfully!');
-        setIsEditing(false);
-      } else {
-        setError(data.message || 'Failed to save profile.');
+      if (!res.ok) {
+        const errorData = await res.json();
+        setError(errorData.message || 'Failed to save profile.');
+        setSaveLoading(false);
+        return;
       }
+
+      const data = await res.json();
+      const updated = {
+        name: data.name || '',
+        email: data.email || '',
+        phone: data.phone || '',
+        major: data.major || '',
+        yearOfStudy: data.yearOfStudy || '',
+        profilePicture: data.profilePicture || null,
+        gender: data.gender || '',
+        dateOfBirth: data.dateOfBirth ? data.dateOfBirth.split('T')[0] : '',
+        program: data.program || '',
+      };
+      setProfileData(updated);
+      setInitialProfileData(updated);
+      setSelectedFile(null);
+      setPreviewUrl(null);
+      setSuccessMessage('Profile updated successfully!');
+      setIsEditing(false);
     } catch {
       setError('An error occurred while saving. Please try again.');
     } finally {
