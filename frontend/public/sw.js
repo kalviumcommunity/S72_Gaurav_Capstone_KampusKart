@@ -9,14 +9,14 @@ const PRECACHE_ASSETS = [
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_ASSETS))
+    caches.open(CACHE_NAME).then((cache).catch(err => console.error(err))=> cache.addAll(PRECACHE_ASSETS))
   );
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
+    caches.keys().then((keys).catch(err => console.error(err))=>
       Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
     )
   );
@@ -41,9 +41,9 @@ self.addEventListener('fetch', (event) => {
   if (request.mode === 'navigate') {
     event.respondWith(
       fetch(request)
-        .then((res) => {
+        .then((res).catch(err => console.error(err))=> {
           const clone = res.clone();
-          caches.open(CACHE_NAME).then((c) => c.put(request, clone));
+          caches.open(CACHE_NAME).then((c).catch(err => console.error(err))=> c.put(request, clone));
           return res;
         })
         .catch(() => caches.match('/'))
@@ -53,12 +53,12 @@ self.addEventListener('fetch', (event) => {
 
   // Static assets: cache-first
   event.respondWith(
-    caches.match(request).then((cached) => {
+    caches.match(request).then((cached).catch(err => console.error(err))=> {
       if (cached) return cached;
-      return fetch(request).then((res) => {
+      return fetch(request).then((res).catch(err => console.error(err))=> {
         if (res.ok) {
           const clone = res.clone();
-          caches.open(CACHE_NAME).then((c) => c.put(request, clone));
+          caches.open(CACHE_NAME).then((c).catch(err => console.error(err))=> c.put(request, clone));
         }
         return res;
       });
