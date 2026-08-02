@@ -12,7 +12,7 @@ const formatDate = (dateString: string | null | undefined) => {
   if (!dateString) return 'Not set';
   try {
     const date = new Date(dateString);
-    if (isNaN(date.getTime())) return 'Not set';
+    if (Number.isNaN(date.getTime())) return 'Not set';
     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
   } catch {
     return 'Not set';
