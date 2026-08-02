@@ -41,7 +41,7 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({
   }, [externalError]);
 
   const validateField = (name: string, value: string): string | null => {
-    if (!value.trim()) return `${name.charAt(0).toUpperCase() + name.slice(1)} is required`;
+    if (!value.trim()) return `${name[0].toUpperCase() + name.slice(1)} is required`;
     return null;
   };
 
