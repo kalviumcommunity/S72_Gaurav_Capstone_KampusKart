@@ -167,7 +167,7 @@ export const FacilityForm: React.FC<FacilityFormProps> = ({
                 onChange={(e) => setFormData((prev) => ({ ...prev, icon: e.target.value }))}
                 className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#00C6A7]"
               >
-                {ICON_OPTIONS.map((opt) => (
+                {(ICON_OPTIONS ?? []).map((opt) => (
                   <option key={opt.value} value={opt.value}>
                     {opt.label}
                   </option>
