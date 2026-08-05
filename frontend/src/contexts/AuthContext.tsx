@@ -446,7 +446,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const handleGoogleCallback = async (receivedToken: string) => {
     // Validate token format
-    if (!receivedToken || typeof receivedToken !== 'string' || receivedToken.trim() === '') {
+    if (!receivedToken || typeof receivedToken !== 'string' || receivedToken.trim().length === 0) {
       console.error('Invalid token: empty or not a string');
       logout();
       return;

@@ -79,7 +79,7 @@ const listItems = async ({ type, category, resolved, search, page, limit }) => {
     filter.type = itemType;
   }
   if (resolved !== undefined) {
-    filter.resolved = resolved === 'true' || resolved === true;
+    filter.resolved = resolved === 'true' || resolved ;
   }
   if (search) {
     const searchRegex = new RegExp(escapeRegex(search), 'i');
