@@ -87,7 +87,7 @@ export const FeatureModal: React.FC<FeatureModalProps> = ({
       }
 
       const first = currentFocusable[0];
-      const last = currentFocusable[currentFocusable.length - 1];
+      const last = currentFocusable.at(-1);
       const active = document.activeElement as HTMLElement | null;
 
       if (e.shiftKey && active === first) {
