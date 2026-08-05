@@ -1586,3 +1586,5 @@ const ChatWindow = () => {
 };
 
 export default ChatWindow;
+
+.catch(err => console.error("Promise.all failed:", err));
